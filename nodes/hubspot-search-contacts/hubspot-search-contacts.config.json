@@ -1,0 +1,83 @@
+{
+  "display_name": "Search Hubspot Contacts",
+  "description": "Search for contacts by filtering on properties, searching through associations, and sorting results",
+  "category": "third-party",
+  "provider": ["hubspot"],
+  "needs_key_from": ["hubspot"],
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "query",
+      "display_name": "Search Query",
+      "type": "string",
+      "description": "The search query string, up to 3000 characters",
+      "required": true
+    },
+    {
+      "name": "properties",
+      "display_name": "Properties",
+      "type": "string or array of strings",
+      "description": "Comma-separated list or array of properties to include in the response",
+      "default": "email,firstname,lastname,phone"
+    },
+    {
+      "name": "limit",
+      "display_name": "Limit",
+      "type": "number",
+      "description": "The maximum number of results to return (up to 200)",
+      "default": 10
+    },
+    {
+      "name": "sorts",
+      "display_name": "Sorts",
+      "type": "string or array of strings",
+      "description": "Comma-separated list or array of property names to sort by. Prefix with '-' for descending order (e.g., 'lastname' or '-createdAt')"
+    },
+    {
+      "name": "after",
+      "display_name": "After",
+      "type": "string",
+      "description": "A paging cursor token from the previous page response (from paging.next.after) for retrieving subsequent pages"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "contacts",
+      "display_name": "Contacts",
+      "type": "array of objects",
+      "description": "Array of contact objects matching the search criteria"
+    },
+    {
+      "name": "total",
+      "display_name": "Total",
+      "type": "number",
+      "description": "The total number of available results matching the search"
+    },
+    {
+      "name": "paging_next_after",
+      "display_name": "Paging Next After",
+      "type": "string",
+      "description": "Cursor token for retrieving the next page of results (from paging.next.after)"
+    },
+    {
+      "name": "paging_next_link",
+      "display_name": "Paging Next Link",
+      "type": "string",
+      "description": "URL that can be used to retrieve the next page of results"
+    },
+    {
+      "name": "paging_prev_before",
+      "display_name": "Paging Previous Before",
+      "type": "string",
+      "description": "Cursor token for retrieving the previous page of results (from paging.prev.before)"
+    },
+    {
+      "name": "paging_prev_link",
+      "display_name": "Paging Previous Link",
+      "type": "string",
+      "description": "URL that can be used to retrieve the previous page of results"
+    }
+  ],
+  "settings": []
+}
+

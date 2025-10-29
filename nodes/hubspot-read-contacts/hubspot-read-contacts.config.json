@@ -1,0 +1,70 @@
+{
+  "display_name": "Read Hubspot Contacts",
+  "description": "Retrieve all contacts from HubSpot CRM using query parameters to specify the information that gets returned",
+  "category": "third-party",
+  "provider": ["hubspot"],
+  "needs_key_from": ["hubspot"],
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "properties",
+      "display_name": "Properties",
+      "type": "string or array of strings",
+      "description": "Comma-separated list or array of properties to be returned in the response. If any of the specified properties are not present on the requested object(s), they will be ignored",
+      "default": "email,firstname,lastname,phone"
+    },
+    {
+      "name": "associations",
+      "display_name": "Associations",
+      "type": "string or array of strings",
+      "description": "Comma-separated list or array of object types to retrieve associated IDs for (e.g., 'companies', 'deals'). If any of the specified associations do not exist, they will be ignored"
+    },
+    {
+      "name": "after",
+      "display_name": "After",
+      "type": "string",
+      "description": "The paging cursor token from the previous page response (from paging.next.after)"
+    },
+    {
+      "name": "limit",
+      "display_name": "Limit",
+      "type": "number",
+      "description": "The maximum number of results to display per page",
+      "default": 10
+    }
+  ],
+  "outputs": [
+    {
+      "name": "contacts",
+      "display_name": "Contacts",
+      "type": "array of objects",
+      "description": "Array of contact objects with properties, timestamps, and associations"
+    },
+    {
+      "name": "paging_next_after",
+      "display_name": "Paging Next After",
+      "type": "string",
+      "description": "Cursor token for retrieving the next page of results (from paging.next.after)"
+    },
+    {
+      "name": "paging_next_link",
+      "display_name": "Paging Next Link",
+      "type": "string",
+      "description": "URL that can be used to retrieve the next page of results"
+    },
+    {
+      "name": "paging_prev_before",
+      "display_name": "Paging Previous Before",
+      "type": "string",
+      "description": "Cursor token for retrieving the previous page of results (from paging.prev.before)"
+    },
+    {
+      "name": "paging_prev_link",
+      "display_name": "Paging Previous Link",
+      "type": "string",
+      "description": "URL that can be used to retrieve the previous page of results"
+    }
+  ],
+  "settings": []
+}
+

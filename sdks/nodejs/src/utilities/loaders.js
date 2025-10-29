@@ -4,6 +4,7 @@ import AdmZip from "adm-zip";
 
 import { convertImportToNodeType } from "./typers.js";
 import { getDirname } from "./helpers.js";
+import { isOAuthKey, OAuthRefreshManager } from "./oauth.js";
 
 
 /**
@@ -152,6 +153,20 @@ export async function loadIntegrations(config, flow = null) {
       }
   }
 
+  // Initialize OAuth refresh manager if any OAuth keys are present
+  let oauthRefreshManager = null;
+  const hasOAuthKeys = Object.values(config.keys || {}).some(key => isOAuthKey(key));
+  
+  if (hasOAuthKeys) {
+    oauthRefreshManager = new OAuthRefreshManager({
+      oauthExpirySkewMs: config.oauthExpirySkewMs,
+      oauthMaxRefreshRetries: config.oauthMaxRefreshRetries,
+      oauthRefreshTimeoutMs: config.oauthRefreshTimeoutMs,
+      onNodeUpdate: config.onNodeUpdate,
+      keys: config.keys // Pass reference for in-memory updates
+    });
+  }
+
   // map of basic keys that share a integrationformat and implementation
   const basicKeyIntegrations = ['firecrawl', 'newsdata_io', 'openai', 'google_custom_search'];
 
@@ -168,36 +183,33 @@ export async function loadIntegrations(config, flow = null) {
       }
     }
   }));
-  
-  // // Load OpenAI integration if API key is provided
-  // if (config.keys?.openai) {
-  //     const openaiPath = path.join(getDirname(import.meta.url), '../integrations', 'openai.js');
-  //     try {
-  //         const OpenAIIntegration = await import(openaiPath).then(module => module.default);
-  //         integrations.openai = new OpenAIIntegration(config.keys.openai, {
-  //             timeout: config.openaiTimeout || 30000
-  //         });
-          
-  //     } catch (error) {
-  //         console.warn('[WARN] Failed to load OpenAI integration:', error.message);
-  //         // Don't throw error - OpenAI is optional
-  //     }
-  // }
-  
-  // // Load NewsData.io integration if API key is provided
-  // if (config.keys?.newsdata) {
-  //     const newsdataPath = path.join(getDirname(import.meta.url), '../integrations', 'newsdata.js');
-  //     try {
-  //         const NewsDataIntegration = await import(newsdataPath).then(module => module.default);
-  //         integrations.newsdata = new NewsDataIntegration(config.keys.newsdata, {
-  //             timeout: config.newsdataTimeout || 30000
-  //         });
-          
-  //     } catch (error) {
-  //         console.warn('[WARN] Failed to load NewsData.io integration:', error.message);
-  //         // Don't throw error - NewsData.io is optional
-  //     }
-  // }
+
+  // Load OAuth-based integrations
+  // HubSpot integration
+  if (config.keys?.hubspot) {
+    const hubspotPath = path.join(getDirname(import.meta.url), '../integrations', 'hubspot.js');
+    try {
+      const HubSpotIntegration = await import(hubspotPath).then(module => module.default);
+      const hubspotIntegration = new HubSpotIntegration(config.keys.hubspot);
+      
+      // Set refresh manager if available
+      if (oauthRefreshManager) {
+        hubspotIntegration.setRefreshManager(oauthRefreshManager);
+      }
+      
+      integrations.hubspot = hubspotIntegration;
+    } catch (error) {
+      console.warn(`[WARN] Failed to load HubSpot integration:`, error.message);
+      // Don't throw error - integration is optional
+    }
+  }
+
+  // Store refresh manager in integrations for access by nodes
+  if (oauthRefreshManager) {
+    integrations._oauthRefreshManager = oauthRefreshManager;
+  }
+
+
   
   return integrations;
 }

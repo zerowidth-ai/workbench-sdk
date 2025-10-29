@@ -1,4 +1,4 @@
-
+import { isOAuthKey } from './oauth.js';
 
 /**
  * Validate keys for all nodes that specify `needs_key_from`
@@ -11,7 +11,24 @@ export function validateKeys() {
     if (!needsKeyFrom) continue;
 
     const requiredKeys = Array.isArray(needsKeyFrom) ? needsKeyFrom : [needsKeyFrom];
-    const missingKeys = requiredKeys.filter((key) => !(key in this.keys));
+    const missingKeys = requiredKeys.filter((key) => {
+      // Key is missing if it doesn't exist in this.keys
+      if (!(key in this.keys)) {
+        return true;
+      }
+      
+      const keyValue = this.keys[key];
+      
+      // Check if it's an OAuth key and validate its structure
+      if (isOAuthKey && isOAuthKey(keyValue)) {
+        // OAuth keys are valid if they have accessToken and onRefresh
+        // (already checked by isOAuthKey)
+        return false;
+      }
+      
+      // For non-OAuth keys, they're valid if they exist (string or object)
+      return false;
+    });
 
     if (missingKeys.length > 0) {
       this.logDebug(`Missing required keys for node type '${nodeType}': ${missingKeys.join(", ")}`);
