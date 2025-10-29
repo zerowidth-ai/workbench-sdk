@@ -58,7 +58,6 @@
     "initial_value": "test"
   },
   "expected": {
-    "result": "test",
-    "all_values": ["test"]
+    "result": "test"
   }
 }

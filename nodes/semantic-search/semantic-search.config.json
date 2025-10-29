@@ -32,7 +32,7 @@
       "name": "document_id",
       "display_name": "Document ID Filter",
       "type": "string",
-      "description": "Optional: Filter results to specific document",
+      "description": "Optional: Filter results to specific document uuid. Only use this if you have a known document uuid to filter by.",
       "default": null
     }
   ],

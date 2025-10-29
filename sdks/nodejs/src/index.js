@@ -30,9 +30,13 @@ export default class zv1 {
    */
   constructor(flow, config = {}) {
     this.flow = flow;
-
     this.debug = config.debug || false;
     this.keys = config.keys || {};
+    this.executionQueue = [];
+    this.runningNodes = new Set();
+    this.completedNodes = new Set();
+    this.maxConcurrency = config.maxConcurrency || 5;
+    this.lastError = null;
 
     this.maxPluginCalls = config.maxPluginCalls || 10;
     
@@ -229,7 +233,7 @@ export default class zv1 {
       // For non-refiring nodes, include input values AND current timestamp
       // This ensures nodes re-execute when inputs change OR when called again
       state.inputHash = JSON.stringify(inputs || {});
-      state.timestamp = Number(process.hrtime.bigint()); // Current execution timestamp
+      // state.timestamp = Number(process.hrtime.bigint()); // Current execution timestamp
     }
     
     // Create deterministic JSON string (sort keys for consistency)
@@ -341,19 +345,7 @@ export default class zv1 {
       this.logDebug(`Error: Node type "${node.type}" not found`);
       throw new Error(`Node type "${node.type}" not found.`);
     }
-  
-    // If this node is a macro, execute its internal flow (check this FIRST before accepts_plugins)
-    if (nodeDefinition.config.is_macro) {
-      this.logDebug(`Node [${node.id}] is a macro. Executing internal flow.`);
-      return await this.processMacroNode(node);
-    }
 
-    // If this node is an LLM that accepts plugins, use the special handler
-    if (nodeDefinition.config.accepts_plugins) {
-      this.logDebug(`Node [${node.id}] is an LLM with plugin support. Using processLLMNode.`);
-      return await this.processLLMNode(node);
-    }
-  
     // Apply default settings from node configuration
     if (!node.settings) {
       node.settings = {};
@@ -486,14 +478,17 @@ export default class zv1 {
   
     // Validate inputs against node configuration
     this.validateInputs(nodeDefinition.config, inputs);
-  
-    // Create execution hash to check for duplicate processing
-    const executionHash = this._createExecutionHash(node.id, inputs, node.settings || {});
     
-    // Skip if this exact execution state has already been processed
-    if (this.executedNodeStates.has(executionHash)) {
-      this.logDebug(`Node [${node.id}] already executed with identical inputs/settings (hash: ${executionHash}), skipping`);
-      return {}; // Return empty outputs to avoid downstream processing
+    // If this node is a macro, execute its internal flow (check this FIRST before accepts_plugins)
+    if (nodeDefinition.config.is_macro) {
+      this.logDebug(`Node [${node.id}] is a macro. Executing internal flow.`);
+      return await this.processMacroNode(node);
+    }
+
+    // If this node is an LLM that accepts plugins, use the special handler
+    if (nodeDefinition.config.accepts_plugins) {
+      this.logDebug(`Node [${node.id}] is an LLM with plugin support. Using processLLMNode.`);
+      return await this.processLLMNode(node);
     }
     
     // Execute the process function using the shared core logic
@@ -501,7 +496,8 @@ export default class zv1 {
     
     const outputs = await this._executeNodeCore(node, inputs, node.settings || {}, nodeDefinition);
     
-    // Track this execution state
+    // Track this execution state to prevent future duplicates
+    const executionHash = this._createExecutionHash(node.id, inputs, node.settings || {});
     this.executedNodeStates.add(executionHash);
     
     // Debug: Log outputs after processing
@@ -577,152 +573,293 @@ export default class zv1 {
    * Propagate values through the graph
    * @param {string} nodeId - The ID of the node to start propagation from
    */
-  async propagate(nodeId) {
-    this.logDebug(`Starting propagation from node [${nodeId}]`);
+  async propagate(currentNodeId) {
+    this.logDebug(`Starting propagation from node [${currentNodeId}]`);
     const visitedNodes = new Map(); // Map to track visit count per node
   
-    const processQueue = async (currentNodeId) => {
-      // Check for timeout
-      if (this.hasTimedOut) {
-        this.errorManager.throwTimeoutError("Flow execution timed out.");
-      }
-      
-      this.logDebug(`Processing queue for node [${currentNodeId}]`);
-      
-      // Get current node definition
-      const currentNode = this.flow.nodes.find((node) => node.id === currentNodeId);
-      if (!currentNode) {
-        this.logDebug(`Error: Node with ID "${currentNodeId}" not found`);
-        throw new Error(`Node with ID "${currentNodeId}" not found.`);
-      }
-      
-      const nodeDefinition = this.nodes[currentNode.type];
-      
-      // Get current visit count (for debugging only)
-      const visitCount = visitedNodes.get(currentNodeId) || 0;
-      
-      // Increment visit count
-      visitedNodes.set(currentNodeId, visitCount + 1);
-      
-      this.logDebug(`Processing node [${currentNodeId}] (visit #${visitCount + 1})`);
-      
-      this.logDebug(`Processing downstream propagation for node [${currentNodeId}]`);
-  
-      // Find all downstream nodes connected to this node
-      const downstreamLinks = this.flow.links.filter((link) => {
+    // Check for timeout
+    if (this.hasTimedOut) {
+      this.errorManager.throwTimeoutError("Flow execution timed out.");
+    }
+    
+    // Get current node definition
+    const currentNode = this.flow.nodes.find((node) => node.id === currentNodeId);
+    if (!currentNode) {
+      this.logDebug(`Error: Node with ID "${currentNodeId}" not found`);
+      throw new Error(`Node with ID "${currentNodeId}" not found.`);
+    }
+    
+    const nodeDefinition = this.nodes[currentNode.type];
+    
+    // Get current visit count (for debugging only)
+    const visitCount = visitedNodes.get(currentNodeId) || 0;
+    
+    // Increment visit count
+    visitedNodes.set(currentNodeId, visitCount + 1);
+    
+    this.logDebug(`Processing node [${currentNodeId}] (visit #${visitCount + 1})`);
+    
+    this.logDebug(`Processing downstream propagation for node [${currentNodeId}]`);
 
-        if(link.from.node_id === currentNodeId) {
+    // Find all downstream nodes connected to this node
+    const downstreamLinks = this.flow.links.filter((link) => {
 
-          // did this output from nodeId actually send a value that wasn't undefined or null?
-          const value = this.cache.get({ node_id: currentNodeId, port_name: link.from.port_name });
-          if(value === undefined || value === null) {
-            return false;
-          }
+      if(link.from.node_id === currentNodeId) {
 
-          return true;
+        // did this output from nodeId actually send a value that wasn't undefined or null?
+        const value = this.cache.get({ node_id: currentNodeId, port_name: link.from.port_name });
+        if(value === undefined || value === null) {
+          return false;
         }
 
-        return false;
-      });
-      const downstreamNodes = downstreamLinks.map((link) => {
-        const node = this.flow.nodes.find((node) => node.id === link.to.node_id);
+        return true;
+      }
+
+      return false;
+    });
+    const downstreamNodes = downstreamLinks.map((link) => {
+      const node = this.flow.nodes.find((node) => node.id === link.to.node_id);
 
 
-        return node;
-      });
+      return node;
+    });
 
-      this.logDebug(`Downstream nodes: ${downstreamNodes.map(n => n?.id).join(', ')}`);
-  
-      for (const downstreamNode of downstreamNodes) {
-        if (!downstreamNode) continue;
-  
-        // Skip plugin nodes that are actually connected as plugins - they should only run when called by LLM
-        const isPluginNode = this.nodes[downstreamNode.type]?.config?.is_plugin;
-        const isConnectedAsPlugin = this.flow.links.some(link => 
-          link.from.node_id === downstreamNode.id && link.type === "plugin"
-        );
-        
-        if (isPluginNode && isConnectedAsPlugin) {
-          this.logDebug(`Skipping plugin node [${downstreamNode.id}] during propagation - will only run when called by LLM`);
-          continue;
+    this.logDebug(`Downstream nodes: ${downstreamNodes.map(n => n?.id).join(', ')}`);
+
+    for (const downstreamNode of downstreamNodes) {
+      if (!downstreamNode) continue;
+
+      // Skip plugin nodes that are actually connected as plugins - they should only run when called by LLM
+      const isPluginNode = this.nodes[downstreamNode.type]?.config?.is_plugin;
+      const isConnectedAsPlugin = this.flow.links.some(link => 
+        link.from.node_id === downstreamNode.id && link.type === "plugin"
+      );
+      
+      if (isPluginNode && isConnectedAsPlugin) {
+        this.logDebug(`Skipping plugin node [${downstreamNode.id}] during propagation - will only run when called by LLM`);
+        continue;
+      }
+
+      // Check if the downstream node is ready
+      const nodeDefinition = this.nodes[downstreamNode.type];
+      const nodeLinks = this.flow.links.filter((link) => link.to.node_id === downstreamNode.id);
+      
+      // Group links by input name
+      const linksByInput = {};
+      nodeLinks.forEach(link => {
+        if (!linksByInput[link.to.port_name]) {
+          linksByInput[link.to.port_name] = [];
         }
-  
-        // Check if the downstream node is ready
-        const nodeDefinition = this.nodes[downstreamNode.type];
-        const nodeLinks = this.flow.links.filter((link) => link.to.node_id === downstreamNode.id);
+        linksByInput[link.to.port_name].push(link);
+      });
+      
+      // Check each input
+      const isReady = Object.entries(linksByInput).every(([inputName, links]) => {
+        const inputDef = nodeDefinition.config.inputs.find(i => i.name === inputName);
+        if (!inputDef) return true; // Skip if no definition (shouldn't happen)
         
-        // Group links by input name
-        const linksByInput = {};
-        nodeLinks.forEach(link => {
-          if (!linksByInput[link.to.port_name]) {
-            linksByInput[link.to.port_name] = [];
-          }
-          linksByInput[link.to.port_name].push(link);
-        });
-        
-        // Check each input
-        const isReady = Object.entries(linksByInput).every(([inputName, links]) => {
-          const inputDef = nodeDefinition.config.inputs.find(i => i.name === inputName);
-          if (!inputDef) return true; // Skip if no definition (shouldn't happen)
+        if (inputDef.allow_multiple && inputDef.refires) {
+          // For refiring inputs, check if ANY link has NEW values (not yet consumed)
+          const lastConsumed = CacheManager.getLastConsumed(downstreamNode.settings, inputName);
           
-          if (inputDef.allow_multiple && inputDef.refires) {
-            // For refiring inputs, check if ANY link has NEW values (not yet consumed)
-            const lastConsumed = CacheManager.getLastConsumed(downstreamNode.settings, inputName);
-            
-            return links.some(link => {
-              // If never consumed before, check if there's any value available
-              if (lastConsumed === 0) {
-                const hasValue = this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name });
-                this.logDebug(`Checking refiring input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, hasValue: ${hasValue} (initial execution)`);
-                return hasValue;
-              } else {
-                const hasNew = this.cache.hasNew({
-                  node_id: link.from.node_id,
-                  port_name: link.from.port_name,
-                  afterTimestamp: lastConsumed
-                });
-                
-                this.logDebug(`Checking refiring input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, hasNew: ${hasNew} (after ${lastConsumed})`);
-                
-                return hasNew;
-              }
-            });
-          }
-          
-          // For non-refiring inputs, ALL links must be ready
-          return links.every(link => {
-            if (link.type === 'plugin') return true;
-            
-            const isValueReady = this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name });
-            
-            this.logDebug(`Checking regular input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, ready: ${isValueReady}`);
-            
-            if (inputDef.required) {
-              return isValueReady;
+          return links.some(link => {
+            // If never consumed before, check if there's any value available
+            if (lastConsumed === 0) {
+              const hasValue = this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name });
+              this.logDebug(`Checking refiring input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, hasValue: ${hasValue} (initial execution)`);
+              return hasValue;
+            } else {
+              const hasNew = this.cache.hasNew({
+                node_id: link.from.node_id,
+                port_name: link.from.port_name,
+                afterTimestamp: lastConsumed
+              });
+              
+              this.logDebug(`Checking refiring input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, hasNew: ${hasNew} (after ${lastConsumed})`);
+              
+              return hasNew;
             }
-            
-            return isValueReady || this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name }) === null;
           });
-        });
-  
-        if (isReady) {
-          this.logDebug(`Node [${downstreamNode.id}] is ready. Processing...`);
+        }
+        
+        // For non-refiring inputs, ALL links must be ready
+        return links.every(link => {
+          if (link.type === 'plugin') return true;
           
-          try {
-            await this.processNode(downstreamNode);
-            await processQueue(downstreamNode.id); // Propagate further downstream
-          } catch (error) {
-            this.logDebug(`Error during propagation at node [${downstreamNode.id}]:`, error.message);
-            throw error;
+          const isValueReady = this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name });
+          
+          this.logDebug(`Checking regular input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, ready: ${isValueReady}`);
+          
+          if (inputDef.required) {
+            return isValueReady;
+          }
+          
+          return isValueReady || this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name }) === null;
+        });
+      });
+
+      if (isReady) {
+        this.logDebug(`Node [${downstreamNode.id}] is ready. Processing...`);
+        
+        try {
+          // Check if this node would be a duplicate before adding to queue
+          const nodeDefinition = this.nodes[downstreamNode.type];
+          const inputs = this._collectNodeInputs(downstreamNode, nodeDefinition);
+          const executionHash = this._createExecutionHash(downstreamNode.id, inputs, downstreamNode.settings || {});
+          
+          if (this.executedNodeStates.has(executionHash)) {
+            this.logDebug(`Node [${downstreamNode.id}] already executed with identical inputs/settings (hash: ${executionHash}), skipping queue addition`);
+          } else {
+            this.logDebug("Adding downstream node to execution queue", downstreamNode.id);
+            this.executionQueue.push(downstreamNode);
+          }
+        } catch (error) {
+          this.logDebug(`Error during propagation at node [${downstreamNode.id}]:`, error.message);
+          throw error;
+        }
+      } else {
+        this.logDebug(`Node [${downstreamNode.id}] is not ready.`);
+      }
+    }
+    this.logDebug(`Propagation from node [${currentNodeId}] completed`);
+  }
+
+  /**
+   * Collect inputs for a node (helper method for duplicate checking)
+   * @param {Object} node - The node to collect inputs for
+   * @param {Object} nodeDefinition - The node definition
+   * @returns {Object} The collected inputs
+   * @private
+   */
+  _collectNodeInputs(node, nodeDefinition) {
+    const inputs = {};
+    
+    // Get all links that connect to this node
+    const nodeInputLinks = this.flow.links.filter((link) => link.to.node_id === node.id);
+    
+    // First, identify which input ports have connections
+    const connectedInputs = new Set();
+    nodeInputLinks.forEach(link => {
+      connectedInputs.add(link.to.port_name);
+    });
+    
+    // Process all connected inputs
+    nodeInputLinks.forEach((link) => {
+      const inputName = link.to.port_name;
+      const inputDef = nodeDefinition.config.inputs.find((i) => i.name === inputName);
+      if (!inputDef) return;
+
+      if (inputDef.allow_multiple && inputDef.refires) {
+        // Refiring input: Only collect NEW values (not yet consumed)
+        const lastConsumed = CacheManager.getLastConsumed(node.settings, inputName);
+        
+        if (lastConsumed === 0) {
+          const latestValue = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
+          if (latestValue !== undefined) {
+            inputs[inputName] = latestValue;
           }
         } else {
-          this.logDebug(`Node [${downstreamNode.id}] is not ready.`);
+          const newValues = this.cache.getNew({
+            node_id: link.from.node_id,
+            port_name: link.from.port_name,
+            afterTimestamp: lastConsumed
+          });
+          
+          if (newValues.length > 0) {
+            inputs[inputName] = newValues[0];
+          }
+        }
+      } else if (inputDef.allow_multiple && !inputDef.refires) {
+        // Non-refiring multiple input: Collect all current values
+        const cachedValue = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
+        
+        if (this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name })) {
+          if(!inputs[inputName]) {
+            inputs[inputName] = [];
+          }
+          
+          const value = cachedValue;
+          const itemType = inputDef.type || "any";
+          
+          if (this.typeCheck(value, itemType)) {
+              inputs[inputName].push(value);
+          }
+        }
+      } else {
+        // Single value input: Always use latest value
+        const cachedValue = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
+        
+        if (this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name })) {
+          inputs[inputName] = cachedValue;
+        } else if (!inputDef.required && inputDef.default !== undefined) {
+          inputs[inputName] = inputDef.default;
         }
       }
-    };
+    });
   
-    await processQueue(nodeId);
-    this.logDebug(`Propagation from node [${nodeId}] completed`);
+    // Handle unconnected inputs with default values
+    nodeDefinition.config.inputs.forEach((inputDef) => {
+      const inputName = inputDef.name;
+      
+      if (connectedInputs.has(inputName) || inputs[inputName] !== undefined) {
+        return;
+      }
+      
+      if (inputDef.default !== undefined) {
+        inputs[inputName] = inputDef.default;
+      }
+    });
+
+    return inputs;
+  }
+
+  /**
+   * Launch a node for parallel execution
+   * @param {Object} node - The node to launch
+   */
+  launchNode(node) {
+    this.runningNodes.add(node.id);
+    this.logDebug(`Node [${node.id}] added to running set`);
+    
+    // Execute node asynchronously
+    this.processNode(node)
+      .then(() => {
+        // Node completed successfully
+        this.runningNodes.delete(node.id);
+        this.completedNodes.add(node.id);
+        this.logDebug(`Node [${node.id}] completed, removed from running set`);
+        
+        // Propagate downstream nodes to queue
+        this.propagate(node.id);
+      })
+      .catch((error) => {
+        // Node failed
+        this.runningNodes.delete(node.id);
+        this.logDebug(`Node [${node.id}] failed, removed from running set:`, error.message);
+        
+        // Store the error for the main execution loop to handle
+        this.lastError = error;
+      });
+  }
+
+  /**
+   * Wait for at least one node to complete
+   * @returns {Promise<void>}
+   */
+  async waitForNodeCompletion() {
+    return new Promise((resolve, reject) => {
+      const checkCompletion = () => {
+        if (this.runningNodes.size === 0) {
+          resolve();
+        } else {
+          // Check again in next tick
+          setImmediate(checkCompletion);
+        }
+      };
+      
+      // Start checking for completion
+      setImmediate(checkCompletion);
+    });
   }
   
   
@@ -792,6 +929,11 @@ export default class zv1 {
     
     // Clear executed states for this run
     this.executedNodeStates.clear();
+
+    // clear the execution queue
+    this.executionQueue = [];
+    this.runningNodes = new Set();
+    this.completedNodes = new Set();
     
     // Update error manager with timeout context
     this.errorManager.updateExecutionContext({
@@ -809,37 +951,28 @@ export default class zv1 {
     let inputsMissingValues = [];
 
     try {
-      // Check for timeout before each major operation
-      if (this.hasTimedOut) {
-        this.errorManager.throwTimeoutError("Flow execution timed out.");
-      }
       this.logDebug("Starting flow execution...");
   
-      // Step 1: Process all entry nodes (constant nodes without inputs)
+      // Step 1: Add all entry nodes (constant nodes without inputs) to the execution queue
       for (const node of this.entryNodes) {
-        if (this.hasTimedOut) {
-          this.errorManager.throwTimeoutError("Flow execution timed out.");
-        }
         this.logDebug(`Processing entry node [${node.id}] of type [${node.type}]`);
-        await this.processNode(node);
-        await this.propagate(node.id);
+        // await this.processNode(node);
+        // await this.propagate(node.id);
+
+        this.executionQueue.push(node);
       }
 
-      // Step 2: Process input nodes (if any)
+
+      // Step 2: Setup and then add input nodes (if any) to the execution queue
       if (this.inputNodes.length > 0) {
 
         const numberOfInputDataNodes = this.inputNodes.filter(node => node.type === "input-data").length;
         const numberOfInputChatNodes = this.inputNodes.filter(node => node.type === "input-chat").length;
         const numberOfInputPromptNodes = this.inputNodes.filter(node => node.type === "input-prompt").length;
 
-
         this.logDebug(`Found ${numberOfInputDataNodes} input-data nodes, ${numberOfInputChatNodes} input-chat nodes, ${numberOfInputPromptNodes} input-prompt nodes`);
 
-
         for(const inputNode of this.inputNodes) {
-          if (this.hasTimedOut) {
-            this.errorManager.throwTimeoutError("Flow execution timed out.");
-          }
           this.logDebug(`Injecting inputData into input node [${inputNode.id}]:`, inputData);
           if(!inputNode.settings) {
             inputNode.settings = {};
@@ -862,8 +995,9 @@ export default class zv1 {
             }
 
             if(variable_value !== undefined) {
-              await this.processNode({ ...inputNode, settings: { ...inputNode.settings, ...{value: variable_value} } });
-              await this.propagate(inputNode.id);
+              // await this.processNode({ ...inputNode, settings: { ...inputNode.settings, ...{value: variable_value} } });
+              // await this.propagate(inputNode.id);
+              this.executionQueue.push({ ...inputNode, settings: { ...inputNode.settings, ...{value: variable_value} } });
             } else {
               inputsMissingValues.push({
                 id: inputNode.id,
@@ -876,8 +1010,9 @@ export default class zv1 {
             let variable_value = inputData[inputNode.settings?.key || 'chat'];
 
             if(variable_value !== undefined) {
-              await this.processNode({ ...inputNode, settings: { ...inputNode.settings, ...{messages: variable_value} } });
-              await this.propagate(inputNode.id);
+              // await this.processNode({ ...inputNode, settings: { ...inputNode.settings, ...{messages: variable_value} } });
+              // await this.propagate(inputNode.id);
+              this.executionQueue.push({ ...inputNode, settings: { ...inputNode.settings, ...{messages: variable_value} } });
             } else {
               inputsMissingValues.push({
                 id: inputNode.id,
@@ -890,8 +1025,9 @@ export default class zv1 {
             let variable_value = inputData[inputNode.settings?.key || 'prompt'];
 
             if(variable_value !== undefined) {
-              await this.processNode({ ...inputNode, settings: { ...inputNode.settings, ...{prompt: variable_value} } });
-              await this.propagate(inputNode.id);
+              // await this.processNode({ ...inputNode, settings: { ...inputNode.settings, ...{prompt: variable_value} } });
+              // await this.propagate(inputNode.id);
+              this.executionQueue.push({ ...inputNode, settings: { ...inputNode.settings, ...{prompt: variable_value} } });
             } else {
               inputsMissingValues.push({
                 id: inputNode.id,
@@ -906,7 +1042,39 @@ export default class zv1 {
         this.logDebug("No input nodes found - flow will start from constant nodes");
       }
 
-      // Step 3: Capture and return all output nodes' results
+      // Step 3: Process the execution queue with parallel execution
+      while(this.executionQueue.length > 0 || this.runningNodes.size > 0) {
+        
+        // timeout check 
+        if(this.hasTimedOut) {
+          this.errorManager.throwTimeoutError("Flow execution timed out.");
+          break;
+        }
+
+        // Launch nodes up to concurrency limit
+        while(this.executionQueue.length > 0 && this.runningNodes.size < this.maxConcurrency) {
+          const node = this.executionQueue.shift();
+          
+          // Launch node asynchronously
+          this.launchNode(node);
+        }
+
+        // Wait for at least one node to complete
+        if(this.runningNodes.size > 0) {
+          await this.waitForNodeCompletion();
+          
+          // Check for errors from parallel execution
+          if(this.lastError) {
+            const error = this.lastError;
+            this.lastError = null; // Clear the error
+            throw error; // Re-throw to be handled by the main try/catch
+          }
+        }
+      }
+
+      ("Execution queue is empty and no nodes running");
+
+      // Step 4: Capture and return all output nodes' results
       const outputNodes = this.flow.nodes.filter(
         (node) => this.nodes[node.type]?.config?.is_output
       );
@@ -1078,6 +1246,234 @@ export default class zv1 {
       clearTimeout(this.flowTimeout);
     }
   }
+
+  /**
+   * Process a macro node by executing its internal flow
+   * @param {Object} node - The macro node to process
+   * @returns {Object} The outputs from the macro
+   */
+  async processMacroNode(node) {
+    this.logDebug(`Processing macro node [${node.id}] of type [${node.type}]`);
+    
+    const nodeDefinition = this.nodes[node.type];
+    const macroConfig = nodeDefinition.config;
+    
+    // Create timeline entry for macro execution
+    const startDate = new Date();
+    const timelineEntry = {
+      node_id: node.id,
+      type: node.type,
+      startTime: startDate.toISOString(),
+      status: 'running'
+    };
+    this.timeline.push(timelineEntry);
+    
+    // Fire onNodeStart event (matching the convention used in _executeNodeCore)
+    if (this.config.onNodeStart) {
+      await this.config.onNodeStart({
+        nodeId: node.id,
+        nodeType: node.type,
+        timestamp: Date.now()
+      });
+    }
+    
+    try {
+      // Create internal flow from macro_flow
+      const internalFlow = {
+        nodes: [...macroConfig.macro_flow.nodes],
+        links: [...macroConfig.macro_flow.links]
+      };
+      
+      // Prepare tools object for internal engine if this macro accepts plugins
+      let tools = {};
+      
+      if (macroConfig.accepts_plugins && macroConfig.plugins && macroConfig.plugins.length > 0) {
+        this.logDebug(`Macro [${node.id}] accepts plugins, creating tool runners for parent context execution`);
+        
+        // Find all plugin nodes connected to this macro in the parent flow
+        const externalPluginNodeIds = this.flow.links
+          .filter(link => link.type === "plugin" && link.to.node_id === node.id)
+          .map(link => link.from.node_id);
+        
+        this.logDebug(`Found ${externalPluginNodeIds.length} external plugins connected to macro [${node.id}]`);
+        
+        // Create tool definitions for each external plugin
+        for (const externalPluginNodeId of externalPluginNodeIds) {
+          const externalPluginNode = this.flow.nodes.find(n => n.id === externalPluginNodeId);
+          if (externalPluginNode) {
+            // Generate the tool schema from the parent context
+            const schema = this.generateToolSchema(externalPluginNode);
+            
+            // Create a tool runner that executes in PARENT context
+            const toolRunner = async (args) => {
+              this.logDebug(`Tool runner called for [${schema.name}] from internal macro engine`);
+              return await this.executePluginInParentContext(externalPluginNode, args);
+            };
+            
+            tools[schema.name] = {
+              schema: schema,
+              process: toolRunner
+            };
+            
+            this.logDebug(`Created tool runner for plugin [${externalPluginNode.id}] -> [${schema.name}]`);
+          }
+        }
+      }
+    
+    // Create internal zv1 instance
+    const internalEngine = new zv1(internalFlow, {
+      ...this.config,
+      // Pass through integrations and other config
+      integrations: this.config.integrations,
+      keys: this.config.keys,
+      debug: this.config.debug,
+      // Pass tools from parent context
+      tools: Object.keys(tools).length > 0 ? tools : undefined,
+      // Conditionally disable event firing for internal engine
+      // If includeInternalEvents is true, pass through the event handlers
+      onNodeStart: this.config.includeInternalEvents ? this.config.onNodeStart : null,
+      onNodeComplete: this.config.includeInternalEvents ? this.config.onNodeComplete : null,
+      onNodeError: this.config.includeInternalEvents ? this.config.onNodeError : null
+    });
+    
+    // Share executed states with internal engine to prevent duplicate execution
+    internalEngine.executedNodeStates = this.executedNodeStates;
+    
+    // Initialize the internal engine
+    await internalEngine.initialize();
+    
+    // Map macro inputs to internal flow inputs
+    const internalInputs = {};
+    macroConfig.inputs.forEach(inputDef => {
+      const inputValue = this.getNodeInputValue(node, inputDef.name);
+      if (inputValue !== undefined) {
+        internalInputs[inputDef.name] = inputValue;
+      }
+    });
+    
+    this.logDebug(`Macro [${node.id}] internal inputs:`, JSON.stringify(internalInputs, null, 2));
+    
+    // Create execution hash to check for duplicate processing
+    const executionHash = this._createExecutionHash(node.id, internalInputs, node.settings || {});
+    
+    // Skip if this exact execution state has already been processed
+    if (this.executedNodeStates.has(executionHash)) {
+
+      this.logDebug(`Macro [${node.id}] already executed with identical inputs/settings (hash: ${executionHash}), skipping`);
+      
+      // Complete timeline entry for skipped execution
+      const endDate = new Date();
+      timelineEntry.endTime = endDate.toISOString();
+      timelineEntry.durationMs = endDate - startDate;
+      timelineEntry.status = 'skipped';
+      timelineEntry.outputs = {};
+      
+      // Fire onNodeComplete event for skipped execution
+      if (this.config.onNodeComplete) {
+        await this.config.onNodeComplete({
+          nodeId: node.id,
+          nodeType: node.type,
+          timestamp: Date.now(),
+          outputs: {},
+          durationMs: endDate - startDate
+        });
+      }
+      
+      return {}; // Return empty outputs to avoid downstream processing
+    }
+    
+    // Execute the internal flow
+    const internalResult = await internalEngine.run(internalInputs);
+    
+    // Map internal outputs back to macro outputs
+    const macroOutputs = {};
+    macroConfig.outputs.forEach(outputDef => {
+      // Look for the output in the internal engine's cache
+      // The output-data node stores its value in the cache with key "output_node_id:value"
+      const outputNodeId = `output_${outputDef.name}`;
+      const outputValue = internalEngine.cache.get({ node_id: outputNodeId, port_name: 'value' });
+      
+      if (outputValue !== undefined) {
+        macroOutputs[outputDef.name] = outputValue;
+      }
+    });
+    
+    this.logDebug(`Macro [${node.id}] outputs:`, JSON.stringify(macroOutputs, null, 2));
+    
+    // Store macro outputs in the main engine's cache for downstream propagation
+    for (const [outputName, outputValue] of Object.entries(macroOutputs)) {
+      this.cache.set({ node_id: node.id, port_name: outputName, value: outputValue });
+      this.logDebug(`Stored macro output in cache: ${node.id}:${outputName}`, outputValue);
+    }
+    
+      // Complete timeline entry
+      const endDate = new Date();
+      timelineEntry.endTime = endDate.toISOString();
+      timelineEntry.durationMs = endDate - startDate;
+      timelineEntry.status = 'completed';
+      timelineEntry.outputs = JSON.parse(JSON.stringify(macroOutputs));
+      
+      // Fire onNodeComplete event (matching the convention used in _executeNodeCore)
+      if (this.config.onNodeComplete) {
+        await this.config.onNodeComplete({
+          nodeId: node.id,
+          nodeType: node.type,
+          timestamp: Date.now(),
+          outputs: JSON.parse(JSON.stringify(macroOutputs)),
+          durationMs: endDate - startDate
+        });
+      }
+      
+      // Track this execution state
+      this.executedNodeStates.add(executionHash);
+      
+      return macroOutputs;
+    } catch (error) {
+      // Update timeline entry with error
+      const endDate = new Date();
+      timelineEntry.endTime = endDate.toISOString();
+      timelineEntry.durationMs = endDate - startDate;
+      timelineEntry.status = 'error';
+      timelineEntry.errorMessage = error.message;
+      
+      // Fire onNodeError event (matching the convention used in _executeNodeCore)
+      if (this.config.onNodeError) {
+        await this.config.onNodeError({
+          nodeId: node.id,
+          nodeType: node.type,
+          timestamp: Date.now(),
+          error: error.message,
+          durationMs: endDate - startDate
+        });
+      }
+      
+      throw error;
+    }
+  }
+
+  /**
+   * Get input value for a specific node and input name
+   * @param {Object} node - The node to get input for
+   * @param {string} inputName - The name of the input
+   * @returns {any} The input value or undefined
+   */
+  getNodeInputValue(node, inputName) {
+    // Find the link that connects to this input
+    const link = this.flow.links.find(link => 
+      link.to.node_id === node.id && link.to.port_name === inputName
+    );
+    
+    if (!link) {
+      this.logDebug(`No link found for input ${inputName} on node ${node.id}`);
+      return undefined;
+    }
+    
+    const value = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
+    
+    this.logDebug(`Getting input value for ${node.id}.${inputName} from ${link.from.node_id}:${link.from.port_name}:`, value);
+    
+    return value;
+  }
   
   /**
    * Clean up the flow by removing invalid links
@@ -1097,7 +1493,6 @@ export default class zv1 {
       this.logDebug(`Removed ${removedCount} invalid link(s) referencing non-existent nodes`);
     }
   }
-
 
   /**
    * Scan for plugin links and map LLM nodes to their plugin/tool nodes
@@ -1255,6 +1650,15 @@ export default class zv1 {
   
     // Validate inputs against node configuration (same as processNode)
     this.validateInputs(nodeDefinition.config, inputs);
+
+    // Create execution hash to check for duplicate processing
+    const executionHash = this._createExecutionHash(node.id, inputs, node.settings || {});
+    
+    // Skip if this exact execution state has already been processed
+    if (this.executedNodeStates.has(executionHash)) {
+      this.logDebug(`LLM Node [${node.id}] already executed with identical inputs/settings (hash: ${executionHash}), skipping`);
+      return {}; // Return empty outputs to avoid downstream processing
+    }
 
     // 1. Gather plugin/tool schemas and runners
     const toolSchemas = [];
@@ -1512,201 +1916,11 @@ export default class zv1 {
       delete llmResult.__updated_settings; // Remove from regular outputs
     }
     
+    // Track this execution state
+    this.executedNodeStates.add(executionHash);
+    
     this.logDebug(`LLM Node [${node.id}] processing completed successfully`);
     return llmResult;
-  }
-
-  /**
-   * Process a macro node by executing its internal flow
-   * @param {Object} node - The macro node to process
-   * @returns {Object} The outputs from the macro
-   */
-  async processMacroNode(node) {
-    this.logDebug(`Processing macro node [${node.id}] of type [${node.type}]`);
-    
-    const nodeDefinition = this.nodes[node.type];
-    const macroConfig = nodeDefinition.config;
-    
-    // Create timeline entry for macro execution
-    const startDate = new Date();
-    const timelineEntry = {
-      node_id: node.id,
-      type: node.type,
-      startTime: startDate.toISOString(),
-      status: 'running'
-    };
-    this.timeline.push(timelineEntry);
-    
-    // Fire onNodeStart event (matching the convention used in _executeNodeCore)
-    if (this.config.onNodeStart) {
-      await this.config.onNodeStart({
-        nodeId: node.id,
-        nodeType: node.type,
-        timestamp: Date.now()
-      });
-    }
-    
-    try {
-      // Create internal flow from macro_flow
-      const internalFlow = {
-        nodes: [...macroConfig.macro_flow.nodes],
-        links: [...macroConfig.macro_flow.links]
-      };
-      
-      // Prepare tools object for internal engine if this macro accepts plugins
-      let tools = {};
-      
-      if (macroConfig.accepts_plugins && macroConfig.plugins && macroConfig.plugins.length > 0) {
-        this.logDebug(`Macro [${node.id}] accepts plugins, creating tool runners for parent context execution`);
-        
-        // Find all plugin nodes connected to this macro in the parent flow
-        const externalPluginNodeIds = this.flow.links
-          .filter(link => link.type === "plugin" && link.to.node_id === node.id)
-          .map(link => link.from.node_id);
-        
-        this.logDebug(`Found ${externalPluginNodeIds.length} external plugins connected to macro [${node.id}]`);
-        
-        // Create tool definitions for each external plugin
-        for (const externalPluginNodeId of externalPluginNodeIds) {
-          const externalPluginNode = this.flow.nodes.find(n => n.id === externalPluginNodeId);
-          if (externalPluginNode) {
-            // Generate the tool schema from the parent context
-            const schema = this.generateToolSchema(externalPluginNode);
-            
-            // Create a tool runner that executes in PARENT context
-            const toolRunner = async (args) => {
-              this.logDebug(`Tool runner called for [${schema.name}] from internal macro engine`);
-              return await this.executePluginInParentContext(externalPluginNode, args);
-            };
-            
-            tools[schema.name] = {
-              schema: schema,
-              process: toolRunner
-            };
-            
-            this.logDebug(`Created tool runner for plugin [${externalPluginNode.id}] -> [${schema.name}]`);
-          }
-        }
-      }
-    
-    // Create internal zv1 instance
-    const internalEngine = new zv1(internalFlow, {
-      ...this.config,
-      // Pass through integrations and other config
-      integrations: this.config.integrations,
-      keys: this.config.keys,
-      debug: this.config.debug,
-      // Pass tools from parent context
-      tools: Object.keys(tools).length > 0 ? tools : undefined,
-      // Conditionally disable event firing for internal engine
-      // If includeInternalEvents is true, pass through the event handlers
-      onNodeStart: this.config.includeInternalEvents ? this.config.onNodeStart : null,
-      onNodeComplete: this.config.includeInternalEvents ? this.config.onNodeComplete : null,
-      onNodeError: this.config.includeInternalEvents ? this.config.onNodeError : null
-    });
-    
-    // Initialize the internal engine
-    await internalEngine.initialize();
-    
-    // Map macro inputs to internal flow inputs
-    const internalInputs = {};
-    macroConfig.inputs.forEach(inputDef => {
-      const inputValue = this.getNodeInputValue(node, inputDef.name);
-      if (inputValue !== undefined) {
-        internalInputs[inputDef.name] = inputValue;
-      }
-    });
-    
-    this.logDebug(`Macro [${node.id}] internal inputs:`, JSON.stringify(internalInputs, null, 2));
-    
-    // Execute the internal flow
-    const internalResult = await internalEngine.run(internalInputs);
-    
-    // Map internal outputs back to macro outputs
-    const macroOutputs = {};
-    macroConfig.outputs.forEach(outputDef => {
-      // Look for the output in the internal engine's cache
-      // The output-data node stores its value in the cache with key "output_node_id:value"
-      const outputNodeId = `output_${outputDef.name}`;
-      const outputValue = internalEngine.cache.get({ node_id: outputNodeId, port_name: 'value' });
-      
-      if (outputValue !== undefined) {
-        macroOutputs[outputDef.name] = outputValue;
-      }
-    });
-    
-    this.logDebug(`Macro [${node.id}] outputs:`, JSON.stringify(macroOutputs, null, 2));
-    
-    // Store macro outputs in the main engine's cache for downstream propagation
-    for (const [outputName, outputValue] of Object.entries(macroOutputs)) {
-      this.cache.set({ node_id: node.id, port_name: outputName, value: outputValue });
-      this.logDebug(`Stored macro output in cache: ${node.id}:${outputName}`, outputValue);
-    }
-    
-      // Complete timeline entry
-      const endDate = new Date();
-      timelineEntry.endTime = endDate.toISOString();
-      timelineEntry.durationMs = endDate - startDate;
-      timelineEntry.status = 'completed';
-      timelineEntry.outputs = JSON.parse(JSON.stringify(macroOutputs));
-      
-      // Fire onNodeComplete event (matching the convention used in _executeNodeCore)
-      if (this.config.onNodeComplete) {
-        await this.config.onNodeComplete({
-          nodeId: node.id,
-          nodeType: node.type,
-          timestamp: Date.now(),
-          outputs: JSON.parse(JSON.stringify(macroOutputs)),
-          durationMs: endDate - startDate
-        });
-      }
-      
-      return macroOutputs;
-    } catch (error) {
-      // Update timeline entry with error
-      const endDate = new Date();
-      timelineEntry.endTime = endDate.toISOString();
-      timelineEntry.durationMs = endDate - startDate;
-      timelineEntry.status = 'error';
-      timelineEntry.errorMessage = error.message;
-      
-      // Fire onNodeError event (matching the convention used in _executeNodeCore)
-      if (this.config.onNodeError) {
-        await this.config.onNodeError({
-          nodeId: node.id,
-          nodeType: node.type,
-          timestamp: Date.now(),
-          error: error.message,
-          durationMs: endDate - startDate
-        });
-      }
-      
-      throw error;
-    }
-  }
-
-  /**
-   * Get input value for a specific node and input name
-   * @param {Object} node - The node to get input for
-   * @param {string} inputName - The name of the input
-   * @returns {any} The input value or undefined
-   */
-  getNodeInputValue(node, inputName) {
-    // Find the link that connects to this input
-    const link = this.flow.links.find(link => 
-      link.to.node_id === node.id && link.to.port_name === inputName
-    );
-    
-    if (!link) {
-      this.logDebug(`No link found for input ${inputName} on node ${node.id}`);
-      return undefined;
-    }
-    
-    const value = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
-    
-    this.logDebug(`Getting input value for ${node.id}.${inputName} from ${link.from.node_id}:${link.from.port_name}:`, value);
-    
-    return value;
   }
 
   /**
@@ -1885,11 +2099,11 @@ export default class zv1 {
     const config = this.nodes[node.type]?.config || {};
     const settings = node.settings || {};
 
-    // Use the node's settings for name/description if present, otherwise fall back to config
-    let name = settings.name || config.display_name || node.type;
+    // Use the node's custom display name name/description if present, otherwise fall back to config
+    let name = node.display_name || config.display_name || node.type;
     name = createSafeToolName(name);
 
-    const description = settings.description || config.description || "";
+    const description = node.description || config.description || "";
 
     // Find which inputs are statically connected (not available to LLM)
     const staticallyConnectedInputs = new Set();
@@ -1941,6 +2155,7 @@ export default class zv1 {
         }
       }
     });
+
 
     // Return the tool schema object
     return {

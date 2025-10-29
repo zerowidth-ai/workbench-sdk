@@ -2793,6 +2793,44 @@
         "id": "combine-document-chunks"
     },
     {
+        "display_name": "Condition Check",
+        "description": "Conditional pass-through that routes data to passed or blocked based on a condition",
+        "category": "logic",
+        "is_plugin": false,
+        "inputs": [
+            {
+                "name": "value",
+                "display_name": "Value",
+                "description": "The value to conditionally pass through",
+                "type": "any",
+                "required": true
+            },
+            {
+                "name": "condition",
+                "display_name": "Condition",
+                "description": "Boolean condition that determines if value passes through",
+                "type": "boolean",
+                "required": true
+            }
+        ],
+        "outputs": [
+            {
+                "name": "passed",
+                "display_name": "Passed",
+                "description": "Value when condition is true (null when false)",
+                "type": "any"
+            },
+            {
+                "name": "blocked",
+                "display_name": "Blocked",
+                "description": "Value when condition is false (null when true)",
+                "type": "any"
+            }
+        ],
+        "settings": [],
+        "id": "condition-check"
+    },
+    {
         "display_name": "CSV Parser",
         "description": "Parses a CSV string into an array of objects or arrays",
         "icon": "table",
@@ -7684,6 +7722,307 @@
         "id": "get-object-property"
     },
     {
+        "display_name": "Google Custom Search",
+        "description": "Search the web using Google Custom Search API with advanced filtering and pagination options",
+        "category": "third-party",
+        "provider": "google",
+        "needs_key_from": [
+            "google_custom_search"
+        ],
+        "is_plugin": true,
+        "inputs": [
+            {
+                "name": "query",
+                "display_name": "Search Query",
+                "type": "string",
+                "description": "The search query string",
+                "required": true
+            },
+            {
+                "name": "cx",
+                "display_name": "Engine ID",
+                "type": "string",
+                "description": "The custom search engine ID (cx parameter). If not provided, will use the default from your key configuration.",
+                "required": false
+            },
+            {
+                "name": "num",
+                "display_name": "Number of Results",
+                "type": "number",
+                "description": "Number of search results to return (1-10)",
+                "default": 10
+            },
+            {
+                "name": "start",
+                "display_name": "Start Index",
+                "type": "number",
+                "description": "The index of the first result to return (1-based)",
+                "default": 1
+            },
+            {
+                "name": "lr",
+                "display_name": "Language Restrict",
+                "type": "string",
+                "description": "Restrict results to documents written in a particular language"
+            },
+            {
+                "name": "safe",
+                "display_name": "Safe Search",
+                "type": "string",
+                "description": "Search safety level",
+                "options": [
+                    "off",
+                    "medium",
+                    "high"
+                ],
+                "default": "off"
+            },
+            {
+                "name": "gl",
+                "display_name": "Country",
+                "type": "string",
+                "description": "Country code for country-specific results"
+            },
+            {
+                "name": "cr",
+                "display_name": "Country Restrict",
+                "type": "string",
+                "description": "Restrict results to documents originating in a particular country"
+            },
+            {
+                "name": "googlehost",
+                "display_name": "Google Host",
+                "type": "string",
+                "description": "The local Google domain to use for the search"
+            },
+            {
+                "name": "highRange",
+                "display_name": "High Range",
+                "type": "string",
+                "description": "Creates a range in the form [highRange...]"
+            },
+            {
+                "name": "hl",
+                "display_name": "Interface Language",
+                "type": "string",
+                "description": "Interface language for the search results"
+            },
+            {
+                "name": "hq",
+                "display_name": "High Query",
+                "type": "string",
+                "description": "Appends the extra query terms to the query"
+            },
+            {
+                "name": "imgColorType",
+                "display_name": "Image Color Type",
+                "type": "string",
+                "description": "Returns black and white, grayscale, or color images",
+                "options": [
+                    "mono",
+                    "gray",
+                    "color"
+                ]
+            },
+            {
+                "name": "imgDominantColor",
+                "display_name": "Image Dominant Color",
+                "type": "string",
+                "description": "Returns images of a specific dominant color",
+                "options": [
+                    "black",
+                    "blue",
+                    "brown",
+                    "gray",
+                    "green",
+                    "orange",
+                    "pink",
+                    "purple",
+                    "red",
+                    "teal",
+                    "white",
+                    "yellow"
+                ]
+            },
+            {
+                "name": "imgSize",
+                "display_name": "Image Size",
+                "type": "string",
+                "description": "Returns images of a specific size",
+                "options": [
+                    "huge",
+                    "icon",
+                    "large",
+                    "medium",
+                    "small",
+                    "xlarge",
+                    "xxlarge"
+                ]
+            },
+            {
+                "name": "imgType",
+                "display_name": "Image Type",
+                "type": "string",
+                "description": "Returns images of a specific type",
+                "options": [
+                    "clipart",
+                    "face",
+                    "lineart",
+                    "stock",
+                    "photo",
+                    "animated"
+                ]
+            },
+            {
+                "name": "linkSite",
+                "display_name": "Link Site",
+                "type": "string",
+                "description": "Specifies that all search results should contain a link to a particular URL"
+            },
+            {
+                "name": "lowRange",
+                "display_name": "Low Range",
+                "type": "string",
+                "description": "Creates a range in the form [lowRange...highRange]"
+            },
+            {
+                "name": "orTerms",
+                "display_name": "OR Terms",
+                "type": "string",
+                "description": "Provides additional search terms to check for in a document"
+            },
+            {
+                "name": "relatedSite",
+                "display_name": "Related Site",
+                "type": "string",
+                "description": "Specifies that all search results should be pages that are related to the specified URL"
+            },
+            {
+                "name": "rights",
+                "display_name": "Rights",
+                "type": "string",
+                "description": "Filters based on licensing. Can be comma-separated string or array",
+                "options": [
+                    "cc_publicdomain",
+                    "cc_attribute",
+                    "cc_sharealike",
+                    "cc_noncommercial",
+                    "cc_nonderived"
+                ]
+            },
+            {
+                "name": "searchType",
+                "display_name": "Search Type",
+                "type": "string",
+                "description": "Specifies the search type. Leave empty for web search, or set to 'image' for image search",
+                "options": [
+                    "image"
+                ],
+                "default": ""
+            },
+            {
+                "name": "siteSearch",
+                "display_name": "Site Search",
+                "type": "string",
+                "description": "Specifies all search results should be pages from a given site"
+            },
+            {
+                "name": "siteSearchFilter",
+                "display_name": "Site Search Filter",
+                "type": "string",
+                "description": "Controls whether the results are restricted to documents in the site specified by siteSearch",
+                "options": [
+                    "e",
+                    "i"
+                ],
+                "default": "e"
+            },
+            {
+                "name": "sort",
+                "display_name": "Sort",
+                "type": "string",
+                "description": "Sorts the results by date"
+            },
+            {
+                "name": "exactTerms",
+                "display_name": "Exact Terms",
+                "type": "string",
+                "description": "Identifies a phrase that all documents in the search results must contain"
+            },
+            {
+                "name": "excludeTerms",
+                "display_name": "Exclude Terms",
+                "type": "string",
+                "description": "Identifies a word or phrase that should not appear in any documents in the search results. Can be comma-separated string or array"
+            },
+            {
+                "name": "fileType",
+                "display_name": "File Type",
+                "type": "string",
+                "description": "Restricts results to files of a specified extension. Can be comma-separated string or array",
+                "options": [
+                    "pdf",
+                    "ps",
+                    "doc",
+                    "xls",
+                    "ppt",
+                    "rtf"
+                ]
+            },
+            {
+                "name": "dateRestrict",
+                "display_name": "Date Restrict",
+                "type": "string",
+                "description": "Restricts results to documents based on date",
+                "options": [
+                    "d1",
+                    "w1",
+                    "m1",
+                    "y1",
+                    "d7",
+                    "w2",
+                    "m2",
+                    "y2",
+                    "m3",
+                    "m6",
+                    "y3",
+                    "y5",
+                    "y10",
+                    "y15",
+                    "y20"
+                ]
+            }
+        ],
+        "outputs": [
+            {
+                "name": "items",
+                "display_name": "Search Results",
+                "type": "array of objects",
+                "description": "Array of cleaned search result items with title, link, displayLink, and snippet"
+            },
+            {
+                "name": "searchInformation",
+                "display_name": "Search Information",
+                "type": "object",
+                "description": "Information about the search query and results"
+            },
+            {
+                "name": "totalResults",
+                "display_name": "Total Results",
+                "type": "string",
+                "description": "Total number of search results available"
+            },
+            {
+                "name": "searchTime",
+                "display_name": "Search Time",
+                "type": "number",
+                "description": "Time taken for the search in seconds"
+            }
+        ],
+        "settings": [],
+        "id": "google-custom-search"
+    },
+    {
         "display_name": "Google: Gemini 2.0 Flash",
         "description": "Gemini Flash 2.0 offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5). It introduces notable enhancements in multimodal understanding, coding capabilities, complex instruction following, and function calling. These advancements come together to deliver more seamless and robust agentic experiences.",
         "category": "llm",
@@ -12347,9 +12686,9 @@
         "category": "i/o",
         "is_input": true,
         "is_resizable": true,
-        "custom_render_height": 450,
+        "custom_render_height": 300,
         "has_expanded_view": true,
-        "width": 450,
+        "width": 300,
         "inputs": [],
         "outputs": [
             {
@@ -12391,9 +12730,9 @@
         "category": "i/o",
         "is_input": true,
         "is_resizable": true,
-        "custom_render_height": 450,
+        "custom_render_height": 300,
         "has_expanded_view": true,
-        "width": 450,
+        "width": 300,
         "inputs": [],
         "outputs": [
             {
@@ -28083,8 +28422,8 @@
             {
                 "name": "message",
                 "display_name": "Message",
-                "type": "message",
-                "description": "The full generated response message."
+                "type": "message or array of messages",
+                "description": "The full generated response message or a full update to the conversation state."
             },
             {
                 "name": "content",
@@ -35594,6 +35933,135 @@
             }
         ],
         "id": "round"
+    },
+    {
+        "display_name": "Route",
+        "description": "Routes a single value to one of two outputs based on a boolean condition",
+        "category": "logic",
+        "is_plugin": false,
+        "inputs": [
+            {
+                "name": "value",
+                "display_name": "Value",
+                "description": "The value to route",
+                "type": "any",
+                "required": true
+            },
+            {
+                "name": "condition",
+                "display_name": "Condition",
+                "description": "Boolean condition that determines routing",
+                "type": "boolean",
+                "required": true
+            }
+        ],
+        "outputs": [
+            {
+                "name": "true_output",
+                "display_name": "If True",
+                "description": "Value when condition is true",
+                "type": "any"
+            },
+            {
+                "name": "false_output",
+                "display_name": "If False",
+                "description": "Value when condition is false",
+                "type": "any"
+            }
+        ],
+        "settings": [],
+        "id": "route"
+    },
+    {
+        "display_name": "Search the Internet",
+        "description": "Search the web using Google Custom Search - returns clean search results with titles, links, and snippets",
+        "category": "third-party",
+        "provider": "google",
+        "needs_key_from": [
+            "google_custom_search"
+        ],
+        "is_macro": true,
+        "is_plugin": true,
+        "macro_flow": {
+            "nodes": [
+                {
+                    "id": "input_query",
+                    "type": "input-data",
+                    "settings": {
+                        "key": "query"
+                    }
+                },
+                {
+                    "id": "search",
+                    "type": "google-custom-search"
+                },
+                {
+                    "id": "num_results",
+                    "type": "string",
+                    "settings": {
+                        "value": "10"
+                    }
+                },
+                {
+                    "id": "output_results",
+                    "type": "output-data",
+                    "settings": {
+                        "key": "results"
+                    }
+                }
+            ],
+            "links": [
+                {
+                    "from": {
+                        "node_id": "input_query",
+                        "port_name": "value"
+                    },
+                    "to": {
+                        "node_id": "search",
+                        "port_name": "query"
+                    }
+                },
+                {
+                    "from": {
+                        "node_id": "num_results",
+                        "port_name": "value"
+                    },
+                    "to": {
+                        "node_id": "search",
+                        "port_name": "num"
+                    }
+                },
+                {
+                    "from": {
+                        "node_id": "search",
+                        "port_name": "items"
+                    },
+                    "to": {
+                        "node_id": "output_results",
+                        "port_name": "value"
+                    }
+                }
+            ]
+        },
+        "inputs": [
+            {
+                "name": "query",
+                "display_name": "Search Query",
+                "type": "string",
+                "description": "What to search for on the internet",
+                "required": true
+            }
+        ],
+        "outputs": [
+            {
+                "name": "results",
+                "display_name": "Search Results",
+                "type": "array of objects",
+                "description": "Array of search results with title, link, displayLink, and snippet"
+            }
+        ],
+        "settings": [],
+        "id": "search-internet"
     },
     {
         "display_name": "Self Healing Error",

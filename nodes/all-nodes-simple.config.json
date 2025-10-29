@@ -78,6 +78,7 @@ boolean-inverter,Boolean Inverter,Inverts the input boolean value
 ceil,Ceil,Rounds up to nearest integer
 clean-text,Clean Text,Clean and normalize text by removing extra whitespace and normalizing line breaks
 combine-document-chunks,Combine Document Chunks,Retrieve all chunks for a document and combine them into a single markdown content string
+condition-check,Condition Check,Conditional pass-through that routes data to passed or blocked based on a condition
 csv-parser,CSV Parser,Parses a CSV string into an array of objects or arrays
 csv-stringifier,CSV Stringifier,Converts an array of objects or arrays into a CSV string
 date-formatter,Date Formatter,Formats a date or timestamp into a string using various formats
@@ -191,6 +192,7 @@ get-last-n-messages,Get Last N Messages,Extract the most recent N messages from 
 get-messages-by-role,Get Messages by Role,Filter messages by specific role (user, assistant, system, etc.).
 get-messages-range,Get Messages Range,Extract messages from a specific range (start index to end index).
 get-object-property,Get Object Property,Extract a specific property value from an object by key name.
+google-custom-search,Google Custom Search,Search the web using Google Custom Search API with advanced filtering and pagination options
 google-gemini-2-0-flash-001,Google: Gemini 2.0 Flash,Gemini Flash 2.0 offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5). It introduces notable enhancements in multimodal understanding, coding capabilities, complex instruction following, and function calling. These advancements come together to deliver more seamless and robust agentic experiences.
 google-gemini-2-0-flash-exp-free,Google: Gemini 2.0 Flash Experimental (free),Gemini Flash 2.0 offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5). It introduces notable enhancements in multimodal understanding, coding capabilities, complex instruction following, and function calling. These advancements come together to deliver more seamless and robust agentic experiences.
 google-gemini-2-0-flash-lite-001,Google: Gemini 2.0 Flash Lite,Gemini 2.0 Flash Lite offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5), all at extremely economical token prices.
@@ -672,6 +674,8 @@ range,Range,Calculates range statistics of numbers
 read-website,Read Website (beta),Simple website reader - scrapes content and extracts main text
 response-format,Response Format,Define a JSON Schema response format for structured outputs from LLMs.
 round,Round,Rounds a number to nearest integer
+route,Route,Routes a single value to one of two outputs based on a boolean condition
+search-internet,Search the Internet,Search the web using Google Custom Search - returns clean search results with titles, links, and snippets
 self-healing-error,Self Healing Error,Throws an error initially but succeeds on retry, useful for testing retry logic and error recovery.
 semantic-search,Semantic Search,Search knowledge base using semantic similarity and vector embeddings
 set-object-property,Set Object Property,Set or add a key-value pair to an object, returning a new object with the property set. Can also create a new object from scratch if the input object is empty or null.

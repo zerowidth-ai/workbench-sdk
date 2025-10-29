@@ -298,6 +298,9 @@ export function convertImportToNodeType(importDef) {
       }
       
       const importEngine = await zv1.create(processedImportDef, importConfig);
+      
+      // Share executed states with import engine to prevent duplicate execution
+      importEngine.executedNodeStates = this.executedNodeStates;
 
       // Map input port names to the data keys that the imported flow expects
       const inputData = {};

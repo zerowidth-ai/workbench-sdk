@@ -79,12 +79,12 @@
   {
     "description": "Undefined value with false condition",
     "inputs": {
-      "value": undefined,
+      "value": null,
       "condition": false
     },
     "expected": {
       "true_output": null,
-      "false_output": undefined
+      "false_output": null
     }
   }
 ]
