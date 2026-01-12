@@ -1,4 +1,4 @@
-async def process(inputs, settings, config, nodeConfig):
+async def process({inputs, settings, config, nodeConfig}):
     """Process function for the OpenAI: GPT-4o Search Preview node"""
     try:
         # Get OpenRouter integration from engine
@@ -10,12 +10,14 @@ async def process(inputs, settings, config, nodeConfig):
 
         # Build parameters dict from config inputs
         params = {}
-        config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null},{"name":"structured_outputs","display_name":"Structured Outputs","type":"string or object","description":"JSON schema enforcement","default":null}]
+        config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null}]
         
         for input_def in config_inputs:
             value = inputs.get(input_def["name"])
             if value is not None:
                 params[input_def["name"]] = value
+
+        
 
         response = await openrouter.chat_completion(
             model="openai/gpt-4o-search-preview",
@@ -24,6 +26,8 @@ async def process(inputs, settings, config, nodeConfig):
             nodeConfig=nodeConfig,
             engineConfig=config
         )
+
+        
 
         return {
             "content": response["content"],

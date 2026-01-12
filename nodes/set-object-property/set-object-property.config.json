@@ -15,7 +15,11 @@
       "display_name": "Key",
       "type": "string",
       "description": "The name of the property to set",
-      "required": true
+      "required": true,
+      "suggestion": {
+        "type": "string",
+        "name": "value"
+      }
     },
     {
       "name": "value",

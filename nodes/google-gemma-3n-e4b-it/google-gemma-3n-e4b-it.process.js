@@ -1,5 +1,4 @@
 export default async ({inputs, settings, config, nodeConfig}) => {
-
     try {
         // Get OpenRouter integration from engine
         const openrouter = config.integrations?.openrouter;
@@ -11,7 +10,7 @@ export default async ({inputs, settings, config, nodeConfig}) => {
 
         // Build parameters object from config inputs
         const params = {};
-        const configInputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":null},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":null},{"name":"frequency_penalty","display_name":"Frequency Penalty","type":"number","description":"Reduces repetition (-2 to 2)","default":null},{"name":"presence_penalty","display_name":"Presence Penalty","type":"number","description":"Encourages new topics (-2 to 2)","default":null},{"name":"stop","display_name":"Stop","type":"string or array","description":"Custom stop sequences","default":null}];
+        const configInputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"frequency_penalty","display_name":"Frequency Penalty","type":"number","description":"Reduces repetition (-2 to 2)","default":null},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"presence_penalty","display_name":"Presence Penalty","type":"number","description":"Encourages new topics (-2 to 2)","default":null},{"name":"stop","display_name":"Stop","type":"string or array","description":"Custom stop sequences","default":null},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":null},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":null}];
         
         for (const input of configInputs) {
 
@@ -23,11 +22,15 @@ export default async ({inputs, settings, config, nodeConfig}) => {
             }
         }
 
+        
+
         const response = await openrouter.chatCompletion({
             model: "google/gemma-3n-e4b-it",
             prompt: inputs.prompt,
             ...params
         }, nodeConfig, config);
+
+        
 
         return {
             content: response.content,

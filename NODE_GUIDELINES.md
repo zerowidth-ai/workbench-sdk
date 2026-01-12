@@ -104,6 +104,47 @@ nodes/your-node-name/
 }
 ```
 
+#### Connection Suggestions
+
+Connection suggestions provide hints for common connection patterns to improve the user experience when building flows. These are optional and purely informational - they don't affect execution.
+
+**For Input Fields**: Suggests a source node type and its output port that commonly connects to this input.
+```json
+{
+  "name": "key",
+  "display_name": "Key",
+  "type": "string",
+  "description": "The name of the property to set",
+  "suggestion": {
+    "type": "string",
+    "name": "value"
+  }
+}
+```
+
+**For Output Fields**: Suggests a target node type and its input port that this output commonly connects to.
+```json
+{
+  "name": "object",
+  "display_name": "Object",
+  "type": "object",
+  "description": "The new object with the property set",
+  "suggestion": {
+    "type": "set-object-property",
+    "name": "object"
+  }
+}
+```
+
+**Guidelines**:
+- Use `suggestion` only when there's a clear, common pattern (80%+ of use cases)
+- Always specify both `type` (kebab-case node type) and `name` (snake_case port name)
+- For inputs: `name` refers to the output port on the suggested source node
+- For outputs: `name` refers to the input port on the suggested target node
+- Only one suggestion per input/output field
+- Omit if the connection pattern is not obvious or varies significantly
+- **Primary Outputs**: If a node doesn't have any outputs marked as primary, the first non-hidden output is assumed to be the primary output
+
 #### Type Guidelines
 - **Arrays**: Use `"array of objects"` or `"array of strings"` for clarity
 - **Complex types**: Be specific about what the object contains
@@ -405,7 +446,11 @@ Object.entries(paramMappings).forEach(([inputKey, apiKey]) => {
       "name": "filter_field",
       "display_name": "Filter Field",
       "type": "string",
-      "description": "Field name to filter by"
+      "description": "Field name to filter by",
+      "suggestion": {
+        "type": "string",
+        "name": "value"
+      }
     },
     {
       "name": "max_items",
@@ -773,6 +818,7 @@ Before submitting a new node, ensure:
 - [ ] No success/status/error fields in outputs
 - [ ] Input validation is performed
 - [ ] Descriptions are clear and helpful
+- [ ] Connection suggestions added where there are clear common patterns (optional)
 - [ ] Test cases cover happy path and error cases
 - [ ] Integration usage follows patterns
 - [ ] Code is clean and well-commented

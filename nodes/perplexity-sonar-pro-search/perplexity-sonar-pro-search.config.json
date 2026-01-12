@@ -1,0 +1,154 @@
+{
+  "display_name": "Perplexity: Sonar Pro Search",
+  "description": "Exclusively available on the OpenRouter API, Sonar Pro's new Pro Search mode is Perplexity's most advanced agentic search system. It is designed for deeper reasoning and analysis. Pricing is based on tokens plus $18 per thousand requests. This model powers the Pro Search mode on the Perplexity platform.\n\nSonar Pro Search adds autonomous, multi-step reasoning to Sonar Pro. So, instead of just one query + synthesis, it plans and executes entire research workflows using tools.",
+  "category": "llm",
+  "provider": "perplexity",
+  "accepts_plugins": false,
+  "model_id": "perplexity/sonar-pro-search",
+  "context_length": 200000,
+  "supported_parameters": [
+    "frequency_penalty",
+    "include_reasoning",
+    "max_tokens",
+    "presence_penalty",
+    "reasoning",
+    "structured_outputs",
+    "temperature",
+    "top_k",
+    "top_p",
+    "web_search_options"
+  ],
+  "inputs": [
+    {
+      "name": "prompt",
+      "display_name": "Prompt",
+      "type": "string",
+      "description": "Text prompt for completion",
+      "required": true
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "include_reasoning",
+      "display_name": "Include Reasoning",
+      "type": "boolean",
+      "description": "Include reasoning in response",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "reasoning",
+      "display_name": "Reasoning",
+      "type": "boolean",
+      "description": "Internal reasoning mode",
+      "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "content",
+      "display_name": "Content",
+      "can_stream": true,
+      "type": "string",
+      "description": "The generated completion text"
+    },
+    {
+      "name": "usage",
+      "display_name": "Token Usage",
+      "type": "object",
+      "description": "Token usage statistics"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost for processing this request (USD)"
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array",
+      "description": "Detailed breakdown of costs"
+    },
+    {
+      "name": "annotations",
+      "display_name": "Annotations",
+      "type": "array",
+      "description": "Array of annotations and citations from the response"
+    },
+    {
+      "name": "citations",
+      "display_name": "Citations",
+      "type": "array",
+      "description": "Array of citation URLs used by the model"
+    },
+    {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
+    },
+    {
+      "name": "reasoning",
+      "display_name": "Reasoning",
+      "type": "string",
+      "can_stream": true,
+      "description": "The detailed reasoning chain from the model"
+    },
+    {
+      "name": "refusal",
+      "display_name": "Refusal",
+      "type": "string",
+      "description": "Model refusal response (if any)"
+    }
+  ],
+  "pricing": {
+    "reference": "https://openrouter.ai/models",
+    "items": [
+      {
+        "key": "input_cost_per_million",
+        "label": "Input Tokens (per 1M)",
+        "cost": 3,
+        "currency": "USD"
+      },
+      {
+        "key": "output_cost_per_million",
+        "label": "Output Tokens (per 1M)",
+        "cost": 15,
+        "currency": "USD"
+      }
+    ]
+  }
+}

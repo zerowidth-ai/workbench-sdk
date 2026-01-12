@@ -8,7 +8,7 @@
       "name": "input",
       "display_name": "Input",
       "type": "string or message or array",
-      "description": "Text string, Message object with {role, content}, or array of messages to extract text from.",
+      "description": "Text string, Message object with {role, content}, or conversation to extract text from.",
       "required": true
     }
   ],

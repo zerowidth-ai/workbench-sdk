@@ -1,4 +1,4 @@
-async def process(inputs, settings, config, nodeConfig):
+async def process({inputs, settings, config, nodeConfig}):
     """Process function for the Perplexity: Sonar node"""
     try:
         # Get OpenRouter integration from engine
@@ -10,12 +10,14 @@ async def process(inputs, settings, config, nodeConfig):
 
         # Build parameters dict from config inputs
         params = {}
-        config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":null},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":null},{"name":"frequency_penalty","display_name":"Frequency Penalty","type":"number","description":"Reduces repetition (-2 to 2)","default":null},{"name":"presence_penalty","display_name":"Presence Penalty","type":"number","description":"Encourages new topics (-2 to 2)","default":null}]
+        config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"frequency_penalty","display_name":"Frequency Penalty","type":"number","description":"Reduces repetition (-2 to 2)","default":null},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"presence_penalty","display_name":"Presence Penalty","type":"number","description":"Encourages new topics (-2 to 2)","default":null},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":null},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":null}]
         
         for input_def in config_inputs:
             value = inputs.get(input_def["name"])
             if value is not None:
                 params[input_def["name"]] = value
+
+        
 
         response = await openrouter.chat_completion(
             model="perplexity/sonar",
@@ -24,6 +26,8 @@ async def process(inputs, settings, config, nodeConfig):
             nodeConfig=nodeConfig,
             engineConfig=config
         )
+
+        
 
         return {
             "content": response["content"],

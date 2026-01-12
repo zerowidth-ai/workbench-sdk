@@ -23,24 +23,10 @@
       "required": true
     },
     {
-      "name": "temperature",
-      "display_name": "Temperature",
-      "type": "number",
-      "description": "Controls randomness (0-2)",
-      "default": null
-    },
-    {
       "name": "max_tokens",
       "display_name": "Max Tokens",
       "type": "number",
       "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "top_p",
-      "display_name": "Top P",
-      "type": "number",
-      "description": "Controls diversity via nucleus sampling",
       "default": null
     },
     {
@@ -63,6 +49,20 @@
       "type": "number",
       "description": "Deterministic outputs",
       "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
     }
   ],
   "outputs": [
@@ -72,12 +72,6 @@
       "can_stream": true,
       "type": "string",
       "description": "The generated completion text"
-    },
-    {
-      "name": "finish_reason",
-      "display_name": "Finish Reason",
-      "type": "string",
-      "description": "Why the completion finished"
     },
     {
       "name": "usage",
@@ -96,6 +90,12 @@
       "display_name": "Itemized Cost",
       "type": "array",
       "description": "Detailed breakdown of costs"
+    },
+    {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
     }
   ],
   "pricing": {

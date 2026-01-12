@@ -27,15 +27,16 @@
   "outputs": [
     {
       "name": "message",
-      "display_name": "Message",
+      "display_name": "System Message",
       "type": "message",
+      "primary": true,
       "description": "The message object, containing the prompt text and system role."
     },
     {
       "name": "prompt",
-      "display_name": "Prompt",
+      "display_name": "Content",
       "type": "string",
-      "description": "The prompt text after variables have been injected."
+      "description": "The prompt text after variables have been injected, without the system role."
     }
   ],
   "settings": [

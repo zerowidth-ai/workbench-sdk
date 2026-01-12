@@ -1,0 +1,44 @@
+[
+  {
+    "description": "Basic completion with default settings",
+    "inputs": {
+      "prompt": "Hello, how are you?"
+    },
+    "expectedSchema": {
+      "content": {
+        "type": "string"
+      },
+      "finish_reason": {
+        "type": "string"
+      },
+      "usage": {
+        "type": "object"
+      },
+      "cost_total": {
+        "type": "number",
+        "minimum": 0
+      },
+      "cost_itemized": {
+        "type": "array"
+      }
+    }
+  },
+  {
+    "description": "With custom temperature",
+    "inputs": {
+      "prompt": "Hello",
+      "temperature": 0.5
+    },
+    "expectedSchema": {
+      "content": {
+        "type": "string"
+      },
+      "finish_reason": {
+        "type": "string"
+      },
+      "usage": {
+        "type": "object"
+      }
+    }
+  }
+]

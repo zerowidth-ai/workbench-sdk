@@ -1,0 +1,47 @@
+[
+  {
+    "description": "Default value when no input is provided",
+    "inputs": {},
+    "expected": { "value": 1 }
+  },
+  {
+    "description": "Override default value with input",
+    "inputs": { "value": 0.7 },
+    "expected": { "value": 0.7 }
+  },
+  {
+    "description": "Value is clamped to maximum (1) when allow_experimental is false",
+    "inputs": { "value": 1.5 },
+    "settings": { "allow_experimental": false },
+    "expected": { "value": 1 }
+  },
+  {
+    "description": "Value is clamped to maximum (2) when allow_experimental is true",
+    "inputs": { "value": 3 },
+    "settings": { "allow_experimental": true },
+    "expected": { "value": 2 }
+  },
+  {
+    "description": "Value is clamped to minimum (0)",
+    "inputs": { "value": -0.5 },
+    "expected": { "value": 0 }
+  },
+  {
+    "description": "Custom settings are respected",
+    "inputs": {},
+    "settings": { "value": 0.5 },
+    "expected": { "value": 0.5 }
+  },
+  {
+    "description": "Values above 1 are allowed when allow_experimental is true",
+    "inputs": { "value": 1.5 },
+    "settings": { "allow_experimental": true },
+    "expected": { "value": 1.5 }
+  },
+  {
+    "description": "String input is converted to number",
+    "inputs": { "value": "0.8" },
+    "expected": { "value": 0.8 }
+  }
+]
+

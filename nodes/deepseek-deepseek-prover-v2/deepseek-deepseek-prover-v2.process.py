@@ -1,4 +1,4 @@
-async def process(inputs, settings, config, nodeConfig):
+async def process({inputs, settings, config, nodeConfig}):
     """Process function for the DeepSeek: DeepSeek Prover V2 node"""
     try:
         # Get OpenRouter integration from engine
@@ -10,12 +10,14 @@ async def process(inputs, settings, config, nodeConfig):
 
         # Build parameters dict from config inputs
         params = {}
-        config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":null},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":null},{"name":"frequency_penalty","display_name":"Frequency Penalty","type":"number","description":"Reduces repetition (-2 to 2)","default":null},{"name":"presence_penalty","display_name":"Presence Penalty","type":"number","description":"Encourages new topics (-2 to 2)","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null},{"name":"stop","display_name":"Stop","type":"string or array","description":"Custom stop sequences","default":null}]
+        config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"frequency_penalty","display_name":"Frequency Penalty","type":"number","description":"Reduces repetition (-2 to 2)","default":null},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"presence_penalty","display_name":"Presence Penalty","type":"number","description":"Encourages new topics (-2 to 2)","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null},{"name":"stop","display_name":"Stop","type":"string or array","description":"Custom stop sequences","default":null},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":null},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":null}]
         
         for input_def in config_inputs:
             value = inputs.get(input_def["name"])
             if value is not None:
                 params[input_def["name"]] = value
+
+        
 
         response = await openrouter.chat_completion(
             model="deepseek/deepseek-prover-v2",
@@ -24,6 +26,8 @@ async def process(inputs, settings, config, nodeConfig):
             nodeConfig=nodeConfig,
             engineConfig=config
         )
+
+        
 
         return {
             "content": response["content"],

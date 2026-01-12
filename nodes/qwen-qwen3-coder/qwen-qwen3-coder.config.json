@@ -1,5 +1,5 @@
 {
-  "display_name": "Qwen: Qwen3 Coder ",
+  "display_name": "Qwen: Qwen3 Coder 480B A35B",
   "description": "Qwen3-Coder-480B-A35B-Instruct is a Mixture-of-Experts (MoE) code generation model developed by the Qwen team. It is optimized for agentic coding tasks such as function calling, tool use, and long-context reasoning over repositories. The model features 480 billion total parameters, with 35 billion active per forward pass (8 out of 160 experts).\n\nPricing for the Alibaba endpoints varies by context length. Once a request is greater than 128k input tokens, the higher pricing is used.",
   "category": "llm",
   "provider": "qwen",
@@ -13,6 +13,7 @@
     "max_tokens",
     "min_p",
     "presence_penalty",
+    "reasoning",
     "repetition_penalty",
     "response_format",
     "seed",
@@ -30,14 +31,14 @@
       "name": "system_prompt",
       "display_name": "System Prompt",
       "type": "string or message",
-      "description": "System prompt for the model",
+      "description": "System prompt to instruct the model",
       "default": null
     },
     {
       "name": "messages",
-      "display_name": "Messages",
-      "type": "array of messages or message or string",
-      "description": "Array of chat messages",
+      "display_name": "Conversation",
+      "type": "conversation or message or string",
+      "description": "Array of chat messages that make up the conversation",
       "required": true
     },
     {
@@ -49,10 +50,10 @@
       "allow_multiple": true
     },
     {
-      "name": "temperature",
-      "display_name": "Temperature",
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
       "type": "number",
-      "description": "Controls randomness (0-2)",
+      "description": "Reduces repetition (-2 to 2)",
       "default": null
     },
     {
@@ -63,24 +64,17 @@
       "default": null
     },
     {
-      "name": "top_p",
-      "display_name": "Top P",
-      "type": "number",
-      "description": "Controls diversity via nucleus sampling",
-      "default": null
-    },
-    {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "presence_penalty",
       "display_name": "Presence Penalty",
       "type": "number",
       "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "reasoning",
+      "display_name": "Reasoning",
+      "type": "boolean",
+      "description": "Internal reasoning mode",
       "default": null
     },
     {
@@ -105,10 +99,10 @@
       "default": null
     },
     {
-      "name": "structured_outputs",
-      "display_name": "Structured Outputs",
-      "type": "string or object",
-      "description": "JSON schema enforcement",
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
       "default": null
     },
     {
@@ -117,22 +111,36 @@
       "type": "string",
       "description": "Tool selection control",
       "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
     }
   ],
   "outputs": [
+    {
+      "name": "conversation",
+      "display_name": "Conversation",
+      "type": "conversation",
+      "can_stream": true,
+      "description": "An array of messages including any tool call & response messages as well as the final generated output."
+    },
     {
       "name": "content",
       "display_name": "Content",
       "can_stream": true,
       "type": "string",
-      "description": "The content portion of the generated response message."
+      "description": "The content portion of the final generated response message."
     },
     {
       "name": "message",
-      "display_name": "Message",
+      "display_name": "Final Message",
       "type": "message",
       "can_stream": true,
-      "description": "The full generated response message."
+      "description": "The final generated response message."
     },
     {
       "name": "role",
@@ -146,12 +154,6 @@
       "display_name": "Tool Calls",
       "type": "array of tools",
       "description": "Tool calls made by the model"
-    },
-    {
-      "name": "finish_reason",
-      "display_name": "Finish Reason",
-      "type": "string",
-      "description": "Why the completion finished"
     },
     {
       "name": "usage",
@@ -172,10 +174,29 @@
       "description": "Detailed breakdown of costs"
     },
     {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
+    },
+    {
       "name": "logprobs",
       "display_name": "Log Probabilities",
       "type": "object",
       "description": "Token probabilities and logprobs from the model"
+    },
+    {
+      "name": "reasoning",
+      "display_name": "Reasoning",
+      "type": "string",
+      "can_stream": true,
+      "description": "The detailed reasoning chain from the model"
+    },
+    {
+      "name": "refusal",
+      "display_name": "Refusal",
+      "type": "string",
+      "description": "Model refusal response (if any)"
     }
   ],
   "pricing": {
@@ -184,13 +205,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.19999999999999998,
+        "cost": 0.22,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.7999999999999999,
+        "cost": 0.95,
         "currency": "USD"
       }
     ]

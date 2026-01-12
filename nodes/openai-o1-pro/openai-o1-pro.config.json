@@ -23,17 +23,17 @@
       "required": true
     },
     {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
       "name": "include_reasoning",
       "display_name": "Include Reasoning",
       "type": "boolean",
       "description": "Include reasoning in response",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
       "default": null
     },
     {
@@ -56,13 +56,6 @@
       "type": "number",
       "description": "Deterministic outputs",
       "default": null
-    },
-    {
-      "name": "structured_outputs",
-      "display_name": "Structured Outputs",
-      "type": "string or object",
-      "description": "JSON schema enforcement",
-      "default": null
     }
   ],
   "outputs": [
@@ -72,12 +65,6 @@
       "can_stream": true,
       "type": "string",
       "description": "The generated completion text"
-    },
-    {
-      "name": "finish_reason",
-      "display_name": "Finish Reason",
-      "type": "string",
-      "description": "Why the completion finished"
     },
     {
       "name": "usage",
@@ -98,9 +85,16 @@
       "description": "Detailed breakdown of costs"
     },
     {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
+    },
+    {
       "name": "reasoning",
       "display_name": "Reasoning",
       "type": "string",
+      "can_stream": true,
       "description": "The detailed reasoning chain from the model"
     },
     {

@@ -66,6 +66,8 @@ export class CacheManager {
   set({ node_id, port_name, value }) {
     const key = this._generateKey(node_id, port_name);
     this._ensureKey(key);
+
+    // console.log('setting:', 'node_id', node_id, 'port_name', port_name, 'value', value);
     this._store[key].push({
       value,
       timestamp: Number(process.hrtime.bigint()) // High-resolution timestamp in nanoseconds
@@ -82,6 +84,8 @@ export class CacheManager {
   get({ node_id, port_name }) {
     const key = this._generateKey(node_id, port_name);
     const entries = this._store[key];
+
+    // console.log('getting:', 'node_id', node_id, 'port_name', port_name, 'entries', JSON.stringify(entries));
     if (!entries || entries.length === 0) {
       return undefined;
     }

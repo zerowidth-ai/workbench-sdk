@@ -3,13 +3,12 @@
   "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities, including structured outputs and function calling. Gemma 3 27B is Google's latest open source model, successor to [Gemma 2](google/gemma-2-27b-it)",
   "category": "llm",
   "provider": "google",
-  "accepts_plugins": false,
+  "accepts_plugins": true,
   "model_id": "google/gemma-3-27b-it",
-  "context_length": 96000,
+  "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",
-    "logprobs",
     "max_tokens",
     "min_p",
     "presence_penalty",
@@ -19,8 +18,9 @@
     "stop",
     "structured_outputs",
     "temperature",
+    "tool_choice",
+    "tools",
     "top_k",
-    "top_logprobs",
     "top_p"
   ],
   "inputs": [
@@ -28,21 +28,29 @@
       "name": "system_prompt",
       "display_name": "System Prompt",
       "type": "string or message",
-      "description": "System prompt for the model",
+      "description": "System prompt to instruct the model",
       "default": null
     },
     {
       "name": "messages",
-      "display_name": "Messages",
-      "type": "array of messages or message or string",
-      "description": "Array of chat messages",
+      "display_name": "Conversation",
+      "type": "conversation or message or string",
+      "description": "Array of chat messages that make up the conversation",
       "required": true
     },
     {
-      "name": "temperature",
-      "display_name": "Temperature",
+      "name": "tools",
+      "display_name": "Tools",
+      "type": "tool",
+      "description": "Array of tools to use",
+      "default": null,
+      "allow_multiple": true
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
       "type": "number",
-      "description": "Controls randomness (0-2)",
+      "description": "Reduces repetition (-2 to 2)",
       "default": null
     },
     {
@@ -50,20 +58,6 @@
       "display_name": "Max Tokens",
       "type": "number",
       "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "top_p",
-      "display_name": "Top P",
-      "type": "number",
-      "description": "Controls diversity via nucleus sampling",
-      "default": null
-    },
-    {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
       "default": null
     },
     {
@@ -95,27 +89,48 @@
       "default": null
     },
     {
-      "name": "structured_outputs",
-      "display_name": "Structured Outputs",
-      "type": "string or object",
-      "description": "JSON schema enforcement",
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
       "default": null
     }
   ],
   "outputs": [
     {
+      "name": "conversation",
+      "display_name": "Conversation",
+      "type": "conversation",
+      "can_stream": true,
+      "description": "An array of messages including any tool call & response messages as well as the final generated output."
+    },
+    {
       "name": "content",
       "display_name": "Content",
       "can_stream": true,
       "type": "string",
-      "description": "The content portion of the generated response message."
+      "description": "The content portion of the final generated response message."
     },
     {
       "name": "message",
-      "display_name": "Message",
+      "display_name": "Final Message",
       "type": "message",
       "can_stream": true,
-      "description": "The full generated response message."
+      "description": "The final generated response message."
     },
     {
       "name": "role",
@@ -125,10 +140,10 @@
       "description": "Role of the response (usually 'assistant')"
     },
     {
-      "name": "finish_reason",
-      "display_name": "Finish Reason",
-      "type": "string",
-      "description": "Why the completion finished"
+      "name": "tool_calls",
+      "display_name": "Tool Calls",
+      "type": "array of tools",
+      "description": "Tool calls made by the model"
     },
     {
       "name": "usage",
@@ -149,10 +164,10 @@
       "description": "Detailed breakdown of costs"
     },
     {
-      "name": "logprobs",
-      "display_name": "Log Probabilities",
-      "type": "object",
-      "description": "Token probabilities and logprobs from the model"
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
     }
   ],
   "pricing": {
@@ -161,13 +176,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.0666396,
+        "cost": 0.07,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.26668800000000004,
+        "cost": 0.5,
         "currency": "USD"
       }
     ]

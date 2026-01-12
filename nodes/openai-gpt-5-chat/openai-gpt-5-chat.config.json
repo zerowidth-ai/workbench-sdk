@@ -5,11 +5,9 @@
   "provider": "openai",
   "accepts_plugins": false,
   "model_id": "openai/gpt-5-chat",
-  "context_length": 400000,
+  "context_length": 128000,
   "supported_parameters": [
-    "include_reasoning",
     "max_tokens",
-    "reasoning",
     "response_format",
     "seed",
     "structured_outputs"
@@ -30,20 +28,6 @@
       "default": null
     },
     {
-      "name": "include_reasoning",
-      "display_name": "Include Reasoning",
-      "type": "boolean",
-      "description": "Include reasoning in response",
-      "default": null
-    },
-    {
-      "name": "reasoning",
-      "display_name": "Reasoning",
-      "type": "boolean",
-      "description": "Internal reasoning mode",
-      "default": null
-    },
-    {
       "name": "response_format",
       "display_name": "Response Format",
       "type": "string or object",
@@ -56,13 +40,6 @@
       "type": "number",
       "description": "Deterministic outputs",
       "default": null
-    },
-    {
-      "name": "structured_outputs",
-      "display_name": "Structured Outputs",
-      "type": "string or object",
-      "description": "JSON schema enforcement",
-      "default": null
     }
   ],
   "outputs": [
@@ -72,12 +49,6 @@
       "can_stream": true,
       "type": "string",
       "description": "The generated completion text"
-    },
-    {
-      "name": "finish_reason",
-      "display_name": "Finish Reason",
-      "type": "string",
-      "description": "Why the completion finished"
     },
     {
       "name": "usage",
@@ -98,16 +69,10 @@
       "description": "Detailed breakdown of costs"
     },
     {
-      "name": "reasoning",
-      "display_name": "Reasoning",
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
       "type": "string",
-      "description": "The detailed reasoning chain from the model"
-    },
-    {
-      "name": "refusal",
-      "display_name": "Refusal",
-      "type": "string",
-      "description": "Model refusal response (if any)"
+      "description": "Why the completion finished"
     }
   ],
   "pricing": {

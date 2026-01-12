@@ -11,7 +11,7 @@ import CacheManager from "./utilities/cache.js";
 import { callMCPTool, fetchMCPToolSchema } from "./utilities/mcp.js";
 import { loadNodes, loadIntegrations, detectAndLoadFlow } from "./utilities/loaders.js";
 import { validateKeys, validateFlow, validateInputs } from "./utilities/validators.js";
-import { loadCustomTypes, typeCheck } from "./utilities/typers.js";
+import { loadCustomTypes, typeCheck, convertType } from "./utilities/typers.js";
 import { createSafeToolName, isRemoteMCPTool, isManualToolNode, mapTypeToJSONSchema, getDirname } from "./utilities/helpers.js";
 
 
@@ -30,7 +30,7 @@ export default class zv1 {
    */
   constructor(flow, config = {}) {
     this.flow = flow;
-    this.debug = config.debug || false;
+    this.debug = true ; //config.debug || false;
     this.keys = config.keys || {};
     this.executionQueue = [];
     this.runningNodes = new Set();
@@ -52,6 +52,10 @@ export default class zv1 {
     
     // Track executed node states to prevent duplicate processing
     this.executedNodeStates = new Set();
+    
+    // Track node hashes that are currently in the queue or running
+    // This prevents adding the same node multiple times to the queue
+    this.queuedNodeHashes = new Set();
 
   }
     
@@ -62,6 +66,7 @@ export default class zv1 {
     this.loadCustomTypes = loadCustomTypes.bind(this);
     
     this.typeCheck = typeCheck.bind(this);
+    this.convertType = convertType.bind(this);
     this.fetchMCPToolSchema = fetchMCPToolSchema.bind(this);
     this.validateKeys = validateKeys.bind(this);
     this.validateFlow = validateFlow.bind(this);
@@ -654,74 +659,171 @@ export default class zv1 {
       });
       
       // Check each input
+      // const isReady = Object.entries(linksByInput).every(([inputName, links]) => {
+      //   const inputDef = nodeDefinition.config.inputs.find(i => i.name === inputName);
+      //   if (!inputDef) return true; // Skip if no definition (shouldn't happen)
+        
+      //   if (inputDef.allow_multiple && inputDef.refires) {
+      //     // For refiring inputs, check if ANY link has NEW values (not yet consumed)
+      //     const lastConsumed = CacheManager.getLastConsumed(downstreamNode.settings, inputName);
+          
+      //     return links.some(link => {
+      //       // If never consumed before, check if there's any value available
+      //       if (lastConsumed === 0) {
+      //         const hasValue = this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name });
+      //         this.logDebug(`Checking refiring input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, hasValue: ${hasValue} (initial execution)`);
+      //         return hasValue;
+      //       } else {
+      //         const hasNew = this.cache.hasNew({
+      //           node_id: link.from.node_id,
+      //           port_name: link.from.port_name,
+      //           afterTimestamp: lastConsumed
+      //         });
+              
+      //         this.logDebug(`Checking refiring input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, hasNew: ${hasNew} (after ${lastConsumed})`);
+              
+      //         return hasNew;
+      //       }
+      //     });
+      //   }
+        
+      //   // For non-refiring inputs, ALL links must be ready
+      //   return links.every(link => {
+      //     if (link.type === 'plugin') return true;
+          
+      //     const isValueReady = this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name });
+          
+      //     this.logDebug(`Checking regular input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, ready: ${isValueReady}`);
+          
+      //     if (inputDef.required) {
+      //       return isValueReady;
+      //     }
+          
+      //     return isValueReady || this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name }) === null;
+      //   });
+      // });
       const isReady = Object.entries(linksByInput).every(([inputName, links]) => {
         const inputDef = nodeDefinition.config.inputs.find(i => i.name === inputName);
-        if (!inputDef) return true; // Skip if no definition (shouldn't happen)
-        
+        if (!inputDef) return true; // defensive; shouldn't normally happen
+      
+        // --- 1) Refiring multiple inputs (loop-start etc.) ---
         if (inputDef.allow_multiple && inputDef.refires) {
-          // For refiring inputs, check if ANY link has NEW values (not yet consumed)
           const lastConsumed = CacheManager.getLastConsumed(downstreamNode.settings, inputName);
-          
+      
           return links.some(link => {
-            // If never consumed before, check if there's any value available
+            if (link.type === "plugin") return false; // shouldn't be refiring anyway
+      
+            const { node_id, port_name } = link.from;
+      
             if (lastConsumed === 0) {
-              const hasValue = this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name });
-              this.logDebug(`Checking refiring input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, hasValue: ${hasValue} (initial execution)`);
-              return hasValue;
+              // First time: we only consider this "ready"
+              // if upstream has actually produced a *non-null* value.
+              const hasEntry = this.cache.has({ node_id, port_name });
+              const value = this.cache.get({ node_id, port_name });
+      
+              const ready = hasEntry && value !== null && value !== undefined;
+              this.logDebug(
+                `Refiring input [${inputName}] first run from ${node_id}:${port_name}, ready: ${ready}`
+              );
+              return ready;
             } else {
+              // Subsequent runs: only fire when there is something newer
               const hasNew = this.cache.hasNew({
-                node_id: link.from.node_id,
-                port_name: link.from.port_name,
+                node_id,
+                port_name,
                 afterTimestamp: lastConsumed
               });
-              
-              this.logDebug(`Checking refiring input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, hasNew: ${hasNew} (after ${lastConsumed})`);
-              
+              this.logDebug(
+                `Refiring input [${inputName}] from ${node_id}:${port_name}, hasNew: ${hasNew} (after ${lastConsumed})`
+              );
               return hasNew;
             }
           });
         }
-        
-        // For non-refiring inputs, ALL links must be ready
+      
+        // --- 2) Non-refiring inputs (your existing behavior, just made explicit) ---
+      
         return links.every(link => {
-          if (link.type === 'plugin') return true;
-          
-          const isValueReady = this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name });
-          
-          this.logDebug(`Checking regular input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, ready: ${isValueReady}`);
-          
+          if (link.type === "plugin") return true;
+      
+          const { node_id, port_name } = link.from;
+          const hasEntry = this.cache.has({ node_id, port_name });
+          const value = this.cache.get({ node_id, port_name });
+      
+          this.logDebug(
+            `Checking regular input [${inputName}] from ${node_id}:${port_name}, hasEntry: ${hasEntry}, value:`,
+            value
+          );
+      
           if (inputDef.required) {
-            return isValueReady;
+            // Required: as soon as the upstream has *any* value in history
+            // (including null), we consider this satisfied.
+            // This matches your previous behavior.
+            return hasEntry;
           }
-          
-          return isValueReady || this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name }) === null;
+      
+          // Optional:
+          // - If no link existed in history -> false (upstream hasn't run yet).
+          // - If upstream ran with either a real value or null -> true.
+          //   (null meaning "ran, but intentionally no data", which is your convention.)
+          return hasEntry || value === null;
         });
       });
+      
 
       if (isReady) {
         this.logDebug(`Node [${downstreamNode.id}] is ready. Processing...`);
         
-        try {
-          // Check if this node would be a duplicate before adding to queue
-          const nodeDefinition = this.nodes[downstreamNode.type];
-          const inputs = this._collectNodeInputs(downstreamNode, nodeDefinition);
-          const executionHash = this._createExecutionHash(downstreamNode.id, inputs, downstreamNode.settings || {});
-          
-          if (this.executedNodeStates.has(executionHash)) {
-            this.logDebug(`Node [${downstreamNode.id}] already executed with identical inputs/settings (hash: ${executionHash}), skipping queue addition`);
-          } else {
-            this.logDebug("Adding downstream node to execution queue", downstreamNode.id);
-            this.executionQueue.push(downstreamNode);
-          }
-        } catch (error) {
-          this.logDebug(`Error during propagation at node [${downstreamNode.id}]:`, error.message);
-          throw error;
-        }
+        // Use centralized method to add to queue with duplicate checking
+        this.addToExecutionQueue(downstreamNode);
       } else {
         this.logDebug(`Node [${downstreamNode.id}] is not ready.`);
       }
     }
     this.logDebug(`Propagation from node [${currentNodeId}] completed`);
+  }
+
+  /**
+   * Add a node to the execution queue with duplicate checking
+   * This centralizes all execution queue additions and ensures nodes
+   * with identical execution states (same inputs/settings) are not executed twice
+   * @param {Object} node - The node to add to the execution queue
+   * @returns {boolean} True if the node was added to the queue, false if it was skipped (duplicate)
+   * @private
+   */
+  addToExecutionQueue(node) {
+    try {
+      const nodeDefinition = this.nodes[node.type];
+      if (!nodeDefinition) {
+        this.logDebug(`Warning: Cannot add node [${node.id}] to queue - node type "${node.type}" not found`);
+        return false;
+      }
+
+      // Collect inputs for this node to create execution hash
+      const inputs = this._collectNodeInputs(node, nodeDefinition);
+      const executionHash = this._createExecutionHash(node.id, inputs, node.settings || {});
+      
+      // Check if this exact execution state has already been processed
+      if (this.executedNodeStates.has(executionHash)) {
+        this.logDebug(`Node [${node.id}] already executed with identical inputs/settings (hash: ${executionHash}), skipping queue addition`);
+        return false;
+      }
+      
+      // Check if this node is already in the queue or currently running
+      if (this.queuedNodeHashes.has(executionHash)) {
+        this.logDebug(`Node [${node.id}] already in queue or running with hash ${executionHash}, skipping duplicate queue addition`);
+        return false;
+      }
+      
+      // Mark as queued and add to execution queue
+      this.queuedNodeHashes.add(executionHash);
+      this.executionQueue.push(node);
+      this.logDebug(`Added node [${node.id}] of type [${node.type}] to execution queue (hash: ${executionHash})`);
+      return true;
+    } catch (error) {
+      this.logDebug(`Error adding node [${node.id}] to execution queue:`, error.message);
+      throw error;
+    }
   }
 
   /**
@@ -820,6 +922,21 @@ export default class zv1 {
   launchNode(node) {
     this.runningNodes.add(node.id);
     this.logDebug(`Node [${node.id}] added to running set`);
+    
+    // Remove from queued hashes since it's now running
+    // Recalculate hash to remove it from tracking
+    try {
+      const nodeDefinition = this.nodes[node.type];
+      if (nodeDefinition) {
+        const inputs = this._collectNodeInputs(node, nodeDefinition);
+        const executionHash = this._createExecutionHash(node.id, inputs, node.settings || {});
+        this.queuedNodeHashes.delete(executionHash);
+        this.logDebug(`Removed node [${node.id}] hash ${executionHash} from queued tracking (now running)`);
+      }
+    } catch (error) {
+      // If hash calculation fails, continue anyway - not critical
+      this.logDebug(`Warning: Could not remove hash for node [${node.id}] from queued tracking:`, error.message);
+    }
     
     // Execute node asynchronously
     this.processNode(node)
@@ -929,6 +1046,7 @@ export default class zv1 {
     
     // Clear executed states for this run
     this.executedNodeStates.clear();
+    this.queuedNodeHashes.clear();
 
     // clear the execution queue
     this.executionQueue = [];
@@ -959,7 +1077,7 @@ export default class zv1 {
         // await this.processNode(node);
         // await this.propagate(node.id);
 
-        this.executionQueue.push(node);
+        this.addToExecutionQueue(node);
       }
 
 
@@ -997,7 +1115,7 @@ export default class zv1 {
             if(variable_value !== undefined) {
               // await this.processNode({ ...inputNode, settings: { ...inputNode.settings, ...{value: variable_value} } });
               // await this.propagate(inputNode.id);
-              this.executionQueue.push({ ...inputNode, settings: { ...inputNode.settings, ...{value: variable_value} } });
+              this.addToExecutionQueue({ ...inputNode, settings: { ...inputNode.settings, ...{value: variable_value} } });
             } else {
               inputsMissingValues.push({
                 id: inputNode.id,
@@ -1012,7 +1130,7 @@ export default class zv1 {
             if(variable_value !== undefined) {
               // await this.processNode({ ...inputNode, settings: { ...inputNode.settings, ...{messages: variable_value} } });
               // await this.propagate(inputNode.id);
-              this.executionQueue.push({ ...inputNode, settings: { ...inputNode.settings, ...{messages: variable_value} } });
+              this.addToExecutionQueue({ ...inputNode, settings: { ...inputNode.settings, ...{messages: variable_value} } });
             } else {
               inputsMissingValues.push({
                 id: inputNode.id,
@@ -1027,7 +1145,7 @@ export default class zv1 {
             if(variable_value !== undefined) {
               // await this.processNode({ ...inputNode, settings: { ...inputNode.settings, ...{prompt: variable_value} } });
               // await this.propagate(inputNode.id);
-              this.executionQueue.push({ ...inputNode, settings: { ...inputNode.settings, ...{prompt: variable_value} } });
+              this.addToExecutionQueue({ ...inputNode, settings: { ...inputNode.settings, ...{prompt: variable_value} } });
             } else {
               inputsMissingValues.push({
                 id: inputNode.id,
@@ -1054,7 +1172,7 @@ export default class zv1 {
         // Launch nodes up to concurrency limit
         while(this.executionQueue.length > 0 && this.runningNodes.size < this.maxConcurrency) {
           const node = this.executionQueue.shift();
-          
+          console.log('node to launch ', node);
           // Launch node asynchronously
           this.launchNode(node);
         }
@@ -1268,14 +1386,6 @@ export default class zv1 {
     };
     this.timeline.push(timelineEntry);
     
-    // Fire onNodeStart event (matching the convention used in _executeNodeCore)
-    if (this.config.onNodeStart) {
-      await this.config.onNodeStart({
-        nodeId: node.id,
-        nodeType: node.type,
-        timestamp: Date.now()
-      });
-    }
     
     try {
       // Create internal flow from macro_flow
@@ -1350,6 +1460,18 @@ export default class zv1 {
         internalInputs[inputDef.name] = inputValue;
       }
     });
+
+
+    // Fire onNodeStart event (matching the convention used in _executeNodeCore)
+    if (this.config.onNodeStart) {
+      await this.config.onNodeStart({
+        nodeId: node.id,
+        nodeType: node.type,
+        timestamp: Date.now(),
+        inputs: internalInputs,
+        settings: node.settings || {}
+      });
+    }
     
     this.logDebug(`Macro [${node.id}] internal inputs:`, JSON.stringify(internalInputs, null, 2));
     

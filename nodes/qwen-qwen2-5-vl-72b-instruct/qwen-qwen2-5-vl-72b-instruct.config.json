@@ -9,16 +9,16 @@
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",
-    "logprobs",
     "max_tokens",
     "min_p",
     "presence_penalty",
     "repetition_penalty",
+    "response_format",
     "seed",
     "stop",
+    "structured_outputs",
     "temperature",
     "top_k",
-    "top_logprobs",
     "top_p"
   ],
   "inputs": [
@@ -30,10 +30,10 @@
       "required": true
     },
     {
-      "name": "temperature",
-      "display_name": "Temperature",
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
       "type": "number",
-      "description": "Controls randomness (0-2)",
+      "description": "Reduces repetition (-2 to 2)",
       "default": null
     },
     {
@@ -44,24 +44,17 @@
       "default": null
     },
     {
-      "name": "top_p",
-      "display_name": "Top P",
-      "type": "number",
-      "description": "Controls diversity via nucleus sampling",
-      "default": null
-    },
-    {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "presence_penalty",
       "display_name": "Presence Penalty",
       "type": "number",
       "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "string or object",
+      "description": "Output format specification",
       "default": null
     },
     {
@@ -77,6 +70,20 @@
       "type": "string or array",
       "description": "Custom stop sequences",
       "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
     }
   ],
   "outputs": [
@@ -86,12 +93,6 @@
       "can_stream": true,
       "type": "string",
       "description": "The generated completion text"
-    },
-    {
-      "name": "finish_reason",
-      "display_name": "Finish Reason",
-      "type": "string",
-      "description": "Why the completion finished"
     },
     {
       "name": "usage",
@@ -112,10 +113,10 @@
       "description": "Detailed breakdown of costs"
     },
     {
-      "name": "logprobs",
-      "display_name": "Log Probabilities",
-      "type": "object",
-      "description": "Token probabilities and logprobs from the model"
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
     }
   ],
   "pricing": {
@@ -124,13 +125,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.0999594,
+        "cost": 0.03,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.400032,
+        "cost": 0.13,
         "currency": "USD"
       }
     ]

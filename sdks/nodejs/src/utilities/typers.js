@@ -4,12 +4,14 @@ import Ajv from "ajv";
 import zv1 from "../index.js";
 
 import { getDirname } from "./helpers.js";
+import { loadTypeConverter } from "./typeConverters.js";
 
 const ajv = new Ajv();
 
 /**
  * Load custom type configurations from ./types/<type>.json
- * @returns {Promise<Object>} Map of type names to compiled validators
+ * Also loads type converters from ./types/<type>.converters.js if they exist
+ * @returns {Promise<Object>} Map of type names to compiled validators and converters
  */
 export async function loadCustomTypes() {
   const retval = {};
@@ -21,6 +23,11 @@ export async function loadCustomTypes() {
     const typeFiles = fs.readdirSync(typeDir);
 
     await Promise.all(typeFiles.map(async (typeFile) => {
+      // Only process JSON files for type schemas
+      if (!typeFile.endsWith('.json')) {
+        return;
+      }
+      
       const typePath = path.join(typeDir, typeFile);
       const typeName = typeFile.replace(/\.json$/, "");
 
@@ -28,7 +35,16 @@ export async function loadCustomTypes() {
         const type = await import(typePath, { with: { type: "json" } });
 
         // For each custom type, compile the schema
-        retval[typeName] = ajv.compile(type);
+        const compiledSchema = ajv.compile(type);
+        
+        // Try to load custom converters for this type
+        const customConverter = await loadTypeConverter(typeName);
+        
+        // Store both validator and converters
+        retval[typeName] = {
+          validate: compiledSchema,
+          converters: customConverter || (typeConverters[typeName] || {})
+        };
 
       } catch (err) { 
         console.error(err);
@@ -100,9 +116,16 @@ export function typeCheck(value, type) {
   }
 
   if (this.compiledCustomTypes[type]) {
-    const customTypeResult = this.compiledCustomTypes[type](value);
-    this.logDebug(`Custom type '${type}' validation: ${customTypeResult ? "passed" : "failed"}`);
-    return customTypeResult;
+    // Handle both old format (just validator function) and new format (object with validate)
+    const validator = typeof this.compiledCustomTypes[type] === 'function' 
+      ? this.compiledCustomTypes[type]
+      : this.compiledCustomTypes[type].validate;
+    
+    if (validator) {
+      const customTypeResult = validator(value);
+      this.logDebug(`Custom type '${type}' validation: ${customTypeResult ? "passed" : "failed"}`);
+      return customTypeResult;
+    }
   }
 
   const typeResult = typeof value === type;
@@ -110,6 +133,50 @@ export function typeCheck(value, type) {
   return typeResult;
 }
 
+
+/**
+ * Convert a value of a given type using type converters
+ * @param {any} value - The value to convert
+ * @param {string} type - The type name
+ * @param {Object} options - Optional conversion options
+ *   - method: Conversion method to use (default: 'toString')
+ *   - separator: Separator for toString (default: '\n\n')
+ * @returns {any} Converted value (usually string)
+ */
+export function convertType(value, type, options = {}) {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  
+  type = type.toLowerCase().trim();
+  const method = options.method || 'toString';
+  
+  // Check if we have a converter for this custom type
+  if (this.compiledCustomTypes && this.compiledCustomTypes[type]) {
+    const typeInfo = this.compiledCustomTypes[type];
+    const converters = typeof typeInfo === 'object' && typeInfo.converters 
+      ? typeInfo.converters 
+      : {};
+    
+    // Try the specified method first
+    if (converters[method]) {
+      this.logDebug(`Converting ${type} using method '${method}'`);
+      if (method === 'toString') {
+        return converters[method](value, options.separator);
+      }
+      return converters[method](value);
+    }
+    
+    // Fallback to toString if method not found
+    if (converters.toString) {
+      this.logDebug(`Converting ${type} to string using custom converter`);
+      return converters.toString(value, options.separator);
+    }
+  }
+  
+  // Fallback to default string conversion
+  return String(value);
+}
 
 /**
  * Convert an import definition into a node type configuration
@@ -177,7 +244,7 @@ export function convertImportToNodeType(importDef) {
             // Use the node's settings.key as the input name to match port connections
             name: node.settings?.key || 'chat',
             display_name: 'Chat',
-            type: 'array of messages',
+            type: 'conversation',
             required: true,
             is_chat_input: true,
             description: 'Chat messages to process'

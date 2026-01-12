@@ -1,0 +1,45 @@
+{
+  "display_name": "Temperature",
+  "description": "A temperature slider useful for controlling randomness in model outputs. Lower values (0.0-0.3) produce very deterministic outputs ideal for factual content, code, or documentation. Medium values (0.4-0.7) balance creativity and coherence for general conversation and controlled creative writing. Higher values (0.8-1.0) introduce more randomness for brainstorming, poetry, and ideation. Values above 1.0 become very random and may be incoherent, suitable only for experimental purposes.",
+  "icon": "thermometer",
+  "category": "ai",
+  "custom_render_height": 42,
+  "is_constant": true,
+  "inputs": [
+    {
+      "name": "value",
+      "display_name": "Value",
+      "type": "number",
+      "description": "Optional value to override the default temperature value.",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "value",
+      "primary": true,
+      "display_name": "Value",
+      "type": "number",
+      "description": "The temperature value (0-1 by default, or 0-2 if experimental mode is enabled). Lower values (0.0-0.3) are very deterministic, ideal for factual or technical outputs. Medium values (0.4-0.7) balance creativity and coherence. Higher values (0.8-1.0) are highly creative for brainstorming or ideation. Values above 1.0 can become incoherent."
+    }
+  ],
+  "settings": [
+    {
+      "name": "value",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "The temperature value to output. Controls randomness in model outputs: 0.0-0.3 for very deterministic outputs (factual, technical, code), 0.4-0.7 for balanced creativity (general conversation, controlled creative writing), 0.8-1.0 for high creativity (brainstorming, poetry, ideation), and above 1.0 for experimental use (may be incoherent).",
+      "default": 1
+    },
+    {
+      "name": "allow_experimental",
+      "display_name": "Allow Experimental",
+      "type": "boolean",
+      "description": "If enabled, allows temperature values above 1.0 (up to 2.0). Values above 1.0 can become very random and incoherent, suitable only for experimental purposes.",
+      "default": false
+    }
+  ],
+  "timeout": 3000,
+  "retry_limit": 3
+}
+

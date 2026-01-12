@@ -3,30 +3,52 @@
   "description": "Qwen3-30B-A3B-Instruct-2507 is a 30.5B-parameter mixture-of-experts language model from Qwen, with 3.3B active parameters per inference. It operates in non-thinking mode and is designed for high-quality instruction following, multilingual understanding, and agentic tool use. Post-trained on instruction data, it demonstrates competitive performance across reasoning (AIME, ZebraLogic), coding (MultiPL-E, LiveCodeBench), and alignment (IFEval, WritingBench) benchmarks. It outperforms its non-instruct variant on subjective and open-ended tasks while retaining strong factual and coding performance.",
   "category": "llm",
   "provider": "qwen",
-  "accepts_plugins": false,
+  "accepts_plugins": true,
   "model_id": "qwen/qwen3-30b-a3b-instruct-2507",
-  "context_length": 131072,
+  "context_length": 262144,
   "supported_parameters": [
+    "frequency_penalty",
     "max_tokens",
     "presence_penalty",
+    "repetition_penalty",
     "response_format",
     "seed",
+    "stop",
+    "structured_outputs",
     "temperature",
+    "tool_choice",
+    "tools",
+    "top_k",
     "top_p"
   ],
   "inputs": [
     {
-      "name": "prompt",
-      "display_name": "Prompt",
-      "type": "string",
-      "description": "Text prompt for completion",
+      "name": "system_prompt",
+      "display_name": "System Prompt",
+      "type": "string or message",
+      "description": "System prompt to instruct the model",
+      "default": null
+    },
+    {
+      "name": "messages",
+      "display_name": "Conversation",
+      "type": "conversation or message or string",
+      "description": "Array of chat messages that make up the conversation",
       "required": true
     },
     {
-      "name": "temperature",
-      "display_name": "Temperature",
+      "name": "tools",
+      "display_name": "Tools",
+      "type": "tool",
+      "description": "Array of tools to use",
+      "default": null,
+      "allow_multiple": true
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
       "type": "number",
-      "description": "Controls randomness (0-2)",
+      "description": "Reduces repetition (-2 to 2)",
       "default": null
     },
     {
@@ -34,13 +56,6 @@
       "display_name": "Max Tokens",
       "type": "number",
       "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "top_p",
-      "display_name": "Top P",
-      "type": "number",
-      "description": "Controls diversity via nucleus sampling",
       "default": null
     },
     {
@@ -63,21 +78,70 @@
       "type": "number",
       "description": "Deterministic outputs",
       "default": null
+    },
+    {
+      "name": "stop",
+      "display_name": "Stop",
+      "type": "string or array",
+      "description": "Custom stop sequences",
+      "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
     }
   ],
   "outputs": [
+    {
+      "name": "conversation",
+      "display_name": "Conversation",
+      "type": "conversation",
+      "can_stream": true,
+      "description": "An array of messages including any tool call & response messages as well as the final generated output."
+    },
     {
       "name": "content",
       "display_name": "Content",
       "can_stream": true,
       "type": "string",
-      "description": "The generated completion text"
+      "description": "The content portion of the final generated response message."
     },
     {
-      "name": "finish_reason",
-      "display_name": "Finish Reason",
+      "name": "message",
+      "display_name": "Final Message",
+      "type": "message",
+      "can_stream": true,
+      "description": "The final generated response message."
+    },
+    {
+      "name": "role",
+      "display_name": "Role",
+      "can_stream": true,
       "type": "string",
-      "description": "Why the completion finished"
+      "description": "Role of the response (usually 'assistant')"
+    },
+    {
+      "name": "tool_calls",
+      "display_name": "Tool Calls",
+      "type": "array of tools",
+      "description": "Tool calls made by the model"
     },
     {
       "name": "usage",
@@ -96,6 +160,12 @@
       "display_name": "Itemized Cost",
       "type": "array",
       "description": "Detailed breakdown of costs"
+    },
+    {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
     }
   ],
   "pricing": {
@@ -104,13 +174,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.19999999999999998,
+        "cost": 0.08,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.7999999999999999,
+        "cost": 0.33,
         "currency": "USD"
       }
     ]

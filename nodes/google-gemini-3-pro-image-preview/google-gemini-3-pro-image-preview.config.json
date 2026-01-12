@@ -1,0 +1,156 @@
+{
+  "display_name": "Google: Nano Banana Pro (Gemini 3 Pro Image Preview)",
+  "description": "Nano Banana Pro is Google’s most advanced image-generation and editing model, built on Gemini 3 Pro. It extends the original Nano Banana with significantly improved multimodal reasoning, real-world grounding, and high-fidelity visual synthesis. The model generates context-rich graphics, from infographics and diagrams to cinematic composites, and can incorporate real-time information via Search grounding.\n\nIt offers industry-leading text rendering in images (including long passages and multilingual layouts), consistent multi-image blending, and accurate identity preservation across up to five subjects. Nano Banana Pro adds fine-grained creative controls such as localized edits, lighting and focus adjustments, camera transformations, and support for 2K/4K outputs and flexible aspect ratios. It is designed for professional-grade design, product visualization, storyboarding, and complex multi-element compositions while remaining efficient for general image creation workflows.",
+  "category": "llm",
+  "provider": "google",
+  "accepts_plugins": false,
+  "model_id": "google/gemini-3-pro-image-preview",
+  "context_length": 65536,
+  "supported_parameters": [
+    "include_reasoning",
+    "max_tokens",
+    "reasoning",
+    "response_format",
+    "seed",
+    "structured_outputs",
+    "temperature",
+    "top_p"
+  ],
+  "inputs": [
+    {
+      "name": "prompt",
+      "display_name": "Prompt",
+      "type": "string",
+      "description": "Text prompt for completion",
+      "required": true
+    },
+    {
+      "name": "modalities",
+      "display_name": "Modalities",
+      "type": "array",
+      "description": "Output modalities to request (e.g., [\"image\", \"text\"])",
+      "default": [
+        "image",
+        "text"
+      ]
+    },
+    {
+      "name": "image_config",
+      "display_name": "Image Config",
+      "type": "object",
+      "description": "Image generation configuration (aspect_ratio: \"1:1\", \"16:9\", etc.)",
+      "default": null
+    },
+    {
+      "name": "include_reasoning",
+      "display_name": "Include Reasoning",
+      "type": "boolean",
+      "description": "Include reasoning in response",
+      "default": null
+    },
+    {
+      "name": "reasoning",
+      "display_name": "Reasoning",
+      "type": "boolean",
+      "description": "Internal reasoning mode",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "string or object",
+      "description": "Output format specification",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
+      "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "content",
+      "display_name": "Content",
+      "can_stream": true,
+      "type": "string",
+      "description": "The generated completion text"
+    },
+    {
+      "name": "images",
+      "display_name": "Images",
+      "type": "array",
+      "description": "Array of generated images (base64-encoded data URLs)"
+    },
+    {
+      "name": "usage",
+      "display_name": "Token Usage",
+      "type": "object",
+      "description": "Token usage statistics"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost for processing this request (USD)"
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array",
+      "description": "Detailed breakdown of costs"
+    },
+    {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
+    },
+    {
+      "name": "reasoning",
+      "display_name": "Reasoning",
+      "type": "string",
+      "can_stream": true,
+      "description": "The detailed reasoning chain from the model"
+    },
+    {
+      "name": "refusal",
+      "display_name": "Refusal",
+      "type": "string",
+      "description": "Model refusal response (if any)"
+    }
+  ],
+  "pricing": {
+    "reference": "https://openrouter.ai/models",
+    "items": [
+      {
+        "key": "input_cost_per_million",
+        "label": "Input Tokens (per 1M)",
+        "cost": 2,
+        "currency": "USD"
+      },
+      {
+        "key": "output_cost_per_million",
+        "label": "Output Tokens (per 1M)",
+        "cost": 12,
+        "currency": "USD"
+      }
+    ]
+  }
+}

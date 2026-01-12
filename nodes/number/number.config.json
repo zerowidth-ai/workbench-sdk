@@ -17,6 +17,7 @@
   "outputs": [
     {
       "name": "value",
+      "primary": true,
       "display_name": "Value",
       "type": "number",
       "description": "The numeric value."

@@ -1,0 +1,121 @@
+{
+  "display_name": "Qwen: Qwen2.5 Coder 7B Instruct",
+  "description": "Qwen2.5-Coder-7B-Instruct is a 7B parameter instruction-tuned language model optimized for code-related tasks such as code generation, reasoning, and bug fixing. Based on the Qwen2.5 architecture, it incorporates enhancements like RoPE, SwiGLU, RMSNorm, and GQA attention with support for up to 128K tokens using YaRN-based extrapolation. It is trained on a large corpus of source code, synthetic data, and text-code grounding, providing robust performance across programming languages and agentic coding workflows.\n\nThis model is part of the Qwen2.5-Coder family and offers strong compatibility with tools like vLLM for efficient deployment. Released under the Apache 2.0 license.",
+  "category": "llm",
+  "provider": "qwen",
+  "accepts_plugins": false,
+  "model_id": "qwen/qwen2.5-coder-7b-instruct",
+  "context_length": 32768,
+  "supported_parameters": [
+    "frequency_penalty",
+    "max_tokens",
+    "presence_penalty",
+    "repetition_penalty",
+    "response_format",
+    "structured_outputs",
+    "temperature",
+    "top_k",
+    "top_p"
+  ],
+  "inputs": [
+    {
+      "name": "prompt",
+      "display_name": "Prompt",
+      "type": "string",
+      "description": "Text prompt for completion",
+      "required": true
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "string or object",
+      "description": "Output format specification",
+      "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "content",
+      "display_name": "Content",
+      "can_stream": true,
+      "type": "string",
+      "description": "The generated completion text"
+    },
+    {
+      "name": "usage",
+      "display_name": "Token Usage",
+      "type": "object",
+      "description": "Token usage statistics"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost for processing this request (USD)"
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array",
+      "description": "Detailed breakdown of costs"
+    },
+    {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
+    }
+  ],
+  "pricing": {
+    "reference": "https://openrouter.ai/models",
+    "items": [
+      {
+        "key": "input_cost_per_million",
+        "label": "Input Tokens (per 1M)",
+        "cost": 0.03,
+        "currency": "USD"
+      },
+      {
+        "key": "output_cost_per_million",
+        "label": "Output Tokens (per 1M)",
+        "cost": 0.09,
+        "currency": "USD"
+      }
+    ]
+  }
+}

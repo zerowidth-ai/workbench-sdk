@@ -1,5 +1,4 @@
 export default async ({inputs, settings, config, nodeConfig}) => {
-
     try {
         // Get OpenRouter integration from engine
         const openrouter = config.integrations?.openrouter;
@@ -11,7 +10,7 @@ export default async ({inputs, settings, config, nodeConfig}) => {
 
         // Build parameters object from config inputs
         const params = {};
-        const configInputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null},{"name":"structured_outputs","display_name":"Structured Outputs","type":"string or object","description":"JSON schema enforcement","default":null}];
+        const configInputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null}];
         
         for (const input of configInputs) {
 
@@ -23,11 +22,15 @@ export default async ({inputs, settings, config, nodeConfig}) => {
             }
         }
 
+        
+
         const response = await openrouter.chatCompletion({
             model: "openai/gpt-4o-mini-search-preview",
             prompt: inputs.prompt,
             ...params
         }, nodeConfig, config);
+
+        
 
         return {
             content: response.content,

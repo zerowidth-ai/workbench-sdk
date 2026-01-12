@@ -54,3 +54,34 @@ export function getFilename(metaUrl) {
 export function getDirname(metaUrl) {
   return dirname(getFilename(metaUrl));
 }
+
+/**
+ * Extract text content from a message's content field
+ * Handles both string and array content formats
+ * @param {string|array|null} content - The content field from a message
+ * @returns {string} Extracted text content
+ */
+export function extractTextFromContent(content) {
+  if (typeof content === 'string') {
+    return content;
+  }
+  
+  if (content === null || content === undefined) {
+    return '';
+  }
+  
+  if (Array.isArray(content)) {
+    let text = '';
+    for (const item of content) {
+      if (item && typeof item === 'object') {
+        // Extract text from content items with type 'text'
+        if (item.type === 'text' && item.text) {
+          text += item.text;
+        }
+      }
+    }
+    return text;
+  }
+  
+  return String(content || '');
+}

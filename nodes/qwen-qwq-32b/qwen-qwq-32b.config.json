@@ -3,14 +3,13 @@
   "description": "QwQ is the reasoning model of the Qwen series. Compared with conventional instruction-tuned models, QwQ, which is capable of thinking and reasoning, can achieve significantly enhanced performance in downstream tasks, especially hard problems. QwQ-32B is the medium-sized reasoning model, which is capable of achieving competitive performance against state-of-the-art reasoning models, e.g., DeepSeek-R1, o1-mini.",
   "category": "llm",
   "provider": "qwen",
-  "accepts_plugins": false,
+  "accepts_plugins": true,
   "model_id": "qwen/qwq-32b",
-  "context_length": 131072,
+  "context_length": 32768,
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
     "logit_bias",
-    "logprobs",
     "max_tokens",
     "min_p",
     "presence_penalty",
@@ -21,8 +20,9 @@
     "stop",
     "structured_outputs",
     "temperature",
+    "tool_choice",
+    "tools",
     "top_k",
-    "top_logprobs",
     "top_p"
   ],
   "inputs": [
@@ -30,36 +30,23 @@
       "name": "system_prompt",
       "display_name": "System Prompt",
       "type": "string or message",
-      "description": "System prompt for the model",
+      "description": "System prompt to instruct the model",
       "default": null
     },
     {
       "name": "messages",
-      "display_name": "Messages",
-      "type": "array of messages or message or string",
-      "description": "Array of chat messages",
+      "display_name": "Conversation",
+      "type": "conversation or message or string",
+      "description": "Array of chat messages that make up the conversation",
       "required": true
     },
     {
-      "name": "temperature",
-      "display_name": "Temperature",
-      "type": "number",
-      "description": "Controls randomness (0-2)",
-      "default": null
-    },
-    {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "top_p",
-      "display_name": "Top P",
-      "type": "number",
-      "description": "Controls diversity via nucleus sampling",
-      "default": null
+      "name": "tools",
+      "display_name": "Tools",
+      "type": "tool",
+      "description": "Array of tools to use",
+      "default": null,
+      "allow_multiple": true
     },
     {
       "name": "frequency_penalty",
@@ -73,6 +60,13 @@
       "display_name": "Include Reasoning",
       "type": "boolean",
       "description": "Include reasoning in response",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
       "default": null
     },
     {
@@ -111,27 +105,48 @@
       "default": null
     },
     {
-      "name": "structured_outputs",
-      "display_name": "Structured Outputs",
-      "type": "string or object",
-      "description": "JSON schema enforcement",
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
       "default": null
     }
   ],
   "outputs": [
     {
+      "name": "conversation",
+      "display_name": "Conversation",
+      "type": "conversation",
+      "can_stream": true,
+      "description": "An array of messages including any tool call & response messages as well as the final generated output."
+    },
+    {
       "name": "content",
       "display_name": "Content",
       "can_stream": true,
       "type": "string",
-      "description": "The content portion of the generated response message."
+      "description": "The content portion of the final generated response message."
     },
     {
       "name": "message",
-      "display_name": "Message",
+      "display_name": "Final Message",
       "type": "message",
       "can_stream": true,
-      "description": "The full generated response message."
+      "description": "The final generated response message."
     },
     {
       "name": "role",
@@ -141,10 +156,10 @@
       "description": "Role of the response (usually 'assistant')"
     },
     {
-      "name": "finish_reason",
-      "display_name": "Finish Reason",
-      "type": "string",
-      "description": "Why the completion finished"
+      "name": "tool_calls",
+      "display_name": "Tool Calls",
+      "type": "array of tools",
+      "description": "Tool calls made by the model"
     },
     {
       "name": "usage",
@@ -165,15 +180,16 @@
       "description": "Detailed breakdown of costs"
     },
     {
-      "name": "logprobs",
-      "display_name": "Log Probabilities",
-      "type": "object",
-      "description": "Token probabilities and logprobs from the model"
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
     },
     {
       "name": "reasoning",
       "display_name": "Reasoning",
       "type": "string",
+      "can_stream": true,
       "description": "The detailed reasoning chain from the model"
     },
     {
@@ -189,13 +205,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.075,
+        "cost": 0.15,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.15,
+        "cost": 0.39999999999999997,
         "currency": "USD"
       }
     ]

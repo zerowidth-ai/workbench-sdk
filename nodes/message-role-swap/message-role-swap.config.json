@@ -8,7 +8,7 @@
     {
       "name": "messages",
       "display_name": "Messages",
-      "type": "array of messages",
+      "type": "conversation",
       "description": "Array of message objects to swap roles",
       "required": true
     }
@@ -17,7 +17,7 @@
     {
       "name": "messages",
       "display_name": "Messages",
-      "type": "array of messages",
+      "type": "conversation",
       "description": "Array of messages with swapped roles (assistant ↔ user)"
     }
   ],

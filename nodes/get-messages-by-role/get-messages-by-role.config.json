@@ -7,7 +7,7 @@
     {
       "name": "messages",
       "display_name": "Messages",
-      "type": "array of messages",
+      "type": "conversation",
       "description": "Array of message objects to filter",
       "required": true
     },
@@ -23,7 +23,7 @@
     {
       "name": "messages",
       "display_name": "Messages",
-      "type": "array of messages",
+      "type": "conversation",
       "description": "Array containing only messages with the specified role"
     },
     {

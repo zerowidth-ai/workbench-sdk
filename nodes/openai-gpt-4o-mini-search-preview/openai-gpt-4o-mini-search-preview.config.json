@@ -33,13 +33,6 @@
       "type": "string or object",
       "description": "Output format specification",
       "default": null
-    },
-    {
-      "name": "structured_outputs",
-      "display_name": "Structured Outputs",
-      "type": "string or object",
-      "description": "JSON schema enforcement",
-      "default": null
     }
   ],
   "outputs": [
@@ -49,12 +42,6 @@
       "can_stream": true,
       "type": "string",
       "description": "The generated completion text"
-    },
-    {
-      "name": "finish_reason",
-      "display_name": "Finish Reason",
-      "type": "string",
-      "description": "Why the completion finished"
     },
     {
       "name": "usage",
@@ -85,6 +72,12 @@
       "display_name": "Citations",
       "type": "array",
       "description": "Array of citation URLs used by the model"
+    },
+    {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
     }
   ],
   "pricing": {

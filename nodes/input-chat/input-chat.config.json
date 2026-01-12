@@ -13,8 +13,8 @@
   "outputs": [
     {
       "name": "messages",
-      "display_name": "Messages",
-      "type": "array of messages",
+      "display_name": "Conversation",
+      "type": "conversation",
       "description": "The incoming chat messages"
     },
     {

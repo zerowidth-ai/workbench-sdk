@@ -1,4 +1,4 @@
-async def process(inputs, settings, config, nodeConfig):
+async def process({inputs, settings, config, nodeConfig}):
     """Process function for the OpenAI: GPT-5 Chat node"""
     try:
         # Get OpenRouter integration from engine
@@ -10,12 +10,14 @@ async def process(inputs, settings, config, nodeConfig):
 
         # Build parameters dict from config inputs
         params = {}
-        config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"include_reasoning","display_name":"Include Reasoning","type":"boolean","description":"Include reasoning in response","default":null},{"name":"reasoning","display_name":"Reasoning","type":"boolean","description":"Internal reasoning mode","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null},{"name":"structured_outputs","display_name":"Structured Outputs","type":"string or object","description":"JSON schema enforcement","default":null}]
+        config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null}]
         
         for input_def in config_inputs:
             value = inputs.get(input_def["name"])
             if value is not None:
                 params[input_def["name"]] = value
+
+        
 
         response = await openrouter.chat_completion(
             model="openai/gpt-5-chat",
@@ -25,10 +27,10 @@ async def process(inputs, settings, config, nodeConfig):
             engineConfig=config
         )
 
+        
+
         return {
             "content": response["content"],
-            "reasoning": response.get("reasoning"),
-            "refusal": response.get("refusal"),
             "finish_reason": response["finish_reason"],
             "usage": response["usage"]
             "cost_total": response.get("cost_total"),

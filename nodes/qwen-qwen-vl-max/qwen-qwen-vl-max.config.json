@@ -3,44 +3,47 @@
   "description": "Qwen VL Max is a visual understanding model with 7500 tokens context length. It excels in delivering optimal performance for a broader spectrum of complex tasks.\n",
   "category": "llm",
   "provider": "qwen",
-  "accepts_plugins": false,
+  "accepts_plugins": true,
   "model_id": "qwen/qwen-vl-max",
-  "context_length": 7500,
+  "context_length": 131072,
   "supported_parameters": [
     "max_tokens",
     "presence_penalty",
     "response_format",
     "seed",
     "temperature",
+    "tool_choice",
+    "tools",
     "top_p"
   ],
   "inputs": [
     {
-      "name": "prompt",
-      "display_name": "Prompt",
-      "type": "string",
-      "description": "Text prompt for completion",
+      "name": "system_prompt",
+      "display_name": "System Prompt",
+      "type": "string or message",
+      "description": "System prompt to instruct the model",
+      "default": null
+    },
+    {
+      "name": "messages",
+      "display_name": "Conversation",
+      "type": "conversation or message or string",
+      "description": "Array of chat messages that make up the conversation",
       "required": true
     },
     {
-      "name": "temperature",
-      "display_name": "Temperature",
-      "type": "number",
-      "description": "Controls randomness (0-2)",
-      "default": null
+      "name": "tools",
+      "display_name": "Tools",
+      "type": "tool",
+      "description": "Array of tools to use",
+      "default": null,
+      "allow_multiple": true
     },
     {
       "name": "max_tokens",
       "display_name": "Max Tokens",
       "type": "number",
       "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "top_p",
-      "display_name": "Top P",
-      "type": "number",
-      "description": "Controls diversity via nucleus sampling",
       "default": null
     },
     {
@@ -63,21 +66,63 @@
       "type": "number",
       "description": "Deterministic outputs",
       "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
     }
   ],
   "outputs": [
+    {
+      "name": "conversation",
+      "display_name": "Conversation",
+      "type": "conversation",
+      "can_stream": true,
+      "description": "An array of messages including any tool call & response messages as well as the final generated output."
+    },
     {
       "name": "content",
       "display_name": "Content",
       "can_stream": true,
       "type": "string",
-      "description": "The generated completion text"
+      "description": "The content portion of the final generated response message."
     },
     {
-      "name": "finish_reason",
-      "display_name": "Finish Reason",
+      "name": "message",
+      "display_name": "Final Message",
+      "type": "message",
+      "can_stream": true,
+      "description": "The final generated response message."
+    },
+    {
+      "name": "role",
+      "display_name": "Role",
+      "can_stream": true,
       "type": "string",
-      "description": "Why the completion finished"
+      "description": "Role of the response (usually 'assistant')"
+    },
+    {
+      "name": "tool_calls",
+      "display_name": "Tool Calls",
+      "type": "array of tools",
+      "description": "Tool calls made by the model"
     },
     {
       "name": "usage",
@@ -96,6 +141,12 @@
       "display_name": "Itemized Cost",
       "type": "array",
       "description": "Detailed breakdown of costs"
+    },
+    {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
     }
   ],
   "pricing": {

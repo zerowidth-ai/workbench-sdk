@@ -7,7 +7,7 @@
     {
       "name": "messages",
       "display_name": "Messages",
-      "type": "array of messages",
+      "type": "conversation",
       "description": "Array of message objects to extract from",
       "required": true
     },
@@ -30,7 +30,7 @@
     {
       "name": "messages",
       "display_name": "Messages",
-      "type": "array of messages",
+      "type": "conversation",
       "description": "Array containing messages from the specified range"
     },
     {

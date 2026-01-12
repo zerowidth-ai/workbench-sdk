@@ -7,56 +7,56 @@
     {
       "name": "input_1",
       "display_name": "Input 1",
-      "type": "message or array of messages or string",
+      "type": "message or conversation or string",
       "description": "First message source",
       "required": false
     },
     {
       "name": "input_2",
       "display_name": "Input 2",
-      "type": "message or array of messages or string",
+      "type": "message or conversation or string",
       "description": "Second message source",
       "required": false
     },
     {
       "name": "input_3",
       "display_name": "Input 3",
-      "type": "message or array of messages or string",
+      "type": "message or conversation or string",
       "description": "Third message source",
       "required": false
     },
     {
       "name": "input_4",
       "display_name": "Input 4",
-      "type": "message or array of messages or string",
+      "type": "message or conversation or string",
       "description": "Fourth message source",
       "required": false
     },
     {
       "name": "input_5",
       "display_name": "Input 5",
-      "type": "message or array of messages or string",
+      "type": "message or conversation or string",
       "description": "Fifth message source",
       "required": false
     },
     {
       "name": "input_6",
       "display_name": "Input 6",
-      "type": "message or array of messages or string",
+      "type": "message or conversation or string",
       "description": "Sixth message source",
       "required": false
     },
     {
       "name": "input_7",
       "display_name": "Input 7",
-      "type": "message or array of messages or string",
+      "type": "message or conversation or string",
       "description": "Seventh message source",
       "required": false
     },
     {
       "name": "input_8",
       "display_name": "Input 8",
-      "type": "message or array of messages or string",
+      "type": "message or conversation or string",
       "description": "Eighth message source",
       "required": false
     }
@@ -65,7 +65,7 @@
     {
       "name": "messages",
       "display_name": "Messages",
-      "type": "array of messages",
+      "type": "conversation",
       "description": "Combined array of all messages from all inputs"
     },
     {
