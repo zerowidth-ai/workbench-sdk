@@ -1,0 +1,43 @@
+# Build results
+bin/
+obj/
+out/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+*.rsuser
+
+# Rider
+.idea/
+
+# Build artifacts
+publish/
+
+# Test results
+TestResults/
+*.trx
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Synced directories (managed by sync_sdks.py)
+nodes/
+types/
+tests/flows/

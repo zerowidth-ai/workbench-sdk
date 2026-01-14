@@ -17,14 +17,14 @@ SDK_TARGETS = {
         "path": os.path.join(SDK_DIR, "nodejs"),
         "extensions": [".js", ".ts"]
     },
-    # "python": {
-    #     "path": os.path.join(SDK_DIR, "python"),
-    #     "extensions": [".py"]
-    # },
-    # "csharp": {
-    #     "path": os.path.join(SDK_DIR, "csharp"),
-    #     "extensions": [".cs"]
-    # },
+    "python": {
+        "path": os.path.join(SDK_DIR, "python"),
+        "extensions": [".py"]
+    },
+    "dotnet": {
+        "path": os.path.join(SDK_DIR, "dotnet"),
+        "extensions": [".cs"]
+    },
 }
 
 def create_master_config():

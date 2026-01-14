@@ -30,7 +30,7 @@ export default class zv1 {
    */
   constructor(flow, config = {}) {
     this.flow = flow;
-    this.debug = true ; //config.debug || false;
+    this.debug = config.debug || false;
     this.keys = config.keys || {};
     this.executionQueue = [];
     this.runningNodes = new Set();
@@ -286,11 +286,16 @@ export default class zv1 {
         });
       }
 
-      // add type and id to nodeConfig
-      nodeDefinition.config.type = node.type;
-      nodeDefinition.config.id = node.id;
+      // Create a copy of nodeConfig with instance-specific type and id
+      // This avoids mutating the shared nodeDefinition.config which would cause
+      // issues when multiple nodes of the same type run concurrently
+      const nodeConfig = {
+        ...nodeDefinition.config,
+        type: node.type,
+        id: node.id
+      };
 
-      const outputs = await nodeDefinition.process({inputs, settings, config: this.config, nodeConfig: nodeDefinition.config});
+      const outputs = await nodeDefinition.process({inputs, settings, config: this.config, nodeConfig});
       const endDate = new Date();
       timelineEntry.outputs = JSON.parse(JSON.stringify(outputs));
       timelineEntry.endTime = endDate.toISOString();
@@ -657,51 +662,8 @@ export default class zv1 {
         }
         linksByInput[link.to.port_name].push(link);
       });
-      
-      // Check each input
-      // const isReady = Object.entries(linksByInput).every(([inputName, links]) => {
-      //   const inputDef = nodeDefinition.config.inputs.find(i => i.name === inputName);
-      //   if (!inputDef) return true; // Skip if no definition (shouldn't happen)
-        
-      //   if (inputDef.allow_multiple && inputDef.refires) {
-      //     // For refiring inputs, check if ANY link has NEW values (not yet consumed)
-      //     const lastConsumed = CacheManager.getLastConsumed(downstreamNode.settings, inputName);
-          
-      //     return links.some(link => {
-      //       // If never consumed before, check if there's any value available
-      //       if (lastConsumed === 0) {
-      //         const hasValue = this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name });
-      //         this.logDebug(`Checking refiring input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, hasValue: ${hasValue} (initial execution)`);
-      //         return hasValue;
-      //       } else {
-      //         const hasNew = this.cache.hasNew({
-      //           node_id: link.from.node_id,
-      //           port_name: link.from.port_name,
-      //           afterTimestamp: lastConsumed
-      //         });
-              
-      //         this.logDebug(`Checking refiring input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, hasNew: ${hasNew} (after ${lastConsumed})`);
-              
-      //         return hasNew;
-      //       }
-      //     });
-      //   }
-        
-      //   // For non-refiring inputs, ALL links must be ready
-      //   return links.every(link => {
-      //     if (link.type === 'plugin') return true;
-          
-      //     const isValueReady = this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name });
-          
-      //     this.logDebug(`Checking regular input [${inputName}] from ${link.from.node_id}:${link.from.port_name}, ready: ${isValueReady}`);
-          
-      //     if (inputDef.required) {
-      //       return isValueReady;
-      //     }
-          
-      //     return isValueReady || this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name }) === null;
-      //   });
-      // });
+
+      // Check if all required inputs are ready
       const isReady = Object.entries(linksByInput).every(([inputName, links]) => {
         const inputDef = nodeDefinition.config.inputs.find(i => i.name === inputName);
         if (!inputDef) return true; // defensive; shouldn't normally happen
@@ -1172,7 +1134,7 @@ export default class zv1 {
         // Launch nodes up to concurrency limit
         while(this.executionQueue.length > 0 && this.runningNodes.size < this.maxConcurrency) {
           const node = this.executionQueue.shift();
-          console.log('node to launch ', node);
+          this.logDebug('Launching node:', node.id, 'type:', node.type);
           // Launch node asynchronously
           this.launchNode(node);
         }
@@ -1190,7 +1152,7 @@ export default class zv1 {
         }
       }
 
-      ("Execution queue is empty and no nodes running");
+      this.logDebug("Execution queue is empty and no nodes running");
 
       // Step 4: Capture and return all output nodes' results
       const outputNodes = this.flow.nodes.filter(
@@ -1805,6 +1767,9 @@ export default class zv1 {
 
     // Then, discover local plugins (these can override or supplement parent tools)
     const pluginNodeIds = this.llmPlugins[node.id] || [];
+    const toolNodeMap = {}; // Map tool name -> plugin node info for timeline/error tracking
+    const manualToolNames = new Set(); // Track manual tools that have no runner
+
     for (const pluginNodeId of pluginNodeIds) {
       const pluginNode = this.flow.nodes.find(n => n.id === pluginNodeId);
       if (!pluginNode) continue;
@@ -1812,6 +1777,9 @@ export default class zv1 {
       if (this.isLocalNodePlugin(pluginNode)) {
         const schema = this.generateToolSchema(pluginNode);
         toolSchemas.push(schema);
+
+        // Track the mapping from tool name to plugin node
+        toolNodeMap[schema.name] = { node: pluginNode, type: 'plugin' };
         
         const nodeDefinition = this.nodes[pluginNode.type];
         
@@ -1914,10 +1882,10 @@ export default class zv1 {
       } else if (isRemoteMCPTool(pluginNode)) {
         // Fetch all tools from the MCP endpoint
         const url = pluginNode.settings?.url;
-        if (!url) continue; 
+        if (!url) continue;
         const id = uuidv4();
         try {
-          
+
           const response = await axios.post(url, {
             id,
             method: "tools/list",
@@ -1931,6 +1899,8 @@ export default class zv1 {
               description: tool.description,
               parameters: tool.inputSchema
             });
+            // Track MCP tools for error handling
+            toolNodeMap[tool.name] = { node: pluginNode, type: 'mcp', mcpToolName: tool.name };
             // Map tool name to a runner that calls this MCP node/tool
             toolRunners[tool.name] = async (args) => {
               return await callMCPTool(pluginNode, { ...args, name: tool.name });
@@ -1942,7 +1912,9 @@ export default class zv1 {
       } else if (isManualToolNode(pluginNode)) {
         const schema = this.generateToolSchema(pluginNode);
         toolSchemas.push(schema);
-        // Manual tools: no runner, just pass through
+        // Manual tools: no runner, just pass through - track them so we don't error
+        manualToolNames.add(schema.name);
+        toolNodeMap[schema.name] = { node: pluginNode, type: 'manual' };
       }
     }
 
@@ -1960,6 +1932,12 @@ export default class zv1 {
         if (!configTool || !configTool.schema) {
           toolSchemas.push(toolSchema);
           this.logDebug(`Loaded manual tool schema from flow: ${toolSchema.name}`);
+          // If there's no runner for this tool, track it as a manual tool
+          if (!configTool?.process && !toolRunners[toolSchema.name]) {
+            manualToolNames.add(toolSchema.name);
+            const sourceNode = this.flow.nodes.find(n => n.id === link.from.node_id);
+            toolNodeMap[toolSchema.name] = { node: sourceNode, type: 'manual' };
+          }
         } else {
           this.logDebug(`Skipping flow schema for ${toolSchema.name} - using config schema instead`);
         }
@@ -1973,35 +1951,163 @@ export default class zv1 {
     let toolCallMessage = null;
     let toolCallCount = 0;
 
+    // Track accumulated messages across tool call rounds
+    // Start with the original messages, then append tool calls/results each round
+    let accumulatedMessages = Array.isArray(inputs.messages) ? [...inputs.messages] : [];
+
     do {
-      llmResult = await this.callLLMWithTools(node, inputs, toolSchemas, toolCallMessage, tool_results);
+      // Create inputs with accumulated messages for this round
+      const roundInputs = { ...inputs, messages: accumulatedMessages };
+      llmResult = await this.callLLMWithTools(node, roundInputs, toolSchemas, toolCallMessage, tool_results);
+
+      // After the LLM call, if there were tool calls/results, they've been appended
+      // Update accumulatedMessages to include what was sent this round
+      if (toolCallMessage && tool_results.length > 0) {
+        accumulatedMessages = [...accumulatedMessages, toolCallMessage];
+        for (const toolResult of tool_results) {
+          accumulatedMessages.push({
+            role: "tool",
+            tool_call_id: toolResult.tool_call_id,
+            name: toolResult.name,
+            content: typeof toolResult.result === "string"
+              ? toolResult.result
+              : JSON.stringify(toolResult.result)
+          });
+        }
+      }
+
       tool_results = [];
       toolCallMessage = null;
 
       if (llmResult.tool_calls && llmResult.tool_calls.length > 0) {
-        
+
         for (const tool_call of llmResult.tool_calls) {
 
-          if(tool_call.type === 'function'){
-            if (toolRunners[tool_call.function.name]) {
+          if (tool_call.type === 'function') {
+            const toolName = tool_call.function.name;
 
-              // try to parse the arguments as a JSON object
+            // Check if this is a manual tool (no runner, pass through)
+            if (manualToolNames.has(toolName)) {
+              this.logDebug(`Manual tool called: ${toolName} - passing through without execution`);
+              // Don't push any result - the tool_calls will pass through on the assistant message
+              continue;
+            }
+
+            if (toolRunners[toolName]) {
+              const toolNodeInfo = toolNodeMap[toolName];
+              const startDate = new Date();
+
+              // Try to parse the arguments as a JSON object
               let toolArguments = tool_call.function.arguments;
               try {
                 toolArguments = JSON.parse(tool_call.function.arguments);
+              } catch (parseError) {
+                // JSON parse failed - create error result
+                this.logDebug(`Failed to parse tool arguments for ${toolName}:`, parseError.message);
 
-                const toolResult = await toolRunners[tool_call.function.name](toolArguments);
+                // Create timeline entry for the parse error
+                if (toolNodeInfo?.node) {
+                  const endDate = new Date();
+                  const timelineEntry = {
+                    nodeId: toolNodeInfo.node.id,
+                    nodeType: toolNodeInfo.node.type,
+                    inputs: { raw_arguments: tool_call.function.arguments },
+                    startTime: startDate.toISOString(),
+                    endTime: endDate.toISOString(),
+                    durationMs: endDate - startDate,
+                    status: 'error',
+                    errorMessage: `Invalid JSON arguments: ${parseError.message}`
+                  };
+                  this.timeline.push(timelineEntry);
+
+                  // Fire onNodeError event
+                  if (this.config.onNodeError) {
+                    await this.config.onNodeError({
+                      nodeId: toolNodeInfo.node.id,
+                      nodeType: toolNodeInfo.node.type,
+                      error: parseError
+                    });
+                  }
+                }
+
+                // Push error result to LLM
                 tool_results.push({
                   original_tool_call: tool_call,
                   tool_call_id: tool_call.id,
-                  name: tool_call.function.name,
+                  name: toolName,
+                  result: {
+                    error: true,
+                    message: `Invalid arguments provided: ${parseError.message}`
+                  }
+                });
+                continue;
+              }
+
+              // Execute the tool runner with error handling
+              try {
+                const toolResult = await toolRunners[toolName](toolArguments);
+
+                // Success - push result
+                tool_results.push({
+                  original_tool_call: tool_call,
+                  tool_call_id: tool_call.id,
+                  name: toolName,
                   result: toolResult
                 });
-              } catch (e) {
-                console.error('Failed to parse tool arguments as JSON', e);
+
+              } catch (executionError) {
+                // Tool execution failed - create error result
+                this.logDebug(`Tool execution failed for ${toolName}:`, executionError.message);
+
+                // Create timeline entry for the execution error
+                if (toolNodeInfo?.node) {
+                  const endDate = new Date();
+                  const timelineEntry = {
+                    nodeId: toolNodeInfo.node.id,
+                    nodeType: toolNodeInfo.node.type,
+                    inputs: toolArguments,
+                    startTime: startDate.toISOString(),
+                    endTime: endDate.toISOString(),
+                    durationMs: endDate - startDate,
+                    status: 'error',
+                    errorMessage: executionError.message
+                  };
+                  this.timeline.push(timelineEntry);
+
+                  // Fire onNodeError event
+                  if (this.config.onNodeError) {
+                    await this.config.onNodeError({
+                      nodeId: toolNodeInfo.node.id,
+                      nodeType: toolNodeInfo.node.type,
+                      error: executionError
+                    });
+                  }
+                }
+
+                // Push error result to LLM
+                tool_results.push({
+                  original_tool_call: tool_call,
+                  tool_call_id: tool_call.id,
+                  name: toolName,
+                  result: {
+                    error: true,
+                    message: executionError.message
+                  }
+                });
               }
             } else {
-              console.error('No runner found for tool', tool_call.name);
+              // No runner found and not a manual tool - this is an error
+              this.logDebug(`No runner found for tool: ${toolName}`);
+
+              tool_results.push({
+                original_tool_call: tool_call,
+                tool_call_id: tool_call.id,
+                name: toolName,
+                result: {
+                  error: true,
+                  message: `Tool "${toolName}" is not available`
+                }
+              });
             }
           }
         }
@@ -2058,6 +2164,7 @@ export default class zv1 {
     
     const nodeDefinition = this.nodes[pluginNode.type];
     if (!nodeDefinition) {
+      this.logDebug(`Error: Node type "${pluginNode.type}" not found`);
       throw new Error(`Node type "${pluginNode.type}" not found.`);
     }
     
@@ -2121,14 +2228,28 @@ export default class zv1 {
     return outputs;
   }
 
+  /**
+   * Check if a node is a local plugin (is_plugin or is_macro)
+   * @param {Object} node - The node to check
+   * @returns {boolean} True if the node is a plugin or macro
+   */
   isLocalNodePlugin(node) {
     const thisNodeConfig = this.nodes[node.type]?.config || {};
     return thisNodeConfig.is_plugin || thisNodeConfig.is_macro;
   }
 
+  /**
+   * Check if a node has all required inputs available in the cache
+   * @param {Object} node - The node to check
+   * @returns {boolean} True if all required inputs are available
+   * @throws {Error} If the node type is not found
+   */
   isNodeReady(node) {
     const nodeDefinition = this.nodes[node.type];
-    if (!nodeDefinition) throw new Error(`Node type "${node.type}" not found.`);
+    if (!nodeDefinition) {
+      this.logDebug(`Error: Node type "${node.type}" not found`);
+      throw new Error(`Node type "${node.type}" not found.`);
+    }
     for (const inputDef of nodeDefinition.config.inputs || []) {
       if (!inputDef.required) continue;
       const inputName = inputDef.name;
@@ -2303,6 +2424,7 @@ export default class zv1 {
 
     const nodeDefinition = this.nodes[node.type];
     if (!nodeDefinition || !nodeDefinition.config.is_import) {
+      this.logDebug(`Error: Node ${node.id} is not an imported node`);
       throw new Error(`Node ${node.id} is not an imported node`);
     }
 
@@ -2409,7 +2531,10 @@ export default class zv1 {
     this.logDebug('processNodeWithArgs', node, args);
 
     const nodeDefinition = this.nodes[node.type];
-    if (!nodeDefinition) throw new Error(`Node type "${node.type}" not found.`);
+    if (!nodeDefinition) {
+      this.logDebug(`Error: Node type "${node.type}" not found`);
+      throw new Error(`Node type "${node.type}" not found.`);
+    }
 
     // For import nodes, their process function expects (inputs, settings, config)
     // For regular nodes, same signature
@@ -2429,7 +2554,10 @@ export default class zv1 {
 
   async callLLMWithTools(node, inputs, toolSchemas, toolCallMessage, toolResults) {
     const nodeDefinition = this.nodes[node.type];
-    if (!nodeDefinition) throw new Error(`Node type "${node.type}" not found.`);
+    if (!nodeDefinition) {
+      this.logDebug(`Error: Node type "${node.type}" not found`);
+      throw new Error(`Node type "${node.type}" not found.`);
+    }
 
     // Use the inputs passed from processLLMNode instead of re-collecting them
     const llmInputs = { ...inputs };
