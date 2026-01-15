@@ -1,0 +1,78 @@
+{
+  "providers": {
+    "anthropic": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    },
+    "deepseek": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    },
+    "google": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    },
+    "liquid": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    },
+    "mistralai": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    },
+    "openai": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    },
+    "perplexity": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    },
+    "qwen": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    },
+    "x-ai": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    },
+    "black-forest-labs": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    }
+  },
+  "generation": {
+    "category": "llm",
+    "include_tests": true,
+    "include_python": true,
+    "include_cost_calculation": true,
+    "dry_run": false,
+    "include_image_generation": true
+  },
+  "output": {
+    "overwrite_existing": true,
+    "backup_existing": false,
+    "create_provider_folders": false,
+    "cleanup_old_nodes": true
+  }
+} 

@@ -95,7 +95,7 @@ def validate_keys(
                     f"Node type '{node_type}' requires the following missing keys: "
                     f"{', '.join(missing_keys)}"
                 ),
-                field="keys",
+                field_name="keys",
             )
 
         if debug:
@@ -240,7 +240,7 @@ def validate_inputs(
                 logger.debug(f"Validation error: Missing required input: {name}")
             raise ValidationError(
                 message=f"{display_name} is missing required input: {name}",
-                field=name,
+                field_name=name,
             )
 
         # Check if type matches
@@ -255,7 +255,7 @@ def validate_inputs(
                     f"{display_name} has a type mismatch for input '{name}': "
                     f"Expected {input_type}, got {type(value).__name__}"
                 ),
-                field=name,
+                field_name=name,
             )
 
         if debug:

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using ZeroWidth.Zv1.Cache;
 using ZeroWidth.Zv1.Errors;
 using ZeroWidth.Zv1.Loaders;
+using ZeroWidth.Zv1.NodeProcessors;
 using ZeroWidth.Zv1.Types;
 using ZeroWidth.Zv1.Validators;
 
@@ -140,6 +141,7 @@ public class Zv1 : IAsyncDisposable
     private Dictionary<string, NodeDefinition> _nodes = new();
     private Dictionary<string, TypeInfo> _customTypes = new();
     private Dictionary<string, object> _integrations = new();
+    private Dictionary<string, object?>? _currentInputs;
     private JsonElement _flow;
     private bool _initialized;
 
@@ -196,6 +198,9 @@ public class Zv1 : IAsyncDisposable
     {
         if (_initialized)
             return;
+
+        // Initialize node processors
+        NodeProcessorRegistry.Initialize();
 
         var nodesDir = _options.NodesDir ?? Zv1Loaders.GetNodesDir();
         var typesDir = _options.TypesDir ?? Zv1Loaders.GetTypesDir();
@@ -254,6 +259,7 @@ public class Zv1 : IAsyncDisposable
         _timeline.Clear();
         _cache.Clear();
         _errorManager.Clear();
+        _currentInputs = inputs;
 
         try
         {
@@ -390,7 +396,10 @@ public class Zv1 : IAsyncDisposable
             // Execute node
             Dictionary<string, object?> outputs;
 
-            if (nodeDef.ProcessFunc != null)
+            // First try the NodeDefinition's ProcessFunc, then the registry
+            var processFunc = nodeDef.ProcessFunc ?? NodeProcessorRegistry.GetProcessor(nodeType);
+
+            if (processFunc != null)
             {
                 var context = new NodeProcessContext
                 {
@@ -399,12 +408,13 @@ public class Zv1 : IAsyncDisposable
                     Config = new Dictionary<string, object?>
                     {
                         ["integrations"] = _integrations,
-                        ["keys"] = _options.Keys
+                        ["keys"] = _options.Keys,
+                        ["flow_inputs"] = _currentInputs
                     },
                     NodeConfig = nodeDef.Config
                 };
 
-                outputs = await nodeDef.ProcessFunc(context);
+                outputs = await processFunc(context);
             }
             else
             {

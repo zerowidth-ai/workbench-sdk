@@ -124,9 +124,9 @@ def copy_nodes_and_types():
             shutil.rmtree(target_test_flows_dir)
         os.makedirs(target_test_flows_dir)
 
-        # Copy all .json files from the test_flows directory
+        # Copy all test flow files (.json, .zv1, .test.json) from the test_flows directory
         for file in os.listdir(TEST_FLOWS_DIR):
-            if file.endswith(".json"):
+            if file.endswith(".json") or file.endswith(".zv1"):
                 src_file = os.path.join(TEST_FLOWS_DIR, file)
                 dest_file = os.path.join(target_test_flows_dir, file)
                 shutil.copyfile(src_file, dest_file)

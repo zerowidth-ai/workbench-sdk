@@ -11,12 +11,10 @@ This module provides centralized error handling with:
 from __future__ import annotations
 
 import time
+from collections.abc import Awaitable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Callable
-
-if TYPE_CHECKING:
-    from collections.abc import Awaitable
+from typing import Any, Callable, Union
 
 
 class ErrorSeverity(str, Enum):
@@ -46,7 +44,7 @@ class ErrorDetails:
     execution_id: str | None = None
     node_id: str | None = None
     node_type: str | None = None
-    field: str | None = None
+    field_name: str | None = None  # Renamed from 'field' to avoid shadowing dataclasses.field
     resource_type: str | None = None
     severity: ErrorSeverity = ErrorSeverity.RECOVERABLE
     extra: dict[str, Any] = field(default_factory=dict)
@@ -164,14 +162,14 @@ class ValidationError(Zv1Error):
     def __init__(
         self,
         message: str,
-        field: str | None = None,
+        field_name: str | None = None,
         execution_id: str | None = None,
         context: dict[str, Any] | None = None,
         original_error: Exception | None = None,
     ) -> None:
         details = ErrorDetails(
             message=message,
-            field=field,
+            field_name=field_name,
             severity=ErrorSeverity.FATAL,
             execution_id=execution_id,
         )
@@ -183,7 +181,7 @@ class ValidationError(Zv1Error):
             context=context,
             original_error=original_error,
         )
-        self.field = field
+        self.field_name = field_name
 
 
 class TimeoutError(Zv1Error):  # noqa: A001 - Intentionally shadows builtin
@@ -241,7 +239,7 @@ class ResourceError(Zv1Error):
 
 
 # Type alias for error callback
-ErrorCallback = Callable[[ErrorEvent], None] | Callable[[ErrorEvent], Awaitable[None]]
+ErrorCallback = Union[Callable[[ErrorEvent], None], Callable[[ErrorEvent], Awaitable[None]]]
 
 
 class ErrorManager:
@@ -442,14 +440,14 @@ class ErrorManager:
 
     def throw_validation_error(
         self,
-        field: str,
+        field_name: str,
         message: str,
         original_error: Exception | None = None,
     ) -> None:
         """Throw a validation error."""
         raise ValidationError(
             message=message,
-            field=field,
+            field_name=field_name,
             execution_id=self.execution_id,
             context=self.execution_context.copy(),
             original_error=original_error,

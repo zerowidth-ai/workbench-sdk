@@ -1,0 +1,102 @@
+{
+  "providers": {
+    "openai": {
+      "enabled": true,
+      "models": {
+        "filter": "specific",
+        "exclude_patterns": ["*2025*", "*2024*", "*2023*", "*-preview", "*-beta", "*-alpha"],
+        "include_patterns": ["gpt-4*"],
+        "specific_models": ["openai/gpt-4o", "openai/gpt-4o-mini"]
+      },
+      "filtering": {
+        "exclude_moderation": true,
+        "exclude_embedding": true,
+        "exclude_vision_only": false,
+        "exclude_deprecated": true,
+        "min_context_length": 100000,
+        "max_context_length": null
+      }
+    },
+    "anthropic": {
+      "enabled": true,
+      "models": {
+        "filter": "specific",
+        "exclude_patterns": ["*-2024-*", "*-2023-*", "*-preview", "*-beta", "*-alpha"],
+        "include_patterns": ["claude-3*"],
+        "specific_models": ["anthropic/claude-3-5-sonnet", "anthropic/claude-3-5-haiku"]
+      },
+      "filtering": {
+        "exclude_moderation": true,
+        "exclude_embedding": true,
+        "exclude_vision_only": false,
+        "exclude_deprecated": true,
+        "min_context_length": 100000,
+        "max_context_length": null
+      }
+    },
+    "google": {
+      "enabled": false,
+      "models": {
+        "filter": "all_current",
+        "exclude_patterns": ["*-2024-*", "*-2023-*", "*-preview", "*-beta", "*-alpha"],
+        "include_patterns": ["gemini-*"],
+        "specific_models": []
+      },
+      "filtering": {
+        "exclude_moderation": true,
+        "exclude_embedding": true,
+        "exclude_vision_only": false,
+        "exclude_deprecated": true,
+        "min_context_length": 0,
+        "max_context_length": null
+      }
+    },
+    "mistralai": {
+      "enabled": false,
+      "models": {
+        "filter": "all_current",
+        "exclude_patterns": ["*-2024-*", "*-2023-*", "*-preview", "*-beta", "*-alpha"],
+        "include_patterns": ["mistral-*"],
+        "specific_models": []
+      },
+      "filtering": {
+        "exclude_moderation": true,
+        "exclude_embedding": true,
+        "exclude_vision_only": false,
+        "exclude_deprecated": true,
+        "min_context_length": 0,
+        "max_context_length": null
+      }
+    },
+    "perplexity": {
+      "enabled": true,
+      "models": {
+        "filter": "specific",
+        "exclude_patterns": ["*-2024-*", "*-2023-*", "*-preview", "*-beta", "*-alpha"],
+        "include_patterns": ["sonar-*"],
+        "specific_models": ["perplexity/sonar-reasoning"]
+      },
+      "filtering": {
+        "exclude_moderation": true,
+        "exclude_embedding": true,
+        "exclude_vision_only": false,
+        "exclude_deprecated": true,
+        "min_context_length": 0,
+        "max_context_length": null
+      }
+    }
+  },
+  "generation": {
+    "category": "llm",
+    "include_tests": true,
+    "include_python": true,
+    "include_cost_calculation": true,
+    "dry_run": true
+  },
+  "output": {
+    "overwrite_existing": true,
+    "backup_existing": false,
+    "create_provider_folders": false,
+    "cleanup_old_nodes": true
+  }
+} 

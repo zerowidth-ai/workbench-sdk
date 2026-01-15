@@ -57,6 +57,9 @@ export default class zv1 {
     // This prevents adding the same node multiple times to the queue
     this.queuedNodeHashes = new Set();
 
+    // Resolvers for waitForNodeCompletion - event-based signaling
+    this.nodeCompletionResolvers = [];
+
   }
     
   async initialize() {
@@ -150,7 +153,6 @@ export default class zv1 {
       
       return engine;
     } catch (error) {
-      console.error(error);
       // Provide more context for common errors
       if (error.message.includes('not found')) {
         throw new Error(`Flow file not found: ${error.message}`);
@@ -175,17 +177,10 @@ export default class zv1 {
   }
 
   /**
-   * Create a hash of node execution state (id + inputs + settings)
-   * Used to prevent duplicate processing of nodes with identical contexts
-   * @private
-   * @param {string} nodeId - The node ID
-   * @param {Object} inputs - The inputs object
-   * @param {Object} settings - The settings object
-   * @returns {string} SHA-256 hash of the execution state
-   */
-  /**
    * Helper to check if node has any refiring inputs
    * @private
+   * @param {string} nodeId - The node ID to check
+   * @returns {boolean} True if the node has any refiring inputs
    */
   _hasRefiringInput(nodeId) {
     const node = this.flow.nodes.find(n => n.id === nodeId);
@@ -199,6 +194,15 @@ export default class zv1 {
     );
   }
 
+  /**
+   * Create a hash of node execution state (id + inputs + settings)
+   * Used to prevent duplicate processing of nodes with identical contexts
+   * @private
+   * @param {string} nodeId - The node ID
+   * @param {Object} inputs - The inputs object
+   * @param {Object} settings - The settings object
+   * @returns {string} SHA-256 hash of the execution state
+   */
   _createExecutionHash(nodeId, inputs, settings) {
     const state = {
       id: nodeId,
@@ -907,38 +911,52 @@ export default class zv1 {
         this.runningNodes.delete(node.id);
         this.completedNodes.add(node.id);
         this.logDebug(`Node [${node.id}] completed, removed from running set`);
-        
+
         // Propagate downstream nodes to queue
         this.propagate(node.id);
+
+        // Signal completion for any waiting promises
+        this._signalNodeCompletion();
       })
       .catch((error) => {
         // Node failed
         this.runningNodes.delete(node.id);
         this.logDebug(`Node [${node.id}] failed, removed from running set:`, error.message);
-        
+
         // Store the error for the main execution loop to handle
         this.lastError = error;
+
+        // Signal completion for any waiting promises (even on failure)
+        this._signalNodeCompletion();
       });
   }
 
   /**
    * Wait for at least one node to complete
+   * Uses event-based signaling instead of busy-waiting
    * @returns {Promise<void>}
    */
   async waitForNodeCompletion() {
-    return new Promise((resolve, reject) => {
-      const checkCompletion = () => {
-        if (this.runningNodes.size === 0) {
-          resolve();
-        } else {
-          // Check again in next tick
-          setImmediate(checkCompletion);
-        }
-      };
-      
-      // Start checking for completion
-      setImmediate(checkCompletion);
+    // If no nodes are running, return immediately
+    if (this.runningNodes.size === 0) {
+      return;
+    }
+
+    // Wait for a node to complete via event-based signaling
+    return new Promise((resolve) => {
+      this.nodeCompletionResolvers.push(resolve);
     });
+  }
+
+  /**
+   * Signal that a node has completed (success or failure)
+   * This triggers any waiting promises from waitForNodeCompletion
+   */
+  _signalNodeCompletion() {
+    if (this.nodeCompletionResolvers.length > 0) {
+      const resolver = this.nodeCompletionResolvers.shift();
+      resolver();
+    }
   }
   
   
@@ -2181,7 +2199,7 @@ export default class zv1 {
         const tempNodeId = `__plugin_arg_${pluginNode.id}`;
         this.cache.set({ node_id: tempNodeId, port_name: inputName, value });
         tempCacheKeys.push({ node_id: tempNodeId, port_name: inputName });
-        
+
         // Also add a temporary link so getNodeInputValue can find it
         const tempLink = {
           from: { node_id: tempNodeId, port_name: inputName },
@@ -2189,19 +2207,20 @@ export default class zv1 {
         };
         this.flow.links.push(tempLink);
       }
-      
-      // Execute the macro
-      const outputs = await this.processMacroNode(pluginNode);
-      
-      // Clean up temporary cache entries and links
-      tempCacheKeys.forEach(({ node_id, port_name }) => 
-        this.cache.delete({ node_id, port_name })
-      );
-      this.flow.links = this.flow.links.filter(link => 
-        !link.from.node_id.startsWith('__plugin_arg_')
-      );
-      
-      return outputs;
+
+      try {
+        // Execute the macro
+        const outputs = await this.processMacroNode(pluginNode);
+        return outputs;
+      } finally {
+        // Always clean up temporary cache entries and links, even on error
+        tempCacheKeys.forEach(({ node_id, port_name }) =>
+          this.cache.delete({ node_id, port_name })
+        );
+        this.flow.links = this.flow.links.filter(link =>
+          !link.from.node_id.startsWith('__plugin_arg_')
+        );
+      }
     }
     
     // For regular nodes and imports
