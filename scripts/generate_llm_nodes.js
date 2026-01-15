@@ -8,9 +8,6 @@ require('dotenv').config();
 // Configuration
 const BASE_DIR = path.dirname(path.resolve(__dirname));
 const NODES_DIR = path.join(BASE_DIR, 'nodes');
-const ENGINES_DIR = path.join(BASE_DIR, 'engines');
-const NODEJS_ENGINE_DIR = path.join(ENGINES_DIR, 'nodejs');
-const NODEJS_INTEGRATIONS_DIR = path.join(NODEJS_ENGINE_DIR, 'integrations');
 
 // OpenRouter API configuration
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1';
@@ -796,6 +793,16 @@ class LLMNodeGenerator {
   }
 
   /**
+   * Convert JSON to Python-compatible string (null -> None, true -> True, false -> False)
+   */
+  jsonToPython(obj) {
+    return JSON.stringify(obj)
+      .replace(/\bnull\b/g, 'None')
+      .replace(/\btrue\b/g, 'True')
+      .replace(/\bfalse\b/g, 'False');
+  }
+
+  /**
    * Generate Python process file
    */
   generatePythonProcess(model) {
@@ -807,47 +814,75 @@ class LLMNodeGenerator {
     const completionProcessing = this.generatePythonCompletionProcessing();
     const conversationBuilding = this.generatePythonConversationBuildingLogic();
     const returnValues = this.generatePythonReturnValues(model);
+    const configInputsPython = this.jsonToPython(this.generateInputs(model));
 
-    return `async def process({inputs, settings, config, nodeConfig}):
-    """Process function for the ${model.name} node"""
-    try:
-        # Get OpenRouter integration from engine
-        openrouter = config.get("integrations", {}).get("openrouter")
-        if not openrouter:
-            raise Exception("OpenRouter integration not found")
+    // Image generation setup if applicable
+    const imageGenSetup = this.hasImageGenerationCapability(model)
+      ? `
+    # Set default modalities for image generation if not provided
+    if "modalities" not in params:
+        params["modalities"] = ["image", "text"]
+`
+      : '';
 
-        ${isChat ? chatProcessing : completionProcessing}
+    return `"""
+${model.name} - LLM node for the zv1 engine.
+"""
 
-        # Build parameters dict from config inputs
-        params = {}
-        config_inputs = ${JSON.stringify(this.generateInputs(model))}
-        
-        for input_def in config_inputs:
-            value = inputs.get(input_def["name"])
-            if value is not None:
-                params[input_def["name"]] = value
+from typing import Any
 
-        ${this.hasImageGenerationCapability(model) ? `# Set default modalities for image generation if not provided
-        if "modalities" not in params:
-            params["modalities"] = ["image", "text"]` : ''}
 
-        response = await openrouter.chat_completion(
-            model="${modelId}",
-            ${isChat ? 'messages=messages,' : 'prompt=inputs.get("prompt"),'}
-            **params,
-            nodeConfig=nodeConfig,
-            engineConfig=config
-        )
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
+    """
+    Process function for the ${model.name} node.
 
-        ${isChat ? conversationBuilding : ''}
+    Args:
+        inputs: Node inputs containing messages/prompt and parameters.
+        settings: Node settings (unused for LLM nodes).
+        config: Engine configuration with integrations and keys.
+        node_config: Node configuration from config.json.
 
-        return {
-            ${returnValues}
-            "cost_total": response.get("cost_total"),
-            "cost_itemized": response.get("cost_itemized")
-        }
-    except Exception as e:
-        raise Exception(f"${model.name} node error: {str(e)}")`;
+    Returns:
+        Dictionary with conversation, message, content, and usage data.
+    """
+    # Get OpenRouter integration from engine
+    openrouter = config.get("integrations", {}).get("openrouter")
+    if not openrouter:
+        raise RuntimeError("OpenRouter integration not available")
+
+${isChat ? chatProcessing : completionProcessing}
+
+    # Build parameters dict from config inputs
+    params = {}
+    config_inputs = ${configInputsPython}
+
+    for input_def in config_inputs:
+        if input_def["name"] == "messages":
+            continue
+        value = inputs.get(input_def["name"])
+        if value is not None:
+            params[input_def["name"]] = value
+${imageGenSetup}
+    response = await openrouter.chat_completion(
+        model="${modelId}",
+        ${isChat ? 'messages=messages,' : 'prompt=inputs.get("prompt"),'}
+        **params,
+        node_config=node_config,
+        engine_config=config,
+    )
+
+${isChat ? conversationBuilding : ''}
+    return {
+${returnValues}
+        "cost_total": response.get("cost_total"),
+        "cost_itemized": response.get("cost_itemized"),
+    }`;
   }
 
   /**
@@ -950,39 +985,42 @@ class LLMNodeGenerator {
    * Generate conversation building logic for Python
    */
   generatePythonConversationBuildingLogic() {
-    return `# Build conversation output: slice from end of input messages until we hit a non-tool message without tool_calls
-        conversation_messages = []
-        if isinstance(messages, list) and len(messages) > 0:
-            # Work backwards from the end
-            for i in range(len(messages) - 1, -1, -1):
-                msg = messages[i]
-                if not isinstance(msg, dict):
-                    continue
-                
-                is_tool = msg.get("role") == "tool"
-                has_tool_calls = msg.get("tool_calls") and isinstance(msg.get("tool_calls"), list) and len(msg.get("tool_calls", [])) > 0
-                
-                # Include this message if it's a tool message or has tool_calls
-                if is_tool or has_tool_calls:
-                    conversation_messages.insert(0, msg)
-                else:
-                    # Stop when we hit a message that is not tool and has no tool_calls
-                    # Include this message as the starting point
-                    conversation_messages.insert(0, msg)
-                    break
-        
-        # Append the final output message
-        final_message = {
-            "content": response.get("content"),
-            "role": response.get("role")
-        }
-        if response.get("tool_calls"):
-            final_message["tool_calls"] = response.get("tool_calls")
-        if response.get("images"):
-            final_message["images"] = response.get("images")
-        conversation_messages.append(final_message)
-        
-        conversation = conversation_messages`;
+    return `    # Build conversation output: collect tool-related messages from end of input
+    conversation_messages: list[dict[str, Any]] = []
+    if isinstance(messages, list) and len(messages) > 0:
+        # Work backwards from the end
+        for i in range(len(messages) - 1, -1, -1):
+            msg = messages[i]
+            if not isinstance(msg, dict):
+                continue
+
+            is_tool = msg.get("role") == "tool"
+            tool_calls = msg.get("tool_calls")
+            has_tool_calls = (
+                tool_calls is not None
+                and isinstance(tool_calls, list)
+                and len(tool_calls) > 0
+            )
+
+            # Include this message if it's a tool message or has tool_calls
+            if is_tool or has_tool_calls:
+                conversation_messages.insert(0, msg)
+            else:
+                # Stop when we hit a message that is not tool and has no tool_calls
+                break
+
+    # Append the final output message
+    final_message: dict[str, Any] = {
+        "content": response.get("content"),
+        "role": response.get("role"),
+    }
+    if response.get("tool_calls"):
+        final_message["tool_calls"] = response.get("tool_calls")
+    if response.get("images"):
+        final_message["images"] = response.get("images")
+    conversation_messages.append(final_message)
+
+    conversation = conversation_messages`;
   }
 
   /**
@@ -1050,27 +1088,30 @@ class LLMNodeGenerator {
    * Generate Python chat message processing
    */
   generatePythonChatMessageProcessing() {
-    return `messages = inputs.get("messages", [])
+    return `    messages = inputs.get("messages", [])
 
-        if isinstance(messages, str):
-            messages = [{ "role": "user", "content": messages }]
+    # Handle string input - convert to user message
+    if isinstance(messages, str):
+        messages = [{"role": "user", "content": messages}]
 
-        if isinstance(messages, dict):
-            messages = [messages]
+    # Handle single message object - wrap in list
+    if isinstance(messages, dict):
+        messages = [messages]
 
-        if inputs.get("system_prompt"):
-            system_prompt = inputs.get("system_prompt") 
-            if isinstance(system_prompt, str):
-                system_prompt = {"role": "system", "content": system_prompt}
-
-            messages = [system_prompt, *messages]`;
+    # Prepend system prompt if provided
+    if inputs.get("system_prompt"):
+        system_prompt = inputs.get("system_prompt")
+        if isinstance(system_prompt, str):
+            system_prompt = {"role": "system", "content": system_prompt}
+        messages = [system_prompt, *messages]`;
   }
 
   /**
    * Generate Python completion processing
    */
   generatePythonCompletionProcessing() {
-    return `# No message processing needed for completion models`;
+    return `    # Completion model - no message processing needed
+    pass`;
   }
 
   /**
@@ -1103,58 +1144,58 @@ class LLMNodeGenerator {
    */
   generatePythonReturnValues(model) {
     const isChat = this.isChatModel(model);
-    const hasReasoning = model.supported_parameters?.includes('reasoning') || 
+    const hasReasoning = model.supported_parameters?.includes('reasoning') ||
                         model.supported_parameters?.includes('include_reasoning');
     const hasWebSearch = this.hasWebSearchCapability(model);
     const hasLogprobs = model.supported_parameters?.includes('logprobs');
     const hasImageGen = this.hasImageGenerationCapability(model);
-    
+
     let returnValues = '';
-    
+
     if (isChat) {
-      returnValues += `"conversation": conversation,
-            "message": {
-                "content": response["content"],
-                "role": response["role"],
-                "tool_calls": response.get("tool_calls")
-            },
-            "content": response["content"],
-            "role": response["role"],
-            "tool_calls": response.get("tool_calls"),`;
+      returnValues += `        "conversation": conversation,
+        "message": {
+            "content": response.get("content"),
+            "role": response.get("role"),
+            "tool_calls": response.get("tool_calls"),
+        },
+        "content": response.get("content"),
+        "role": response.get("role"),
+        "tool_calls": response.get("tool_calls"),`;
     } else {
-      returnValues += `"content": response["content"],`;
+      returnValues += `        "content": response.get("content"),`;
     }
 
     // Add images output if model supports image generation
     if (hasImageGen) {
       returnValues += `
-            "images": response.get("images"),`;
+        "images": response.get("images"),`;
     }
 
     // Add reasoning-related outputs
     if (hasReasoning) {
       returnValues += `
-            "reasoning": response.get("reasoning"),
-            "refusal": response.get("refusal"),`;
+        "reasoning": response.get("reasoning"),
+        "refusal": response.get("refusal"),`;
     }
 
     // Add web search outputs
     if (hasWebSearch) {
       returnValues += `
-            "annotations": response.get("annotations"),
-            "citations": response.get("citations"),`;
+        "annotations": response.get("annotations"),
+        "citations": response.get("citations"),`;
     }
 
     // Add logprobs output
     if (hasLogprobs) {
       returnValues += `
-            "logprobs": response.get("logprobs"),`;
+        "logprobs": response.get("logprobs"),`;
     }
 
     // Common outputs
     returnValues += `
-            "finish_reason": response["finish_reason"],
-            "usage": response["usage"]`;
+        "finish_reason": response.get("finish_reason"),
+        "usage": response.get("usage"),`;
 
     return returnValues;
   }
@@ -1343,15 +1384,14 @@ class LLMNodeGenerator {
   }
 
   /**
-   * Remove existing LLM nodes when overwrite_existing is enabled
+   * Remove existing LLM nodes when cleanup_old_nodes is enabled
    */
   removeExistingLLMNodes() {
     const existingLLMNodes = this.getExistingLLMNodes();
-    const generatedNodeNames = this.models.map(model => this.generateNodeName(model.id));
-    
-    console.log(`Found ${existingLLMNodes.length} existing LLM nodes`);
-    console.log(`Will generate ${generatedNodeNames.length} new LLM nodes`);
-    
+
+    console.log(`Found ${existingLLMNodes.length} existing LLM nodes to remove`);
+    console.log(`Will generate ${this.models.length} new LLM nodes`);
+
     for (const nodeName of existingLLMNodes) {
       const nodeDir = path.join(NODES_DIR, nodeName);
       if (fs.existsSync(nodeDir)) {
@@ -1396,8 +1436,8 @@ class LLMNodeGenerator {
     if (this.options.dryRun) {
       console.log('This was a dry run. No files were actually created.');
     } else {
-      console.log('Run the sync script to update engine directories:');
-      console.log('cd scripts && python sync_nodes.py');
+      console.log('Run the sync script to distribute nodes to SDKs:');
+      console.log('  python scripts/sync_sdks.py');
     }
 
     return this.generatedNodes;

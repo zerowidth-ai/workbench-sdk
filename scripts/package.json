@@ -12,7 +12,9 @@
     "dev": "node sync-watcher.js --watch --verbose"
   },
   "dependencies": {
-    "chokidar": "^3.5.3"
+    "axios": "^1.13.2",
+    "chokidar": "^3.5.3",
+    "dotenv": "^17.2.3"
   },
   "engines": {
     "node": ">=14.0.0"

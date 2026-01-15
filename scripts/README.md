@@ -1,11 +1,14 @@
-# ZV1 Sync Scripts
+# ZV1 Scripts
 
-This directory contains scripts for synchronizing shared assets across the zv1 monorepo.
+This directory contains scripts for generating LLM nodes and synchronizing shared assets across the zv1 monorepo.
 
 ## Scripts
 
+### generate_llm_nodes.js
+Generates LLM node definitions by fetching available models from OpenRouter. Creates config, JavaScript process, Python process, and test files for each model.
+
 ### sync_sdks.py
-The original Python script for one-time synchronization of nodes, types, and test flows to all SDKs.
+Python script for one-time synchronization of nodes, types, and test flows to all SDKs.
 
 ### sync-watcher.js
 A Node.js file watcher that automatically syncs changes from the `/nodes`, `/types`, and `/tests` directories to language-specific SDKs in real-time.
@@ -16,6 +19,44 @@ A Node.js file watcher that automatically syncs changes from the `/nodes`, `/typ
 cd scripts
 npm install
 ```
+
+## LLM Node Generation
+
+Generate or update LLM nodes from OpenRouter's model catalog:
+
+```bash
+# Requires OPENROUTER_API_KEY in .env or environment
+cd scripts
+node generate_llm_nodes.js
+
+# Dry run (preview changes without writing files)
+node generate_llm_nodes.js --dry-run
+
+# Then sync to SDKs
+python sync_sdks.py
+```
+
+### Configuration
+
+Edit `generator.config.json` to control which providers/models are generated:
+
+```json
+{
+  "providers": {
+    "anthropic": { "enabled": true },
+    "openai": { "enabled": true }
+  },
+  "generation": {
+    "dry_run": false,
+    "include_python": true
+  },
+  "output": {
+    "cleanup_old_nodes": true
+  }
+}
+```
+
+See `generator.config.example.json` for all available options.
 
 ## Usage
 
