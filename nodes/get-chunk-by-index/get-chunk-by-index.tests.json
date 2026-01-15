@@ -1,53 +1,51 @@
-{
-  "tests": [
-    {
-      "name": "Get chunk by valid index",
-      "inputs": {
+[
+  {
+    "inputs": {
+      "document_id": "test-doc-1",
+      "chunk_index": 0
+    },
+    "expected": {
+      "found": true,
+      "chunk": {
         "document_id": "test-doc-1",
-        "chunk_index": 0
-      },
-      "expected": {
-        "found": true,
-        "chunk": {
-          "document_id": "test-doc-1",
-          "chunk_index": 0,
-          "content": "This is the first chunk of the document."
-        }
+        "chunk_index": 0,
+        "content": "This is the first chunk of the document."
       }
     },
-    {
-      "name": "Get chunk by invalid index",
-      "inputs": {
-        "document_id": "test-doc-1",
-        "chunk_index": 999
-      },
-      "expected": {
-        "found": false,
-        "chunk": null
-      }
+    "description": "Get chunk by valid index"
+  },
+  {
+    "inputs": {
+      "document_id": "test-doc-1",
+      "chunk_index": 999
     },
-    {
-      "name": "Get chunk with invalid document ID",
-      "inputs": {
-        "document_id": "non-existent-doc",
-        "chunk_index": 0
-      },
-      "expected": {
-        "found": false,
-        "chunk": null
-      }
+    "expected": {
+      "found": false,
+      "chunk": null
     },
-    {
-      "name": "Missing required inputs",
-      "inputs": {
-        "document_id": "",
-        "chunk_index": null
-      },
-      "expected": {
-        "found": false,
-        "chunk": null,
-        "error": "Document ID is required and must be a string"
-      }
-    }
-  ]
-}
+    "description": "Get chunk by invalid index"
+  },
+  {
+    "inputs": {
+      "document_id": "non-existent-doc",
+      "chunk_index": 0
+    },
+    "expected": {
+      "found": false,
+      "chunk": null
+    },
+    "description": "Get chunk with invalid document ID"
+  },
+  {
+    "inputs": {
+      "document_id": "",
+      "chunk_index": null
+    },
+    "expected": {
+      "found": false,
+      "chunk": null,
+      "error": "Document ID is required and must be a string"
+    },
+    "description": "Missing required inputs"
+  }
+]

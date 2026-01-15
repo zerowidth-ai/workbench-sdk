@@ -1,134 +1,139 @@
-{
-  "test_cases": [
-    {
-      "name": "First iteration - should loop back",
-      "inputs": {
-        "value": "test",
-        "loop_limit": 10,
-        "while_condition": true
-      },
-      "expected": {
-        "loop_back": "test",
-        "loop_end": null,
-        "iteration": 1
-      }
+[
+  {
+    "inputs": {
+      "value": "test",
+      "loop_limit": 10,
+      "while_condition": true
     },
-    {
-      "name": "Continue looping - iteration 5 of 10",
-      "settings": {
-        "_loop_iteration": 4
-      },
-      "inputs": {
-        "value": "test",
-        "loop_limit": 10,
-        "while_condition": true
-      },
-      "expected": {
-        "loop_back": "test",
-        "loop_end": null,
-        "iteration": 5
-      }
+    "expected": {
+      "loop_back": "test",
+      "final_value": null,
+      "total_iterations": null,
+      "all_values": null
     },
-    {
-      "name": "Exit on limit reached",
-      "settings": {
-        "_loop_iteration": 9
-      },
-      "inputs": {
-        "value": "final",
-        "loop_limit": 10,
-        "while_condition": true
-      },
-      "expected": {
-        "loop_back": null,
-        "loop_end": "final",
-        "iteration": 10
-      }
+    "description": "First iteration - should loop back"
+  },
+  {
+    "settings": {
+      "_loop_iteration": 4
     },
-    {
-      "name": "Exit on while_condition false",
-      "settings": {
-        "_loop_iteration": 2
-      },
-      "inputs": {
-        "value": "early exit",
-        "loop_limit": 10,
-        "while_condition": false
-      },
-      "expected": {
-        "loop_back": null,
-        "loop_end": "early exit",
-        "iteration": 3
-      }
+    "inputs": {
+      "value": "test",
+      "loop_limit": 10,
+      "while_condition": true
     },
-    {
-      "name": "Small loop limit (3 iterations)",
-      "settings": {
-        "_loop_iteration": 2
-      },
-      "inputs": {
-        "value": "done",
-        "loop_limit": 3,
-        "while_condition": true
-      },
-      "expected": {
-        "loop_back": null,
-        "loop_end": "done",
-        "iteration": 3
-      }
+    "expected": {
+      "loop_back": "test",
+      "final_value": null,
+      "total_iterations": null,
+      "all_values": null
     },
-    {
-      "name": "Use default loop_limit (10)",
-      "settings": {
-        "_loop_iteration": 0
-      },
-      "inputs": {
-        "value": "default test",
-        "while_condition": true
-      },
-      "expected": {
-        "loop_back": "default test",
-        "loop_end": null,
-        "iteration": 1
-      }
+    "description": "Continue looping - iteration 5 of 10"
+  },
+  {
+    "settings": {
+      "_loop_iteration": 9
     },
-    {
-      "name": "Use default while_condition (true)",
-      "settings": {
-        "_loop_iteration": 0
-      },
-      "inputs": {
-        "value": "default condition",
-        "loop_limit": 5
-      },
-      "expected": {
-        "loop_back": "default condition",
-        "loop_end": null,
-        "iteration": 1
-      }
+    "inputs": {
+      "value": "final",
+      "loop_limit": 10,
+      "while_condition": true
     },
-    {
-      "name": "Pass through object",
-      "settings": {
-        "_loop_iteration": 0
+    "expected": {
+      "loop_back": null,
+      "final_value": "final",
+      "total_iterations": 10,
+      "all_values": ["final"]
+    },
+    "description": "Exit on limit reached"
+  },
+  {
+    "settings": {
+      "_loop_iteration": 2
+    },
+    "inputs": {
+      "value": "early exit",
+      "loop_limit": 10,
+      "while_condition": false
+    },
+    "expected": {
+      "loop_back": null,
+      "final_value": "early exit",
+      "total_iterations": 3,
+      "all_values": ["early exit"]
+    },
+    "description": "Exit on while_condition false"
+  },
+  {
+    "settings": {
+      "_loop_iteration": 2
+    },
+    "inputs": {
+      "value": "done",
+      "loop_limit": 3,
+      "while_condition": true
+    },
+    "expected": {
+      "loop_back": null,
+      "final_value": "done",
+      "total_iterations": 3,
+      "all_values": ["done"]
+    },
+    "description": "Small loop limit (3 iterations)"
+  },
+  {
+    "settings": {
+      "_loop_iteration": 0
+    },
+    "inputs": {
+      "value": "default test",
+      "while_condition": true
+    },
+    "expected": {
+      "loop_back": "default test",
+      "final_value": null,
+      "total_iterations": null,
+      "all_values": null
+    },
+    "description": "Use default loop_limit (10)"
+  },
+  {
+    "settings": {
+      "_loop_iteration": 0
+    },
+    "inputs": {
+      "value": "default condition",
+      "loop_limit": 5
+    },
+    "expected": {
+      "loop_back": "default condition",
+      "final_value": null,
+      "total_iterations": null,
+      "all_values": null
+    },
+    "description": "Use default while_condition (true)"
+  },
+  {
+    "settings": {
+      "_loop_iteration": 0
+    },
+    "inputs": {
+      "value": {
+        "data": [1, 2, 3],
+        "status": "processing"
       },
-      "inputs": {
-        "value": {
-          "data": [1, 2, 3],
-          "status": "processing"
-        },
-        "loop_limit": 5,
-        "while_condition": true
+      "loop_limit": 5,
+      "while_condition": true
+    },
+    "expected": {
+      "loop_back": {
+        "data": [1, 2, 3],
+        "status": "processing"
       },
-      "expected": {
-        "loop_back": {
-          "data": [1, 2, 3],
-          "status": "processing"
-        },
-        "loop_end": null,
-        "iteration": 1
-      }
-    }
-  ]
-}
-
+      "final_value": null,
+      "total_iterations": null,
+      "all_values": null
+    },
+    "description": "Pass through object"
+  }
+]

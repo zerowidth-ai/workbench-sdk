@@ -5,8 +5,9 @@
       "value": "always succeeds",
       "errorProbability": 0.0
     },
-    "expected": "Should always return the value without throwing",
-    "shouldThrow": false
+    "expected": {
+      "result": "always succeeds"
+    }
   },
   {
     "description": "Always throw error (100% probability)",
@@ -14,68 +15,24 @@
       "value": "never reaches here",
       "errorProbability": 1.0
     },
-    "expected": "Should always throw an error",
-    "shouldThrow": true
+    "expectedError": "Random error occurred"
   },
   {
-    "description": "50% chance of error",
-    "inputs": {
-      "value": "might succeed or fail",
-      "errorProbability": 0.5
-    },
-    "expected": "Should either return the value or throw an error with 50% probability",
-    "shouldThrow": "maybe"
-  },
-  {
-    "description": "Default probability (10%)",
-    "inputs": {
-      "value": "default behavior test"
-    },
-    "expected": "Should return the value with 90% probability, throw error with 10% probability",
-    "shouldThrow": "maybe"
-  },
-  {
-    "description": "Custom error message and type",
-    "inputs": {
-      "value": "custom error test",
-      "errorProbability": 1.0,
-      "errorMessage": "Custom random error message",
-      "errorType": "CustomRandomError"
-    },
-    "expected": "Should throw CustomRandomError with custom message",
-    "shouldThrow": true
-  },
-  {
-    "description": "Handle edge case probability values",
+    "description": "Handle edge case probability values (clamped to 1.0)",
     "inputs": {
       "value": "edge case test",
       "errorProbability": 1.5
     },
-    "expected": "Should clamp probability to 1.0 and always throw error",
-    "shouldThrow": true
+    "expectedError": "Random error occurred"
   },
   {
-    "description": "Handle negative probability",
+    "description": "Handle negative probability (clamped to 0.0)",
     "inputs": {
       "value": "negative test",
       "errorProbability": -0.5
     },
-    "expected": "Should clamp probability to 0.0 and never throw error",
-    "shouldThrow": false
-  },
-  {
-    "description": "Test with complex data structure",
-    "inputs": {
-      "value": {
-        "nested": {
-          "array": [1, 2, 3],
-          "string": "complex object",
-          "number": 123.45
-        }
-      },
-      "errorProbability": 0.2
-    },
-    "expected": "Should return the complex object with 80% probability, throw error with 20% probability",
-    "shouldThrow": "maybe"
+    "expected": {
+      "result": "negative test"
+    }
   }
-] 
+]

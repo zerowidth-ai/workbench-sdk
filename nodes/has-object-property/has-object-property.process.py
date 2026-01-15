@@ -2,9 +2,15 @@
 Process function for the Has Object Property node.
 Check if an object has a specific property/key.
 """
-from typing import Any, Dict
+from typing import Any
 
-async def process(inputs: Dict[str, Any], settings: Dict[str, Any], config: Dict[str, Any], nodeConfig: Dict[str, Any]) -> Dict[str, Any]:
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     object_input = inputs.get("object")
     key = inputs.get("key")
     check_own_properties = settings.get("check_own_properties", True)

@@ -1,6 +1,13 @@
+from typing import Any
 import json
 
-async def process(inputs, settings, config, nodeConfig):
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     """
     Process function for the JSON Parser node.
     Parses a JSON string into an object or array.

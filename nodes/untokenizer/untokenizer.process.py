@@ -1,7 +1,13 @@
 import tiktoken
-from typing import Any, Dict, List, Union
+from typing import Any
 
-async def process(inputs: Dict[str, Any], settings: Dict[str, Any], config: Dict[str, Any], nodeConfig: Dict[str, Any]) -> Dict[str, Any]:
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     try:
         tokens = inputs.get('tokens')
         if not isinstance(tokens, list):

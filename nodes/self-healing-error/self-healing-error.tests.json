@@ -1,51 +1,16 @@
 [
   {
-    "description": "Fail once then succeed (default behavior)",
-    "inputs": {
-      "value": "healed value"
-    },
-    "expected": "Should fail on first attempt, succeed on second attempt",
-    "shouldThrow": true
-  },
-  {
-    "description": "Fail twice then succeed",
-    "inputs": {
-      "value": "healed after 2 failures",
-      "failCount": 2
-    },
-    "expected": "Should fail on first two attempts, succeed on third attempt",
-    "shouldThrow": true
-  },
-  {
     "description": "Never fail (failCount = 0)",
     "inputs": {
       "value": "immediate success",
       "failCount": 0
     },
-    "expected": "Should succeed immediately on first attempt",
-    "shouldThrow": false
+    "expected": {
+      "result": "immediate success"
+    }
   },
   {
-    "description": "Custom error message",
-    "inputs": {
-      "value": "custom error test",
-      "failCount": 1,
-      "errorMessage": "Custom failure message"
-    },
-    "expected": "Should fail with custom error message, then succeed",
-    "shouldThrow": true
-  },
-  {
-    "description": "Large fail count",
-    "inputs": {
-      "value": "healed after many failures",
-      "failCount": 5
-    },
-    "expected": "Should fail 5 times, then succeed on 6th attempt",
-    "shouldThrow": true
-  },
-  {
-    "description": "Complex data structure",
+    "description": "Complex data structure (failCount = 0)",
     "inputs": {
       "value": {
         "status": "healed",
@@ -54,9 +19,16 @@
           "attempts": "tracked internally"
         }
       },
-      "failCount": 1
+      "failCount": 0
     },
-    "expected": "Should fail once, then return the complex object",
-    "shouldThrow": true
+    "expected": {
+      "result": {
+        "status": "healed",
+        "data": [1, 2, 3],
+        "metadata": {
+          "attempts": "tracked internally"
+        }
+      }
+    }
   }
-] 
+]

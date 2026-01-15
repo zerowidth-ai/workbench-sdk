@@ -1,7 +1,14 @@
+from typing import Any
 import csv
 import io
 
-async def process(inputs, settings, config, nodeConfig):
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     """
     Process function for the CSV Parser node.
     Parses a CSV string into an array of objects or arrays.

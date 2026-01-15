@@ -1,14 +1,22 @@
 from datetime import datetime
-from typing import Any, Dict, List, Union
+from typing import Any
 
-async def process(inputs: Dict[str, Any], settings: Dict[str, Any], config: Dict[str, Any], nodeConfig: Dict[str, Any]) -> Dict[str, Any]:
+
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     try:
         format_type = inputs.get('format', 'iso')
         
         now = datetime.now()
         unix_timestamp = int(now.timestamp())
         unix_timestamp_ms = int(now.timestamp() * 1000)
-        iso_string = now.isoformat() + 'Z'
+        # Format ISO string to match JavaScript's toISOString() format: YYYY-MM-DDTHH:MM:SS.sssZ
+        iso_string = now.strftime('%Y-%m-%dT%H:%M:%S.') + f'{now.microsecond // 1000:03d}Z'
         
         # Check for preset format keywords first
         if format_type == 'iso':

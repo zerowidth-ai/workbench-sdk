@@ -9,13 +9,17 @@
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
-    "logprobs",
+    "logit_bias",
     "max_tokens",
     "presence_penalty",
     "reasoning",
+    "repetition_penalty",
+    "response_format",
+    "seed",
     "stop",
+    "structured_outputs",
     "temperature",
-    "top_logprobs",
+    "top_k",
     "top_p"
   ],
   "inputs": [
@@ -59,6 +63,20 @@
       "display_name": "Reasoning",
       "type": "boolean",
       "description": "Internal reasoning mode",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "string or object",
+      "description": "Output format specification",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
       "default": null
     },
     {
@@ -116,12 +134,6 @@
       "description": "Why the completion finished"
     },
     {
-      "name": "logprobs",
-      "display_name": "Log Probabilities",
-      "type": "object",
-      "description": "Token probabilities and logprobs from the model"
-    },
-    {
       "name": "reasoning",
       "display_name": "Reasoning",
       "type": "string",
@@ -141,13 +153,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.28,
+        "cost": 0.27,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.39999999999999997,
+        "cost": 0.41,
         "currency": "USD"
       }
     ]

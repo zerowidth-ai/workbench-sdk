@@ -7,21 +7,14 @@
   "model_id": "openai/gpt-oss-20b:free",
   "context_length": 131072,
   "supported_parameters": [
-    "frequency_penalty",
     "include_reasoning",
     "max_tokens",
-    "presence_penalty",
     "reasoning",
-    "repetition_penalty",
-    "response_format",
     "seed",
     "stop",
-    "structured_outputs",
     "temperature",
     "tool_choice",
-    "tools",
-    "top_k",
-    "top_p"
+    "tools"
   ],
   "inputs": [
     {
@@ -47,13 +40,6 @@
       "allow_multiple": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "include_reasoning",
       "display_name": "Include Reasoning",
       "type": "boolean",
@@ -68,24 +54,10 @@
       "default": null
     },
     {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "reasoning",
       "display_name": "Reasoning",
       "type": "boolean",
       "description": "Internal reasoning mode",
-      "default": null
-    },
-    {
-      "name": "response_format",
-      "display_name": "Response Format",
-      "type": "string or object",
-      "description": "Output format specification",
       "default": null
     },
     {
@@ -114,13 +86,6 @@
       "display_name": "Tool Choice",
       "type": "string",
       "description": "Tool selection control",
-      "default": null
-    },
-    {
-      "name": "top_p",
-      "display_name": "Top P",
-      "type": "number",
-      "description": "Controls diversity via nucleus sampling",
       "default": null
     }
   ],

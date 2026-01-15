@@ -5,7 +5,7 @@
   "provider": "deepseek",
   "accepts_plugins": true,
   "model_id": "deepseek/deepseek-r1-0528",
-  "context_length": 163840,
+  "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
@@ -213,13 +213,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.19999999999999998,
+        "cost": 0.44999999999999996,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 4.5,
+        "cost": 2.1500000000000004,
         "currency": "USD"
       }
     ]

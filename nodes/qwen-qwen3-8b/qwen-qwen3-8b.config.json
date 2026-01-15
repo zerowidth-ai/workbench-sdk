@@ -5,7 +5,7 @@
   "provider": "qwen",
   "accepts_plugins": true,
   "model_id": "qwen/qwen3-8b",
-  "context_length": 128000,
+  "context_length": 32000,
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
@@ -16,7 +16,6 @@
     "reasoning",
     "repetition_penalty",
     "response_format",
-    "seed",
     "stop",
     "structured_outputs",
     "temperature",
@@ -89,13 +88,6 @@
       "display_name": "Response Format",
       "type": "string or object",
       "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "seed",
-      "display_name": "Seed",
-      "type": "number",
-      "description": "Deterministic outputs",
       "default": null
     },
     {
@@ -212,13 +204,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.028,
+        "cost": 0.049999999999999996,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.1104,
+        "cost": 0.25,
         "currency": "USD"
       }
     ]

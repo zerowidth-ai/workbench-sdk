@@ -7,20 +7,14 @@
   "model_id": "openai/gpt-5.1-codex",
   "context_length": 400000,
   "supported_parameters": [
-    "frequency_penalty",
     "include_reasoning",
-    "logit_bias",
-    "logprobs",
     "max_tokens",
-    "presence_penalty",
     "reasoning",
     "response_format",
     "seed",
-    "stop",
     "structured_outputs",
     "tool_choice",
-    "tools",
-    "top_logprobs"
+    "tools"
   ],
   "inputs": [
     {
@@ -46,13 +40,6 @@
       "allow_multiple": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "include_reasoning",
       "display_name": "Include Reasoning",
       "type": "boolean",
@@ -64,13 +51,6 @@
       "display_name": "Max Tokens",
       "type": "number",
       "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
       "default": null
     },
     {
@@ -92,13 +72,6 @@
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
-      "default": null
-    },
-    {
-      "name": "stop",
-      "display_name": "Stop",
-      "type": "string or array",
-      "description": "Custom stop sequences",
       "default": null
     },
     {
@@ -167,12 +140,6 @@
       "display_name": "Finish Reason",
       "type": "string",
       "description": "Why the completion finished"
-    },
-    {
-      "name": "logprobs",
-      "display_name": "Log Probabilities",
-      "type": "object",
-      "description": "Token probabilities and logprobs from the model"
     },
     {
       "name": "reasoning",

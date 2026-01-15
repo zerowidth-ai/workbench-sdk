@@ -1,6 +1,13 @@
+from typing import Any
 import math
 
-async def process(inputs, settings, config, nodeConfig):
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
   numbers = inputs.get("numbers", [])
   if not isinstance(numbers, list):
     numbers = [numbers]

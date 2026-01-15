@@ -1,6 +1,13 @@
+from typing import Any
 import random
 
-async def process(inputs, settings, config, nodeConfig):
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
   array = inputs.get("array", [])
   if not isinstance(array, list):
     array = [array]
@@ -20,13 +27,7 @@ async def process(inputs, settings, config, nodeConfig):
     result[i], result[j] = result[j], result[i]
     indices[i], indices[j] = indices[j], indices[i]
   
-  # For empty or single-element arrays, match the expected output format
-  if len(array) <= 1:
-    return {
-      "array": result
-    }
-  
   return {
     "array": result,
-    "indices": indices
+    "indices": indices,
   } 

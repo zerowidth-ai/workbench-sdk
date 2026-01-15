@@ -1,71 +1,69 @@
-{
-  "tests": [
-    {
-      "name": "Basic search test",
-      "inputs": {
-        "query": "artificial intelligence",
-        "cx": "test-search-engine-id",
-        "num": 5
-      },
-      "expected": {
-        "items": "array",
-        "searchInformation": "object",
-        "queries": "object",
-        "totalResults": "string",
-        "searchTime": "number"
-      }
+[
+  {
+    "inputs": {
+      "query": "artificial intelligence",
+      "cx": "test-search-engine-id",
+      "num": 5
     },
-    {
-      "name": "Image search test",
-      "inputs": {
-        "query": "mountain landscape",
-        "cx": "test-search-engine-id",
-        "searchType": "image",
-        "imgSize": "large",
-        "num": 3
-      },
-      "expected": {
-        "items": "array",
-        "searchInformation": "object",
-        "queries": "object",
-        "totalResults": "string",
-        "searchTime": "number"
-      }
+    "expected": {
+      "items": "array",
+      "searchInformation": "object",
+      "queries": "object",
+      "totalResults": "string",
+      "searchTime": "number"
     },
-    {
-      "name": "Filtered search test",
-      "inputs": {
-        "query": "machine learning",
-        "cx": "test-search-engine-id",
-        "fileType": "pdf",
-        "dateRestrict": "m1",
-        "safe": "high",
-        "num": 2
-      },
-      "expected": {
-        "items": "array",
-        "searchInformation": "object",
-        "queries": "object",
-        "totalResults": "string",
-        "searchTime": "number"
-      }
+    "description": "Basic search test"
+  },
+  {
+    "inputs": {
+      "query": "mountain landscape",
+      "cx": "test-search-engine-id",
+      "searchType": "image",
+      "imgSize": "large",
+      "num": 3
     },
-    {
-      "name": "Site-specific search test",
-      "inputs": {
-        "query": "tutorial",
-        "cx": "test-search-engine-id",
-        "siteSearch": "github.com",
-        "siteSearchFilter": "i",
-        "num": 4
-      },
-      "expected": {
-        "items": "array",
-        "searchInformation": "object",
-        "queries": "object",
-        "totalResults": "string",
-        "searchTime": "number"
-      }
-    }
-  ]
-}
+    "expected": {
+      "items": "array",
+      "searchInformation": "object",
+      "queries": "object",
+      "totalResults": "string",
+      "searchTime": "number"
+    },
+    "description": "Image search test"
+  },
+  {
+    "inputs": {
+      "query": "machine learning",
+      "cx": "test-search-engine-id",
+      "fileType": "pdf",
+      "dateRestrict": "m1",
+      "safe": "high",
+      "num": 2
+    },
+    "expected": {
+      "items": "array",
+      "searchInformation": "object",
+      "queries": "object",
+      "totalResults": "string",
+      "searchTime": "number"
+    },
+    "description": "Filtered search test"
+  },
+  {
+    "inputs": {
+      "query": "tutorial",
+      "cx": "test-search-engine-id",
+      "siteSearch": "github.com",
+      "siteSearchFilter": "i",
+      "num": 4
+    },
+    "expected": {
+      "items": "array",
+      "searchInformation": "object",
+      "queries": "object",
+      "totalResults": "string",
+      "searchTime": "number"
+    },
+    "description": "Site-specific search test"
+  }
+]

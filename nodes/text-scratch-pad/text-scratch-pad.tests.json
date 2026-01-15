@@ -1,133 +1,131 @@
-{
-  "test_cases": [
-    {
-      "name": "First text addition",
-      "inputs": {
-        "text": "Hello world"
-      },
-      "settings": {
-        "initial_content": "",
-        "default_delimiter": "\n"
-      },
-      "expected": {
-        "content": "Hello world",
-        "length": 11
-      }
+[
+  {
+    "inputs": {
+      "text": "Hello world"
     },
-    {
-      "name": "Second text addition with default delimiter",
-      "inputs": {
-        "text": "This is line 2"
-      },
-      "settings": {
-        "accumulated_content": "Hello world",
-        "default_delimiter": "\n"
-      },
-      "expected": {
-        "content": "Hello world\nThis is line 2",
-        "length": 26
-      }
+    "settings": {
+      "initial_content": "",
+      "default_delimiter": "\n"
     },
-    {
-      "name": "Custom delimiter",
-      "inputs": {
-        "text": "Another item",
-        "delimiter": " | "
-      },
-      "settings": {
-        "accumulated_content": "Item 1",
-        "default_delimiter": "\n"
-      },
-      "expected": {
-        "content": "Item 1 | Another item",
-        "length": 22
-      }
+    "expected": {
+      "content": "Hello world",
+      "length": 11
     },
-    {
-      "name": "Clear scratch pad",
-      "inputs": {
-        "text": "New content",
-        "clear": true
-      },
-      "settings": {
-        "accumulated_content": "Old content that should be cleared",
-        "default_delimiter": "\n"
-      },
-      "expected": {
-        "content": "New content",
-        "length": 11
-      }
+    "description": "First text addition"
+  },
+  {
+    "inputs": {
+      "text": "This is line 2"
     },
-    {
-      "name": "Empty text input",
-      "inputs": {
-        "text": ""
-      },
-      "settings": {
-        "accumulated_content": "Existing content",
-        "default_delimiter": "\n"
-      },
-      "expected": {
-        "content": "Existing content",
-        "length": 17
-      }
+    "settings": {
+      "accumulated_content": "Hello world",
+      "default_delimiter": "\n"
     },
-    {
-      "name": "Null text input",
-      "inputs": {
-        "text": null
-      },
-      "settings": {
-        "accumulated_content": "Existing content",
-        "default_delimiter": "\n"
-      },
-      "expected": {
-        "content": "Existing content",
-        "length": 17
-      }
+    "expected": {
+      "content": "Hello world\nThis is line 2",
+      "length": 26
     },
-    {
-      "name": "Multiple additions with comma delimiter",
-      "inputs": {
-        "text": "Third item",
-        "delimiter": ", "
-      },
-      "settings": {
-        "accumulated_content": "First item, Second item",
-        "default_delimiter": "\n"
-      },
-      "expected": {
-        "content": "First item, Second item, Third item",
-        "length": 35
-      }
+    "description": "Second text addition with default delimiter"
+  },
+  {
+    "inputs": {
+      "text": "Another item",
+      "delimiter": " | "
     },
-    {
-      "name": "Clear without new text",
-      "inputs": {
-        "clear": true
-      },
-      "settings": {
-        "accumulated_content": "Content to be cleared",
-        "default_delimiter": "\n"
-      },
-      "expected": {
-        "content": "",
-        "length": 0
-      }
+    "settings": {
+      "accumulated_content": "Item 1",
+      "default_delimiter": "\n"
     },
-    {
-      "name": "Initial content from settings",
-      "inputs": {
-        "text": "Additional text"
-      },
-      "settings": {
-        "initial_content": "Starting text",
-        "default_delimiter": " - "
-      },
-      "expected": {
-        "content": "Starting text - Additional text",
-        "length": 30
-      }
-    }
-  ]
-}
+    "expected": {
+      "content": "Item 1 | Another item",
+      "length": 21
+    },
+    "description": "Custom delimiter"
+  },
+  {
+    "inputs": {
+      "text": "New content",
+      "clear": true
+    },
+    "settings": {
+      "accumulated_content": "Old content that should be cleared",
+      "default_delimiter": "\n"
+    },
+    "expected": {
+      "content": "New content",
+      "length": 11
+    },
+    "description": "Clear scratch pad"
+  },
+  {
+    "inputs": {
+      "text": ""
+    },
+    "settings": {
+      "accumulated_content": "Existing content",
+      "default_delimiter": "\n"
+    },
+    "expected": {
+      "content": "Existing content",
+      "length": 16
+    },
+    "description": "Empty text input"
+  },
+  {
+    "inputs": {
+      "text": null
+    },
+    "settings": {
+      "accumulated_content": "Existing content",
+      "default_delimiter": "\n"
+    },
+    "expected": {
+      "content": "Existing content",
+      "length": 16
+    },
+    "description": "Null text input"
+  },
+  {
+    "inputs": {
+      "text": "Third item",
+      "delimiter": ", "
+    },
+    "settings": {
+      "accumulated_content": "First item, Second item",
+      "default_delimiter": "\n"
+    },
+    "expected": {
+      "content": "First item, Second item, Third item",
+      "length": 35
+    },
+    "description": "Multiple additions with comma delimiter"
+  },
+  {
+    "inputs": {
+      "clear": true
+    },
+    "settings": {
+      "accumulated_content": "Content to be cleared",
+      "default_delimiter": "\n"
+    },
+    "expected": {
+      "content": "",
+      "length": 0
+    },
+    "description": "Clear without new text"
+  },
+  {
+    "inputs": {
+      "text": "Additional text"
+    },
+    "settings": {
+      "initial_content": "Starting text",
+      "default_delimiter": " - "
+    },
+    "expected": {
+      "content": "Starting text - Additional text",
+      "length": 31
+    },
+    "description": "Initial content from settings"
+  }
+]

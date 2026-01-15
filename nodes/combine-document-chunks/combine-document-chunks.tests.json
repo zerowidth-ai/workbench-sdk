@@ -1,53 +1,51 @@
-{
-  "tests": [
-    {
-      "name": "Combine chunks for valid document",
-      "inputs": {
-        "document_id": "test-doc-1",
-        "include_metadata": false,
-        "separator": "\n\n---\n\n"
-      },
-      "expected": {
-        "chunk_count": 3,
-        "content": "# Test Document\n\n*Document ID: test-doc-1*\n*File Type: markdown*\n*Chunks: 3*\n\nThis is the first chunk.\n\n---\n\nThis is the second chunk.\n\n---\n\nThis is the third chunk."
-      }
+[
+  {
+    "description": "Combine chunks for valid document",
+    "inputs": {
+      "document_id": "test-doc-1",
+      "include_metadata": false,
+      "separator": "\n\n---\n\n"
     },
-    {
-      "name": "Combine chunks with metadata",
-      "inputs": {
-        "document_id": "test-doc-1",
-        "include_metadata": true,
-        "separator": "\n\n---\n\n"
-      },
-      "expected": {
-        "chunk_count": 3,
-        "content": "# Test Document\n\n*Document ID: test-doc-1*\n*File Type: markdown*\n*Chunks: 3*\n\n## Chunk 0\n\nThis is the first chunk.\n\n---\n\n## Chunk 1\n\nThis is the second chunk.\n\n---\n\n## Chunk 2\n\nThis is the third chunk."
-      }
-    },
-    {
-      "name": "Combine chunks for non-existent document",
-      "inputs": {
-        "document_id": "non-existent-doc",
-        "include_metadata": false,
-        "separator": "\n\n---\n\n"
-      },
-      "expected": {
-        "chunk_count": 0,
-        "content": "",
-        "error": "Document with ID 'non-existent-doc' not found"
-      }
-    },
-    {
-      "name": "Combine chunks with custom separator",
-      "inputs": {
-        "document_id": "test-doc-1",
-        "include_metadata": false,
-        "separator": "\n\n***\n\n"
-      },
-      "expected": {
-        "chunk_count": 3,
-        "content": "# Test Document\n\n*Document ID: test-doc-1*\n*File Type: markdown*\n*Chunks: 3*\n\nThis is the first chunk.\n\n***\n\nThis is the second chunk.\n\n***\n\nThis is the third chunk."
-      }
+    "expected": {
+      "chunk_count": 3,
+      "content": "# Test Document\n\n*Document ID: test-doc-1*\n*File Type: markdown*\n*Chunks: 3*\n\nThis is the first chunk.\n\n---\n\nThis is the second chunk.\n\n---\n\nThis is the third chunk."
     }
-  ]
-}
+  },
+  {
+    "description": "Combine chunks with metadata",
+    "inputs": {
+      "document_id": "test-doc-1",
+      "include_metadata": true,
+      "separator": "\n\n---\n\n"
+    },
+    "expected": {
+      "chunk_count": 3,
+      "content": "# Test Document\n\n*Document ID: test-doc-1*\n*File Type: markdown*\n*Chunks: 3*\n\n## Chunk 0\n\nThis is the first chunk.\n\n---\n\n## Chunk 1\n\nThis is the second chunk.\n\n---\n\n## Chunk 2\n\nThis is the third chunk."
+    }
+  },
+  {
+    "description": "Combine chunks for non-existent document",
+    "inputs": {
+      "document_id": "non-existent-doc",
+      "include_metadata": false,
+      "separator": "\n\n---\n\n"
+    },
+    "expected": {
+      "chunk_count": 0,
+      "content": "",
+      "error": "Document with ID 'non-existent-doc' not found"
+    }
+  },
+  {
+    "description": "Combine chunks with custom separator",
+    "inputs": {
+      "document_id": "test-doc-1",
+      "include_metadata": false,
+      "separator": "\n\n***\n\n"
+    },
+    "expected": {
+      "chunk_count": 3,
+      "content": "# Test Document\n\n*Document ID: test-doc-1*\n*File Type: markdown*\n*Chunks: 3*\n\nThis is the first chunk.\n\n***\n\nThis is the second chunk.\n\n***\n\nThis is the third chunk."
+    }
+  }
+]

@@ -1,6 +1,12 @@
-from typing import Any, Dict, List, Union
+from typing import Any
 
-async def process(inputs: Dict[str, Any], settings: Dict[str, Any], config: Dict[str, Any], nodeConfig: Dict[str, Any]) -> Dict[str, Any]:
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     try:
         preserve_order = settings.get('preserve_order', True)
         filter_empty = settings.get('filter_empty', True)

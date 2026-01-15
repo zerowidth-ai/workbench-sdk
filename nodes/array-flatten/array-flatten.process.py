@@ -1,10 +1,18 @@
-async def process(inputs, settings, config, nodeConfig):
+from typing import Any
+
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
   array = inputs.get("array", [])
   if not isinstance(array, list):
     array = [array]
     
   max_depth = settings.get("depth", -1)
-  skip_empty = settings.get("skip_empty", False)
+  skip_empty = settings.get("skip_empty", True)
   
   def flatten(arr, depth=0):
     if skip_empty and len(arr) == 0:

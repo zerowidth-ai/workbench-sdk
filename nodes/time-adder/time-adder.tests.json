@@ -1,164 +1,158 @@
-{
-  "test_cases": [
-    {
-      "name": "Add 2 hours to timestamp",
-      "inputs": {
-        "base_time": "2024-01-15T10:00:00Z",
-        "amount": 2,
-        "unit": "hours"
-      },
-      "expected": {
-        "result_time": "2024-01-15T12:00:00.000Z",
-        "iso_string": "2024-01-15T12:00:00.000Z",
-        "unix_timestamp": 1705320000,
-        "unix_timestamp_ms": 1705320000000
-      }
+[
+  {
+    "description": "Add 2 hours to timestamp",
+    "inputs": {
+      "base_time": "2024-01-15T10:00:00Z",
+      "amount": 2,
+      "unit": "hours"
     },
-    {
-      "name": "Subtract 30 minutes from timestamp",
-      "inputs": {
-        "base_time": "2024-01-15T12:00:00Z",
-        "amount": -30,
-        "unit": "minutes"
-      },
-      "expected": {
-        "result_time": "2024-01-15T11:30:00.000Z",
-        "iso_string": "2024-01-15T11:30:00.000Z",
-        "unix_timestamp": 1705318200,
-        "unix_timestamp_ms": 1705318200000
-      }
+    "expected": {
+      "result_time": "2024-01-15T12:00:00.000Z",
+      "iso_string": "2024-01-15T12:00:00.000Z",
+      "unix_timestamp": 1705320000,
+      "unix_timestamp_ms": 1705320000000
+    }
+  },
+  {
+    "description": "Subtract 30 minutes from timestamp",
+    "inputs": {
+      "base_time": "2024-01-15T12:00:00Z",
+      "amount": -30,
+      "unit": "minutes"
     },
-    {
-      "name": "Add 5 days to timestamp",
-      "inputs": {
-        "base_time": "2024-01-15T10:00:00Z",
-        "amount": 5,
-        "unit": "days"
-      },
-      "expected": {
-        "result_time": "2024-01-20T10:00:00.000Z",
-        "iso_string": "2024-01-20T10:00:00.000Z",
-        "unix_timestamp": 1705744800,
-        "unix_timestamp_ms": 1705744800000
-      }
+    "expected": {
+      "result_time": "2024-01-15T11:30:00.000Z",
+      "iso_string": "2024-01-15T11:30:00.000Z",
+      "unix_timestamp": 1705318200,
+      "unix_timestamp_ms": 1705318200000
+    }
+  },
+  {
+    "description": "Add 5 days to timestamp",
+    "inputs": {
+      "base_time": "2024-01-15T10:00:00Z",
+      "amount": 5,
+      "unit": "days"
     },
-    {
-      "name": "Add 1 week to timestamp",
-      "inputs": {
-        "base_time": "2024-01-15T10:00:00Z",
-        "amount": 1,
-        "unit": "weeks"
-      },
-      "expected": {
-        "result_time": "2024-01-22T10:00:00.000Z",
-        "iso_string": "2024-01-22T10:00:00.000Z",
-        "unix_timestamp": 1705924800,
-        "unix_timestamp_ms": 1705924800000
-      }
+    "expected": {
+      "result_time": "2024-01-20T10:00:00.000Z",
+      "iso_string": "2024-01-20T10:00:00.000Z",
+      "unix_timestamp": 1705744800,
+      "unix_timestamp_ms": 1705744800000
+    }
+  },
+  {
+    "description": "Add 1 week to timestamp",
+    "inputs": {
+      "base_time": "2024-01-15T10:00:00Z",
+      "amount": 1,
+      "unit": "weeks"
     },
-    {
-      "name": "Add 3 months to timestamp",
-      "inputs": {
-        "base_time": "2024-01-15T10:00:00Z",
-        "amount": 3,
-        "unit": "months"
-      },
-      "expected": {
-        "result_time": "2024-04-15T10:00:00.000Z",
-        "iso_string": "2024-04-15T10:00:00.000Z",
-        "unix_timestamp": 1713172800,
-        "unix_timestamp_ms": 1713172800000
-      }
+    "expected": {
+      "result_time": "2024-01-22T10:00:00.000Z",
+      "iso_string": "2024-01-22T10:00:00.000Z",
+      "unix_timestamp": 1705917600,
+      "unix_timestamp_ms": 1705917600000
+    }
+  },
+  {
+    "description": "Add 3 months to timestamp",
+    "inputs": {
+      "base_time": "2024-01-15T10:00:00Z",
+      "amount": 3,
+      "unit": "months"
     },
-    {
-      "name": "Add 1 year to timestamp",
-      "inputs": {
-        "base_time": "2024-01-15T10:00:00Z",
-        "amount": 1,
-        "unit": "years"
-      },
-      "expected": {
-        "result_time": "2025-01-15T10:00:00.000Z",
-        "iso_string": "2025-01-15T10:00:00.000Z",
-        "unix_timestamp": 1736932800,
-        "unix_timestamp_ms": 1736932800000
-      }
+    "expected": {
+      "result_time": "2024-04-15T10:00:00.000Z",
+      "iso_string": "2024-04-15T10:00:00.000Z",
+      "unix_timestamp": 1713175200,
+      "unix_timestamp_ms": 1713175200000
+    }
+  },
+  {
+    "description": "Add 1 year to timestamp",
+    "inputs": {
+      "base_time": "2024-01-15T10:00:00Z",
+      "amount": 1,
+      "unit": "years"
     },
-    {
-      "name": "Unix timestamp output format",
-      "inputs": {
-        "base_time": "2024-01-15T10:00:00Z",
-        "amount": 2,
-        "unit": "hours",
-        "output_format": "unix"
-      },
-      "expected": {
-        "result_time": "1705320000",
-        "iso_string": "2024-01-15T12:00:00.000Z",
-        "unix_timestamp": 1705320000,
-        "unix_timestamp_ms": 1705320000000
-      }
+    "expected": {
+      "result_time": "2025-01-15T10:00:00.000Z",
+      "iso_string": "2025-01-15T10:00:00.000Z",
+      "unix_timestamp": 1736935200,
+      "unix_timestamp_ms": 1736935200000
+    }
+  },
+  {
+    "description": "Unix timestamp output format",
+    "inputs": {
+      "base_time": "2024-01-15T10:00:00Z",
+      "amount": 2,
+      "unit": "hours",
+      "output_format": "unix"
     },
-    {
-      "name": "RFC2822 output format",
-      "inputs": {
-        "base_time": "2024-01-15T10:00:00Z",
-        "amount": 2,
-        "unit": "hours",
-        "output_format": "rfc2822"
-      },
-      "expected": {
-        "result_time": "Mon, 15 Jan 2024 12:00:00 GMT",
-        "iso_string": "2024-01-15T12:00:00.000Z",
-        "unix_timestamp": 1705320000,
-        "unix_timestamp_ms": 1705320000000
-      }
+    "expected": {
+      "result_time": "1705320000",
+      "iso_string": "2024-01-15T12:00:00.000Z",
+      "unix_timestamp": 1705320000,
+      "unix_timestamp_ms": 1705320000000
+    }
+  },
+  {
+    "description": "RFC2822 output format",
+    "inputs": {
+      "base_time": "2024-01-15T10:00:00Z",
+      "amount": 2,
+      "unit": "hours",
+      "output_format": "rfc2822"
     },
-    {
-      "name": "Add to current time (no base_time)",
-      "inputs": {
-        "amount": 3600,
-        "unit": "seconds"
-      },
-      "expected": {
-        "iso_string": "2024-01-15T11:00:00.000Z",
-        "unix_timestamp": 1705316400,
-        "unix_timestamp_ms": 1705316400000
-      }
+    "expected": {
+      "result_time": "Mon, 15 Jan 2024 12:00:00 GMT",
+      "iso_string": "2024-01-15T12:00:00.000Z",
+      "unix_timestamp": 1705320000,
+      "unix_timestamp_ms": 1705320000000
+    }
+  },
+  {
+    "description": "Add to current time (no base_time) - schema validation",
+    "inputs": {
+      "amount": 3600,
+      "unit": "seconds"
     },
-    {
-      "name": "Error - missing amount",
-      "inputs": {
-        "base_time": "2024-01-15T10:00:00Z",
-        "unit": "hours"
+    "expectedSchema": {
+      "iso_string": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
       },
-      "expectedError": {
-        "type": "node",
-        "message": "Amount is required"
-      }
-    },
-    {
-      "name": "Error - missing unit",
-      "inputs": {
-        "base_time": "2024-01-15T10:00:00Z",
-        "amount": 2
-      },
-      "expectedError": {
-        "type": "node",
-        "message": "Unit is required"
-      }
-    },
-    {
-      "name": "Error - invalid base time",
-      "inputs": {
-        "base_time": "invalid-date",
-        "amount": 2,
-        "unit": "hours"
-      },
-      "expectedError": {
-        "type": "node",
-        "message": "Invalid base timestamp format"
+      "unix_timestamp": {
+        "type": "number",
+        "minimum": 1000000000
       }
     }
-  ]
-}
+  },
+  {
+    "description": "Error - missing amount",
+    "inputs": {
+      "base_time": "2024-01-15T10:00:00Z",
+      "unit": "hours"
+    },
+    "expectedError": "Time Adder error: Amount is required"
+  },
+  {
+    "description": "Error - missing unit",
+    "inputs": {
+      "base_time": "2024-01-15T10:00:00Z",
+      "amount": 2
+    },
+    "expectedError": "Time Adder error: Unit is required"
+  },
+  {
+    "description": "Error - invalid base time",
+    "inputs": {
+      "base_time": "invalid-date",
+      "amount": 2,
+      "unit": "hours"
+    },
+    "expectedError": "Time Adder error: Invalid base timestamp format"
+  }
+]

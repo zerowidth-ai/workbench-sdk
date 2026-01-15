@@ -2,9 +2,15 @@
 Process function for the Set Object Property node.
 Set or add a key-value pair to an object, returning a new object with the property set.
 """
-from typing import Any, Dict
+from typing import Any
 
-async def process(inputs: Dict[str, Any], settings: Dict[str, Any], config: Dict[str, Any], nodeConfig: Dict[str, Any]) -> Dict[str, Any]:
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     object_input = inputs.get("object")
     key = inputs.get("key")
     value = inputs.get("value")

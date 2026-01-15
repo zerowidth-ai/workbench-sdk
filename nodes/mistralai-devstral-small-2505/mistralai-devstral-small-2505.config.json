@@ -3,7 +3,7 @@
   "description": "Devstral-Small-2505 is a 24B parameter agentic LLM fine-tuned from Mistral-Small-3.1, jointly developed by Mistral AI and All Hands AI for advanced software engineering tasks. It is optimized for codebase exploration, multi-file editing, and integration into coding agents, achieving state-of-the-art results on SWE-Bench Verified (46.8%).\n\nDevstral supports a 128k context window and uses a custom Tekken tokenizer. It is text-only, with the vision encoder removed, and is suitable for local deployment on high-end consumer hardware (e.g., RTX 4090, 32GB RAM Macs). Devstral is best used in agentic workflows via the OpenHands scaffold and is compatible with inference frameworks like vLLM, Transformers, and Ollama. It is released under the Apache 2.0 license.",
   "category": "llm",
   "provider": "mistralai",
-  "accepts_plugins": true,
+  "accepts_plugins": false,
   "model_id": "mistralai/devstral-small-2505",
   "context_length": 128000,
   "supported_parameters": [
@@ -15,35 +15,17 @@
     "response_format",
     "seed",
     "stop",
-    "structured_outputs",
     "temperature",
-    "tool_choice",
-    "tools",
     "top_k",
     "top_p"
   ],
   "inputs": [
     {
-      "name": "system_prompt",
-      "display_name": "System Prompt",
-      "type": "string or message",
-      "description": "System prompt to instruct the model",
-      "default": null
-    },
-    {
-      "name": "messages",
-      "display_name": "Conversation",
-      "type": "conversation or message or string",
-      "description": "Array of chat messages that make up the conversation",
+      "name": "prompt",
+      "display_name": "Prompt",
+      "type": "string",
+      "description": "Text prompt for completion",
       "required": true
-    },
-    {
-      "name": "tools",
-      "display_name": "Tools",
-      "type": "tool",
-      "description": "Array of tools to use",
-      "default": null,
-      "allow_multiple": true
     },
     {
       "name": "frequency_penalty",
@@ -95,13 +77,6 @@
       "default": null
     },
     {
-      "name": "tool_choice",
-      "display_name": "Tool Choice",
-      "type": "string",
-      "description": "Tool selection control",
-      "default": null
-    },
-    {
       "name": "top_p",
       "display_name": "Top P",
       "type": "number",
@@ -111,38 +86,11 @@
   ],
   "outputs": [
     {
-      "name": "conversation",
-      "display_name": "Conversation",
-      "type": "conversation",
-      "can_stream": true,
-      "description": "An array of messages including any tool call & response messages as well as the final generated output."
-    },
-    {
       "name": "content",
       "display_name": "Content",
       "can_stream": true,
       "type": "string",
-      "description": "The content portion of the final generated response message."
-    },
-    {
-      "name": "message",
-      "display_name": "Final Message",
-      "type": "message",
-      "can_stream": true,
-      "description": "The final generated response message."
-    },
-    {
-      "name": "role",
-      "display_name": "Role",
-      "can_stream": true,
-      "type": "string",
-      "description": "Role of the response (usually 'assistant')"
-    },
-    {
-      "name": "tool_calls",
-      "display_name": "Tool Calls",
-      "type": "array of tools",
-      "description": "Tool calls made by the model"
+      "description": "The generated completion text"
     },
     {
       "name": "usage",

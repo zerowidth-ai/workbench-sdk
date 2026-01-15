@@ -10,7 +10,6 @@
     "frequency_penalty",
     "max_tokens",
     "presence_penalty",
-    "repetition_penalty",
     "seed",
     "stop",
     "temperature",

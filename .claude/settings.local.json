@@ -6,7 +6,13 @@
       "Bash(python3:*)",
       "Bash(find:*)",
       "Bash(xargs ls:*)",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(while read f)",
+      "Bash(do if ! grep -q '\"\"\"\"description\"\"\"\":' \"$f\")",
+      "Bash(then echo \"$f\" fi done)",
+      "Bash(python -m pytest tests/test_all_nodes.py -v --tb=short)"
     ]
   }
 }

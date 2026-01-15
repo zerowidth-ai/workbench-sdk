@@ -1,28 +1,84 @@
-async def process(inputs, settings, config, nodeConfig):
+"""
+System Prompt Node - Outputs a message object with the prompt text and system role.
+"""
+
+import re
+from typing import Any
+
+
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     """
-    Process function for the Message node.
-    Outputs a message object, either from the input or from the settings.
+    Process function for the System Prompt node.
+    Outputs a message object, containing the prompt text and system role.
     """
-    # If an input value is provided, use it; otherwise use the value from settings
-    message = inputs.get("message") if "message" in inputs else settings.get("message", {
-        "role": "user",
-        "content": "Hello, world!"
-    })
+    # Initialize variables list if not provided
+    variables = inputs.get("variables", [])
+    if variables is None:
+        variables = []
 
-    if isinstance(message, str):
-        message = {
-            "role": "user",
-            "content": message
-        }
+    # Get the base content from settings
+    base_content = settings.get("content", "")
 
+    # Handle chain input if provided
+    chained_content = ""
+    chain = inputs.get("chain")
+    if chain:
+        if isinstance(chain, str):
+            chained_content = chain
+        elif isinstance(chain, dict) and chain.get("content"):
+            # Handle message object format
+            content = chain.get("content")
+            if isinstance(content, list):
+                # Extract text content from array format
+                text_parts = [
+                    item.get("text", "")
+                    for item in content
+                    if isinstance(item, dict) and item.get("type") == "text"
+                ]
+                chained_content = "\n".join(text_parts)
+            elif isinstance(content, str):
+                chained_content = content
 
-    # if we have variables and text content, we need to replace the text content with the variables
-    if message.get("content", None) and isinstance(message["content"], list) and len(message["content"]) == 1 and message["content"][0].get("type", None) == "text":
-        text_content = message["content"][0]
-        if text_content.get("text", None):
-            text_content["text"] = text_content["text"].replace("{{", "").replace("}}", "")
-    
-    # Return the string value
+    # Combine chained content with base content
+    if chained_content:
+        full_content = f"{chained_content}\n\n{base_content}"
+    else:
+        full_content = base_content
+
+    # Create message object
+    message = {
+        "role": "system",
+        "content": [
+            {
+                "type": "text",
+                "text": full_content,
+            }
+        ],
+    }
+
+    # Process variables - replace {{key}} with variable value
+    def replace_variable(match):
+        key = match.group(1)
+        # Look for a variable with the matching key
+        for variable in variables:
+            if isinstance(variable, dict) and key in variable:
+                return str(variable[key])
+        return match.group(0)  # Return original if no match
+
+    message["content"][0]["text"] = re.sub(
+        r"\{\{(.*?)\}\}",
+        replace_variable,
+        message["content"][0]["text"]
+    )
+
+    # Return the message and string prompt
     return {
-        "message": message
-    } 
+        "message": message,
+        "prompt": message["content"][0]["text"],
+    }

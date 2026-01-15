@@ -46,5 +46,5 @@ async def process(
 
     return {
         "value": value,
-        "data": {settings.get("key"): value},
+        "data": {(settings.get("key") or "data"): value},
     }

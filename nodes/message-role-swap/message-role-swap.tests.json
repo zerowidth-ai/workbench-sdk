@@ -1,202 +1,197 @@
-{
-  "test_cases": [
-    {
-      "name": "Basic role swap test",
-      "inputs": {
-        "messages": [
-          {
-            "role": "user",
-            "content": "Hello, how are you?"
-          },
-          {
-            "role": "assistant",
-            "content": "I'm doing well, thank you!"
-          },
-          {
-            "role": "user",
-            "content": "What's the weather like?"
-          }
-        ]
-      },
-      "expected": {
-        "messages": [
-          {
-            "role": "assistant",
-            "content": "Hello, how are you?"
-          },
-          {
-            "role": "user",
-            "content": "I'm doing well, thank you!"
-          },
-          {
-            "role": "assistant",
-            "content": "What's the weather like?"
-          }
-        ]
-      }
+[
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello, how are you?"
+        },
+        {
+          "role": "assistant",
+          "content": "I'm doing well, thank you!"
+        },
+        {
+          "role": "user",
+          "content": "What's the weather like?"
+        }
+      ]
     },
-    {
-      "name": "Mixed roles with system messages",
-      "inputs": {
-        "messages": [
-          {
-            "role": "system",
-            "content": "You are a helpful assistant."
-          },
-          {
-            "role": "user",
-            "content": "Tell me a joke"
-          },
-          {
-            "role": "assistant",
-            "content": "Why don't scientists trust atoms? Because they make up everything!"
-          },
-          {
-            "role": "tool",
-            "content": "Tool response"
-          }
-        ]
-      },
-      "expected": {
-        "messages": [
-          {
-            "role": "system",
-            "content": "You are a helpful assistant."
-          },
-          {
-            "role": "assistant",
-            "content": "Tell me a joke"
-          },
-          {
-            "role": "user",
-            "content": "Why don't scientists trust atoms? Because they make up everything!"
-          },
-          {
-            "role": "tool",
-            "content": "Tool response"
-          }
-        ]
-      }
+    "expected": {
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "Hello, how are you?"
+        },
+        {
+          "role": "user",
+          "content": "I'm doing well, thank you!"
+        },
+        {
+          "role": "assistant",
+          "content": "What's the weather like?"
+        }
+      ]
     },
-    {
-      "name": "Empty messages array",
-      "inputs": {
-        "messages": []
-      },
-      "expected": {
-        "messages": []
-      }
+    "description": "Basic role swap test"
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a helpful assistant."
+        },
+        {
+          "role": "user",
+          "content": "Tell me a joke"
+        },
+        {
+          "role": "assistant",
+          "content": "Why don't scientists trust atoms? Because they make up everything!"
+        },
+        {
+          "role": "tool",
+          "content": "Tool response"
+        }
+      ]
     },
-    {
-      "name": "Only assistant messages",
-      "inputs": {
-        "messages": [
-          {
-            "role": "assistant",
-            "content": "First response"
-          },
-          {
-            "role": "assistant",
-            "content": "Second response"
-          }
-        ]
-      },
-      "expected": {
-        "messages": [
-          {
-            "role": "user",
-            "content": "First response"
-          },
-          {
-            "role": "user",
-            "content": "Second response"
-          }
-        ]
-      }
+    "expected": {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a helpful assistant."
+        },
+        {
+          "role": "assistant",
+          "content": "Tell me a joke"
+        },
+        {
+          "role": "user",
+          "content": "Why don't scientists trust atoms? Because they make up everything!"
+        },
+        {
+          "role": "tool",
+          "content": "Tool response"
+        }
+      ]
     },
-    {
-      "name": "Only user messages",
-      "inputs": {
-        "messages": [
-          {
-            "role": "user",
-            "content": "First question"
-          },
-          {
-            "role": "user",
-            "content": "Second question"
-          }
-        ]
-      },
-      "expected": {
-        "messages": [
-          {
-            "role": "assistant",
-            "content": "First question"
-          },
-          {
-            "role": "assistant",
-            "content": "Second question"
-          }
-        ]
-      }
+    "description": "Mixed roles with system messages"
+  },
+  {
+    "inputs": {
+      "messages": []
     },
-    {
-      "name": "Messages with complex content",
-      "inputs": {
-        "messages": [
-          {
-            "role": "user",
-            "content": [
-              {
-                "type": "text",
-                "text": "Hello there!"
-              }
-            ]
-          },
-          {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "Hi! How can I help you today?"
-              }
-            ]
-          }
-        ]
-      },
-      "expected": {
-        "messages": [
-          {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "Hello there!"
-              }
-            ]
-          },
-          {
-            "role": "user",
-            "content": [
-              {
-                "type": "text",
-                "text": "Hi! How can I help you today?"
-              }
-            ]
-          }
-        ]
-      }
+    "expected": {
+      "messages": []
     },
-    {
-      "name": "Invalid input - not array",
-      "inputs": {
-        "messages": "not an array"
-      },
-      "expectedError": {
-        "type": "node",
-        "message": "Messages input must be an array"
-      }
-    }
-  ]
-}
+    "description": "Empty messages array"
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "First response"
+        },
+        {
+          "role": "assistant",
+          "content": "Second response"
+        }
+      ]
+    },
+    "expected": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "First response"
+        },
+        {
+          "role": "user",
+          "content": "Second response"
+        }
+      ]
+    },
+    "description": "Only assistant messages"
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "First question"
+        },
+        {
+          "role": "user",
+          "content": "Second question"
+        }
+      ]
+    },
+    "expected": {
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "First question"
+        },
+        {
+          "role": "assistant",
+          "content": "Second question"
+        }
+      ]
+    },
+    "description": "Only user messages"
+  },
+  {
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "Hello there!"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "Hi! How can I help you today?"
+            }
+          ]
+        }
+      ]
+    },
+    "expected": {
+      "messages": [
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "Hello there!"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "Hi! How can I help you today?"
+            }
+          ]
+        }
+      ]
+    },
+    "description": "Messages with complex content"
+  },
+  {
+    "inputs": {
+      "messages": "not an array"
+    },
+    "expectedError": "Message Role Swap error: Messages input must be an array",
+    "description": "Invalid input - not array"
+  }
+]

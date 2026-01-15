@@ -5,7 +5,7 @@
   "provider": "qwen",
   "accepts_plugins": true,
   "model_id": "qwen/qwen3-vl-235b-a22b-instruct",
-  "context_length": 131072,
+  "context_length": 262144,
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",
@@ -184,13 +184,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.21,
+        "cost": 0.19999999999999998,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 1.9,
+        "cost": 1.2,
         "currency": "USD"
       }
     ]

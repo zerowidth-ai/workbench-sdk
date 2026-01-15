@@ -1,6 +1,13 @@
+from typing import Any
 import re
 
-async def process(inputs, settings, config, nodeConfig):
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
   template = str(inputs.get("template", ""))
   variables = inputs.get("variables", {})
   keep_missing = settings.get("keep_missing", False)

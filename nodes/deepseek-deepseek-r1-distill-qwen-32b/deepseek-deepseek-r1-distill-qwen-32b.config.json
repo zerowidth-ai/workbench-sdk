@@ -5,7 +5,7 @@
   "provider": "deepseek",
   "accepts_plugins": false,
   "model_id": "deepseek/deepseek-r1-distill-qwen-32b",
-  "context_length": 64000,
+  "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
@@ -181,13 +181,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.24,
+        "cost": 0.27,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.24,
+        "cost": 0.27,
         "currency": "USD"
       }
     ]

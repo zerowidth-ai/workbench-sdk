@@ -5,7 +5,7 @@
   "provider": "deepseek",
   "accepts_plugins": true,
   "model_id": "deepseek/deepseek-chat-v3.1",
-  "context_length": 163840,
+  "context_length": 32768,
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
@@ -213,13 +213,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.19999999999999998,
+        "cost": 0.15,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.7999999999999999,
+        "cost": 0.75,
         "currency": "USD"
       }
     ]

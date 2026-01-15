@@ -53,5 +53,28 @@
         "type": "object"
       }
     }
+  },
+  {
+    "description": "With custom temperature",
+    "inputs": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello"
+        }
+      ],
+      "temperature": 0.5
+    },
+    "expectedSchema": {
+      "content": {
+        "type": "string"
+      },
+      "finish_reason": {
+        "type": "string"
+      },
+      "usage": {
+        "type": "object"
+      }
+    }
   }
 ]

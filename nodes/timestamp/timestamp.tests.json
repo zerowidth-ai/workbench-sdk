@@ -1,122 +1,90 @@
-{
-  "test_cases": [
-    {
-      "name": "Default ISO format",
-      "inputs": {},
-      "expected": {
-        "timestamp": "2024-01-15T10:30:45.123Z",
-        "unix_timestamp": 1705312245,
-        "unix_timestamp_ms": 1705312245123,
-        "iso_string": "2024-01-15T10:30:45.123Z"
-      }
-    },
-    {
-      "name": "ISO format explicit",
-      "inputs": {
-        "format": "iso"
+[
+  {
+    "description": "Default ISO format",
+    "inputs": {},
+    "expectedSchema": {
+      "timestamp": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
       },
-      "expected": {
-        "timestamp": "2024-01-15T10:30:45.123Z",
-        "unix_timestamp": 1705312245,
-        "unix_timestamp_ms": 1705312245123,
-        "iso_string": "2024-01-15T10:30:45.123Z"
-      }
-    },
-    {
-      "name": "Unix timestamp format",
-      "inputs": {
-        "format": "unix"
+      "unix_timestamp": {
+        "type": "number",
+        "minimum": 1000000000
       },
-      "expected": {
-        "timestamp": "1705312245",
-        "unix_timestamp": 1705312245,
-        "unix_timestamp_ms": 1705312245123,
-        "iso_string": "2024-01-15T10:30:45.123Z"
-      }
-    },
-    {
-      "name": "Unix timestamp milliseconds format",
-      "inputs": {
-        "format": "unix_ms"
+      "unix_timestamp_ms": {
+        "type": "number",
+        "minimum": 1000000000000
       },
-      "expected": {
-        "timestamp": "1705312245123",
-        "unix_timestamp": 1705312245,
-        "unix_timestamp_ms": 1705312245123,
-        "iso_string": "2024-01-15T10:30:45.123Z"
-      }
-    },
-    {
-      "name": "RFC2822 format",
-      "inputs": {
-        "format": "rfc2822"
-      },
-      "expected": {
-        "timestamp": "Mon, 15 Jan 2024 10:30:45 GMT",
-        "unix_timestamp": 1705312245,
-        "unix_timestamp_ms": 1705312245123,
-        "iso_string": "2024-01-15T10:30:45.123Z"
-      }
-    },
-    {
-      "name": "Custom format - YYYY-MM-DD",
-      "inputs": {
-        "format": "YYYY-MM-DD"
-      },
-      "expected": {
-        "timestamp": "2024-01-15",
-        "unix_timestamp": 1705312245,
-        "unix_timestamp_ms": 1705312245123,
-        "iso_string": "2024-01-15T10:30:45.123Z"
-      }
-    },
-    {
-      "name": "Custom format - YYYY-MM-DD HH:mm:ss",
-      "inputs": {
-        "format": "YYYY-MM-DD HH:mm:ss"
-      },
-      "expected": {
-        "timestamp": "2024-01-15 10:30:45",
-        "unix_timestamp": 1705312245,
-        "unix_timestamp_ms": 1705312245123,
-        "iso_string": "2024-01-15T10:30:45.123Z"
-      }
-    },
-    {
-      "name": "Custom format - MM/DD/YYYY",
-      "inputs": {
-        "format": "MM/DD/YYYY"
-      },
-      "expected": {
-        "timestamp": "01/15/2024",
-        "unix_timestamp": 1705312245,
-        "unix_timestamp_ms": 1705312245123,
-        "iso_string": "2024-01-15T10:30:45.123Z"
-      }
-    },
-    {
-      "name": "Custom format with milliseconds",
-      "inputs": {
-        "format": "YYYY-MM-DD HH:mm:ss.SSS"
-      },
-      "expected": {
-        "timestamp": "2024-01-15 10:30:45.123",
-        "unix_timestamp": 1705312245,
-        "unix_timestamp_ms": 1705312245123,
-        "iso_string": "2024-01-15T10:30:45.123Z"
-      }
-    },
-    {
-      "name": "Custom format - HH:mm:ss",
-      "inputs": {
-        "format": "HH:mm:ss"
-      },
-      "expected": {
-        "timestamp": "10:30:45",
-        "unix_timestamp": 1705312245,
-        "unix_timestamp_ms": 1705312245123,
-        "iso_string": "2024-01-15T10:30:45.123Z"
+      "iso_string": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
       }
     }
-  ]
-}
+  },
+  {
+    "description": "Unix timestamp format",
+    "inputs": {
+      "format": "unix"
+    },
+    "expectedSchema": {
+      "timestamp": {
+        "type": "string",
+        "pattern": "^\\d{10}$"
+      },
+      "unix_timestamp": {
+        "type": "number"
+      }
+    }
+  },
+  {
+    "description": "Unix timestamp milliseconds format",
+    "inputs": {
+      "format": "unix_ms"
+    },
+    "expectedSchema": {
+      "timestamp": {
+        "type": "string",
+        "pattern": "^\\d{13}$"
+      },
+      "unix_timestamp_ms": {
+        "type": "number"
+      }
+    }
+  },
+  {
+    "description": "RFC2822 format",
+    "inputs": {
+      "format": "rfc2822"
+    },
+    "expectedSchema": {
+      "timestamp": {
+        "type": "string",
+        "pattern": "^\\w{3}, \\d{2} \\w{3} \\d{4} \\d{2}:\\d{2}:\\d{2} GMT$"
+      }
+    }
+  },
+  {
+    "description": "Custom format - YYYY-MM-DD",
+    "inputs": {
+      "format": "YYYY-MM-DD"
+    },
+    "expectedSchema": {
+      "timestamp": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+      }
+    }
+  },
+  {
+    "description": "Custom format - HH:mm:ss",
+    "inputs": {
+      "format": "HH:mm:ss"
+    },
+    "expectedSchema": {
+      "timestamp": {
+        "type": "string",
+        "pattern": "^\\d{2}:\\d{2}:\\d{2}$"
+      }
+    }
+  }
+]

@@ -9,6 +9,7 @@
   "supported_parameters": [
     "max_tokens",
     "seed",
+    "stop",
     "temperature",
     "top_p"
   ],
@@ -39,6 +40,13 @@
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
+      "default": null
+    },
+    {
+      "name": "stop",
+      "display_name": "Stop",
+      "type": "string or array",
+      "description": "Custom stop sequences",
       "default": null
     },
     {

@@ -2,7 +2,7 @@
   {
     "description": "Test that the default value is returned if no value is provided",
     "settings": {
-      "variable_name": "test_variable",
+      "key": "test_variable",
       "default_value": "test_value"
     },
     "expected": {
@@ -15,7 +15,7 @@
   {
     "description": "Test that the value is returned if it is provided",
     "settings": {
-      "variable_name": "test_variable",
+      "key": "test_variable",
       "value": "test_value"
     },
     "expected": {
@@ -28,7 +28,7 @@
   {
     "description": "Test that the value is a part of the options if the type is select",
     "settings": {
-      "variable_name": "test_variable",
+      "key": "test_variable",
       "value": "test_value",
       "type": "select",
       "options": ["test_value", "test_value2"]
@@ -43,7 +43,7 @@
   {
     "description": "Test that an error is thrown if the value is not a part of the options if the type is select",
     "settings": {
-      "variable_name": "test_variable",
+      "key": "test_variable",
       "value": "test_value",
       "type": "select",
       "options": ["test_value2"]

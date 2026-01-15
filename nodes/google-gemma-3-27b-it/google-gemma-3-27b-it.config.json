@@ -5,7 +5,7 @@
   "provider": "google",
   "accepts_plugins": true,
   "model_id": "google/gemma-3-27b-it",
-  "context_length": 131072,
+  "context_length": 96000,
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",
@@ -176,13 +176,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.07,
+        "cost": 0.04,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.5,
+        "cost": 0.15,
         "currency": "USD"
       }
     ]

@@ -1,8 +1,14 @@
 import asyncio
 import aiohttp
-from typing import Any, Dict, List, Union
+from typing import Any
 
-async def process(inputs: Dict[str, Any], settings: Dict[str, Any], config: Dict[str, Any], nodeConfig: Dict[str, Any]) -> Dict[str, Any]:
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     try:
         input_data = inputs.get('input')
         if not input_data:

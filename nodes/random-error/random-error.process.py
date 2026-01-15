@@ -1,6 +1,13 @@
+from typing import Any
 import random
 
-async def process(inputs, settings, config, nodeConfig):
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     """
     Process function for the Random Error node.
     Randomly raises an exception based on probability, or passes through the value.

@@ -2,9 +2,15 @@
 Process function for the Get Object Property node.
 Extracts a specific property value from an object by key name.
 """
-from typing import Any, Dict
+from typing import Any
 
-async def process(inputs: Dict[str, Any], settings: Dict[str, Any], config: Dict[str, Any], nodeConfig: Dict[str, Any]) -> Dict[str, Any]:
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     object_input = inputs.get("object")
     key = inputs.get("key")
     default_value = settings.get("default_value")

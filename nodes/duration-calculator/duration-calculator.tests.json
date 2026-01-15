@@ -1,131 +1,124 @@
-{
-  "test_cases": [
-    {
-      "name": "Basic duration calculation - ISO timestamps",
-      "inputs": {
-        "start_time": "2024-01-15T10:00:00Z",
-        "end_time": "2024-01-15T12:30:00Z"
-      },
-      "expected": {
-        "duration": 9000,
-        "duration_seconds": 9000,
-        "duration_minutes": 150,
-        "duration_hours": 2.5,
-        "duration_days": 0.1,
-        "human_readable": "2 hours 30 minutes"
-      }
+[
+  {
+    "inputs": {
+      "start_time": "2024-01-15T10:00:00Z",
+      "end_time": "2024-01-15T12:30:00Z"
     },
-    {
-      "name": "Duration in minutes",
-      "inputs": {
-        "start_time": "2024-01-15T10:00:00Z",
-        "end_time": "2024-01-15T12:30:00Z",
-        "output_unit": "minutes"
-      },
-      "expected": {
-        "duration": 150,
-        "duration_seconds": 9000,
-        "duration_minutes": 150,
-        "duration_hours": 2.5,
-        "duration_days": 0.1,
-        "human_readable": "2 hours 30 minutes"
-      }
+    "expected": {
+      "duration": 9000,
+      "duration_seconds": 9000,
+      "duration_minutes": 150,
+      "duration_hours": 2.5,
+      "duration_days": 0.1,
+      "human_readable": "2 hours 30 minutes"
     },
-    {
-      "name": "Duration in hours",
-      "inputs": {
-        "start_time": "2024-01-15T10:00:00Z",
-        "end_time": "2024-01-15T12:30:00Z",
-        "output_unit": "hours"
-      },
-      "expected": {
-        "duration": 2.5,
-        "duration_seconds": 9000,
-        "duration_minutes": 150,
-        "duration_hours": 2.5,
-        "duration_days": 0.1,
-        "human_readable": "2 hours 30 minutes"
-      }
+    "description": "Basic duration calculation - ISO timestamps"
+  },
+  {
+    "inputs": {
+      "start_time": "2024-01-15T10:00:00Z",
+      "end_time": "2024-01-15T12:30:00Z",
+      "output_unit": "minutes"
     },
-    {
-      "name": "Unix timestamp inputs",
-      "inputs": {
-        "start_time": "1705312800",
-        "end_time": "1705320000"
-      },
-      "expected": {
-        "duration": 7200,
-        "duration_seconds": 7200,
-        "duration_minutes": 120,
-        "duration_hours": 2,
-        "duration_days": 0.08,
-        "human_readable": "2 hours"
-      }
+    "expected": {
+      "duration": 150,
+      "duration_seconds": 9000,
+      "duration_minutes": 150,
+      "duration_hours": 2.5,
+      "duration_days": 0.1,
+      "human_readable": "2 hours 30 minutes"
     },
-    {
-      "name": "Multi-day duration",
-      "inputs": {
-        "start_time": "2024-01-01T00:00:00Z",
-        "end_time": "2024-01-05T12:00:00Z",
-        "output_unit": "days"
-      },
-      "expected": {
-        "duration": 4.5,
-        "duration_seconds": 388800,
-        "duration_minutes": 6480,
-        "duration_hours": 108,
-        "duration_days": 4.5,
-        "human_readable": "4 days 12 hours"
-      }
+    "description": "Duration in minutes"
+  },
+  {
+    "inputs": {
+      "start_time": "2024-01-15T10:00:00Z",
+      "end_time": "2024-01-15T12:30:00Z",
+      "output_unit": "hours"
     },
-    {
-      "name": "Current time as end time",
-      "inputs": {
-        "start_time": "2024-01-15T10:00:00Z"
-      },
-      "expected": {
-        "duration_seconds": 0,
-        "duration_minutes": 0,
-        "duration_hours": 0,
-        "duration_days": 0,
-        "human_readable": "0 seconds"
-      }
+    "expected": {
+      "duration": 2.5,
+      "duration_seconds": 9000,
+      "duration_minutes": 150,
+      "duration_hours": 2.5,
+      "duration_days": 0.1,
+      "human_readable": "2 hours 30 minutes"
     },
-    {
-      "name": "Negative duration (end before start)",
-      "inputs": {
-        "start_time": "2024-01-15T12:00:00Z",
-        "end_time": "2024-01-15T10:00:00Z"
-      },
-      "expected": {
-        "duration": -7200,
-        "duration_seconds": -7200,
-        "duration_minutes": -120,
-        "duration_hours": -2,
-        "duration_days": -0.08,
-        "human_readable": "-2 hours"
-      }
+    "description": "Duration in hours"
+  },
+  {
+    "inputs": {
+      "start_time": "1705312800",
+      "end_time": "1705320000"
     },
-    {
-      "name": "Error - invalid start time",
-      "inputs": {
-        "start_time": "invalid-date",
-        "end_time": "2024-01-15T12:00:00Z"
-      },
-      "expectedError": {
-        "type": "node",
-        "message": "Invalid timestamp format. Use ISO strings, Unix timestamps, or parseable date formats"
-      }
+    "expected": {
+      "duration": 7200,
+      "duration_seconds": 7200,
+      "duration_minutes": 120,
+      "duration_hours": 2,
+      "duration_days": 0.08,
+      "human_readable": "2 hours"
     },
-    {
-      "name": "Error - missing start time",
-      "inputs": {
-        "end_time": "2024-01-15T12:00:00Z"
-      },
-      "expectedError": {
-        "type": "node",
-        "message": "Invalid timestamp format. Use ISO strings, Unix timestamps, or parseable date formats"
-      }
-    }
-  ]
-}
+    "description": "Unix timestamp inputs"
+  },
+  {
+    "inputs": {
+      "start_time": "2024-01-01T00:00:00Z",
+      "end_time": "2024-01-05T12:00:00Z",
+      "output_unit": "days"
+    },
+    "expected": {
+      "duration": 4.5,
+      "duration_seconds": 388800,
+      "duration_minutes": 6480,
+      "duration_hours": 108,
+      "duration_days": 4.5,
+      "human_readable": "4 days 12 hours"
+    },
+    "description": "Multi-day duration"
+  },
+  {
+    "inputs": {
+      "start_time": "2024-01-15T10:00:00Z"
+    },
+    "expectedSchema": {
+      "duration": { "type": "number" },
+      "duration_seconds": { "type": "number" },
+      "duration_minutes": { "type": "number" },
+      "duration_hours": { "type": "number" },
+      "duration_days": { "type": "number" },
+      "human_readable": { "type": "string" }
+    },
+    "description": "Current time as end time - schema validation"
+  },
+  {
+    "inputs": {
+      "start_time": "2024-01-15T12:00:00Z",
+      "end_time": "2024-01-15T10:00:00Z"
+    },
+    "expected": {
+      "duration": -7200,
+      "duration_seconds": -7200,
+      "duration_minutes": -120,
+      "duration_hours": -2,
+      "duration_days": -0.08,
+      "human_readable": "-2 hours"
+    },
+    "description": "Negative duration (end before start)"
+  },
+  {
+    "inputs": {
+      "start_time": "invalid-date",
+      "end_time": "2024-01-15T12:00:00Z"
+    },
+    "expectedError": "Duration Calculator error: Invalid timestamp format. Use ISO strings, Unix timestamps, or parseable date formats",
+    "description": "Error - invalid start time"
+  },
+  {
+    "inputs": {
+      "end_time": "2024-01-15T12:00:00Z"
+    },
+    "expectedError": "Duration Calculator error: Invalid timestamp format. Use ISO strings, Unix timestamps, or parseable date formats",
+    "description": "Error - missing start time"
+  }
+]

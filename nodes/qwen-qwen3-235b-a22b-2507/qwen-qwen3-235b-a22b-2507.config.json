@@ -5,15 +5,17 @@
   "provider": "qwen",
   "accepts_plugins": true,
   "model_id": "qwen/qwen3-235b-a22b-2507",
-  "context_length": 131072,
+  "context_length": 262144,
   "supported_parameters": [
     "frequency_penalty",
+    "include_reasoning",
     "logit_bias",
     "logprobs",
     "max_tokens",
     "min_p",
     "presence_penalty",
     "reasoning",
+    "reasoning_effort",
     "repetition_penalty",
     "response_format",
     "seed",
@@ -54,6 +56,13 @@
       "display_name": "Frequency Penalty",
       "type": "number",
       "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "include_reasoning",
+      "display_name": "Include Reasoning",
+      "type": "boolean",
+      "description": "Include reasoning in response",
       "default": null
     },
     {
@@ -205,13 +214,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.072,
+        "cost": 0.071,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.464,
+        "cost": 0.463,
         "currency": "USD"
       }
     ]

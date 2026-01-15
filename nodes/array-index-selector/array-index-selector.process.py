@@ -1,4 +1,17 @@
-async def process(inputs, settings, config, nodeConfig):
+"""
+Array Index Selector Node - Selects an element from an array by index.
+"""
+
+from typing import Any
+
+
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
     """
     Process function for the Array Index Selector node.
     """
@@ -10,14 +23,11 @@ async def process(inputs, settings, config, nodeConfig):
     # Check if index is a number and round it
     if isinstance(index_to_use, (int, float)):
         index_to_use = round(index_to_use)
-    
-    # Safely handle array index access
-    element = None
-    if 0 <= index_to_use < len(array):
-        element = array[index_to_use]
 
-    # Raise an error if the element is undefined (out of bounds)
-    if element is None:
-        raise IndexError(f"Index {index_to_use} is out of bounds for array of length {len(array)}")
+    # Check if index is in bounds
+    if not isinstance(array, list) or index_to_use < 0 or index_to_use >= len(array):
+        raise IndexError(f"Index {index_to_use} is out of bounds for array of length {len(array) if isinstance(array, list) else 0}")
+
+    element = array[index_to_use]
 
     return {"element": element}

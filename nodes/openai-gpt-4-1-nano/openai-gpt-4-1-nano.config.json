@@ -11,8 +11,10 @@
     "response_format",
     "seed",
     "structured_outputs",
+    "temperature",
     "tool_choice",
-    "tools"
+    "tools",
+    "top_p"
   ],
   "inputs": [
     {
@@ -59,10 +61,24 @@
       "default": null
     },
     {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
       "name": "tool_choice",
       "display_name": "Tool Choice",
       "type": "string",
       "description": "Tool selection control",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
       "default": null
     }
   ],

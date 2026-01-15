@@ -1,6 +1,13 @@
+from typing import Any
 import re
 
-async def process(inputs, settings, config, nodeConfig):
+async def process(
+    *,
+    inputs: dict[str, Any],
+    settings: dict[str, Any],
+    config: dict[str, Any],
+    node_config: dict[str, Any],
+) -> dict[str, Any]:
   text = str(inputs.get("text", ""))
   chars = inputs.get("chars")
   mode = settings.get("mode", "both")
