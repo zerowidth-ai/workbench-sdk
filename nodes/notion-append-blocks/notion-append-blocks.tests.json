@@ -1,0 +1,80 @@
+[
+  {
+    "description": "Append paragraph block to page",
+    "inputs": {
+      "block_id": "${NOTION_TEST_PAGE_ID}",
+      "children": [
+        {
+          "object": "block",
+          "type": "paragraph",
+          "paragraph": {
+            "rich_text": [
+              {
+                "type": "text",
+                "text": {
+                  "content": "Appended paragraph from test."
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "expected": {
+      "results": "array"
+    }
+  },
+  {
+    "description": "Append multiple blocks",
+    "inputs": {
+      "block_id": "${NOTION_TEST_PAGE_ID}",
+      "children": [
+        {
+          "object": "block",
+          "type": "heading_2",
+          "heading_2": {
+            "rich_text": [
+              {
+                "type": "text",
+                "text": {
+                  "content": "Test Heading"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "object": "block",
+          "type": "bulleted_list_item",
+          "bulleted_list_item": {
+            "rich_text": [
+              {
+                "type": "text",
+                "text": {
+                  "content": "List item 1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "object": "block",
+          "type": "bulleted_list_item",
+          "bulleted_list_item": {
+            "rich_text": [
+              {
+                "type": "text",
+                "text": {
+                  "content": "List item 2"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "expected": {
+      "results": "array"
+    }
+  }
+]

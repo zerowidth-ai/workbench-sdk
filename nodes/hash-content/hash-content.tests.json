@@ -1,0 +1,51 @@
+[
+  {
+    "description": "Hash string with SHA256",
+    "inputs": {
+      "content": "Hello World",
+      "algorithm": "sha256"
+    },
+    "expected": {
+      "hash": "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"
+    }
+  },
+  {
+    "description": "Hash string with MD5",
+    "inputs": {
+      "content": "Hello World",
+      "algorithm": "md5"
+    },
+    "expected": {
+      "hash": "b10a8db164e0754105b7a99be72e3fe5"
+    }
+  },
+  {
+    "description": "Hash string with SHA1",
+    "inputs": {
+      "content": "Hello World",
+      "algorithm": "sha1"
+    },
+    "expected": {
+      "hash": "0a4d55a8d778e5022fab701977c5d840bbc486d0"
+    }
+  },
+  {
+    "description": "Hash empty string",
+    "inputs": {
+      "content": "",
+      "algorithm": "sha256"
+    },
+    "expected": {
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "description": "Default algorithm is SHA256",
+    "inputs": {
+      "content": "Hello World"
+    },
+    "expected": {
+      "hash": "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"
+    }
+  }
+]

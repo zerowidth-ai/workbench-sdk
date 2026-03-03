@@ -1,5 +1,6 @@
 {
   "display_name": "Histogram Fixed Bins",
+  "tagline": "Group numbers into bins",
   "description": "Groups numbers into bins of fixed size",
   "category": "math",
   "inputs": [

@@ -1,5 +1,6 @@
 {
   "display_name": "NewsData.io: Latest News",
+  "tagline": "Get latest news",
   "description": "Fetch latest headlines from the last 48 hours with rich filtering options including keywords, countries, regions, categories, and more",
   "category": "third-party",
   "provider": "newsdata_io",

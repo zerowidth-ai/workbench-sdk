@@ -1,0 +1,74 @@
+{
+  "display_name": "Notion Search",
+  "tagline": "Search Notion",
+  "description": "Search pages and databases in a Notion workspace",
+  "icon": "search",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "query",
+      "display_name": "Query",
+      "type": "string",
+      "required": false,
+      "description": "Search query string (searches titles)"
+    },
+    {
+      "name": "filter_type",
+      "display_name": "Filter Type",
+      "type": "string",
+      "required": false,
+      "description": "Filter by object type: 'page' or 'database'"
+    },
+    {
+      "name": "sort_direction",
+      "display_name": "Sort Direction",
+      "type": "string",
+      "required": false,
+      "description": "Sort direction: 'ascending' or 'descending'",
+      "default": "descending"
+    },
+    {
+      "name": "sort_timestamp",
+      "display_name": "Sort Timestamp",
+      "type": "string",
+      "required": false,
+      "description": "Sort by timestamp: 'last_edited_time'",
+      "default": "last_edited_time"
+    },
+    {
+      "name": "start_cursor",
+      "display_name": "Start Cursor",
+      "type": "string",
+      "required": false,
+      "description": "Pagination cursor for next page"
+    },
+    {
+      "name": "page_size",
+      "display_name": "Page Size",
+      "type": "number",
+      "required": false,
+      "description": "Number of results per page (max 100)",
+      "default": 100
+    }
+  ],
+  "outputs": [
+    {
+      "name": "results",
+      "display_name": "Results",
+      "type": "array",
+      "description": "Array of page and database objects"
+    },
+    {
+      "name": "has_more",
+      "display_name": "Has More",
+      "type": "boolean",
+      "description": "Whether there are more results"
+    },
+    {
+      "name": "next_cursor",
+      "display_name": "Next Cursor",
+      "type": "string",
+      "description": "Cursor for the next page of results"
+    }
+  ]
+}

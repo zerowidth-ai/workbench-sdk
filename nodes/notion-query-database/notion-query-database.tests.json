@@ -1,0 +1,52 @@
+[
+  {
+    "description": "Query all entries from test database",
+    "inputs": {
+      "database_id": "${NOTION_TEST_DATABASE_ID}"
+    },
+    "expected": {
+      "results": "array",
+      "has_more": "boolean"
+    }
+  },
+  {
+    "description": "Query with page size limit",
+    "inputs": {
+      "database_id": "${NOTION_TEST_DATABASE_ID}",
+      "page_size": 1
+    },
+    "expected": {
+      "results": "array"
+    }
+  },
+  {
+    "description": "Query with filter",
+    "inputs": {
+      "database_id": "${NOTION_TEST_DATABASE_ID}",
+      "filter": {
+        "property": "Status",
+        "select": {
+          "equals": "Active"
+        }
+      }
+    },
+    "expected": {
+      "results": "array"
+    }
+  },
+  {
+    "description": "Query with sort",
+    "inputs": {
+      "database_id": "${NOTION_TEST_DATABASE_ID}",
+      "sorts": [
+        {
+          "property": "Name",
+          "direction": "ascending"
+        }
+      ]
+    },
+    "expected": {
+      "results": "array"
+    }
+  }
+]

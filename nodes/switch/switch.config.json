@@ -1,5 +1,6 @@
 {
   "display_name": "Switch",
+  "tagline": "Switch between cases",
   "description": "Routes data based on a value matching cases",
   "category": "logic",
   "inputs": [

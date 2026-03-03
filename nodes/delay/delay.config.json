@@ -1,5 +1,6 @@
 {
   "display_name": "Delay",
+  "tagline": "Add a delay",
   "description": "Waits for specified time before continuing",
   "category": "logic",
   "inputs": [

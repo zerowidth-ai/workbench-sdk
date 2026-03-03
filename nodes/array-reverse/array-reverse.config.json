@@ -1,5 +1,6 @@
 {
   "display_name": "Array Reverse",
+  "tagline": "Reverse list order",
   "description": "Reverses the order of elements in an array",
   "category": "lists",
   "inputs": [

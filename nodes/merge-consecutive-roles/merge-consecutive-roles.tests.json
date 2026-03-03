@@ -1,0 +1,199 @@
+[
+  {
+    "description": "Merge consecutive user messages",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "user", "content": "How are you?"},
+        {"role": "assistant", "content": "Hi there!"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello\n\nHow are you?"},
+        {"role": "assistant", "content": "Hi there!"}
+      ],
+      "merged_count": 1
+    }
+  },
+  {
+    "description": "Merge consecutive assistant messages without tool_calls",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Tell me a story"},
+        {"role": "assistant", "content": "Once upon a time..."},
+        {"role": "assistant", "content": "...there was a dragon."}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Tell me a story"},
+        {"role": "assistant", "content": "Once upon a time...\n\n...there was a dragon."}
+      ],
+      "merged_count": 1
+    }
+  },
+  {
+    "description": "Do not merge assistant messages with tool_calls",
+    "inputs": {
+      "messages": [
+        {"role": "assistant", "content": "Let me check", "tool_calls": [{"id": "call_1", "function": {"name": "get_weather"}}]},
+        {"role": "assistant", "content": "Also checking time", "tool_calls": [{"id": "call_2", "function": {"name": "get_time"}}]}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "assistant", "content": "Let me check", "tool_calls": [{"id": "call_1", "function": {"name": "get_weather"}}]},
+        {"role": "assistant", "content": "Also checking time", "tool_calls": [{"id": "call_2", "function": {"name": "get_time"}}]}
+      ],
+      "merged_count": 0
+    }
+  },
+  {
+    "description": "Do not merge tool messages",
+    "inputs": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "Sunny"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "3:00 PM"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "Sunny"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "3:00 PM"}
+      ],
+      "merged_count": 0
+    }
+  },
+  {
+    "description": "Do not merge plain assistant into assistant with tool_calls",
+    "inputs": {
+      "messages": [
+        {"role": "assistant", "content": "Let me check", "tool_calls": [{"id": "call_1", "function": {"name": "get_weather"}}]},
+        {"role": "assistant", "content": "Here's what I found"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "assistant", "content": "Let me check", "tool_calls": [{"id": "call_1", "function": {"name": "get_weather"}}]},
+        {"role": "assistant", "content": "Here's what I found"}
+      ],
+      "merged_count": 0
+    }
+  },
+  {
+    "description": "Do not merge assistant with tool_calls into plain assistant",
+    "inputs": {
+      "messages": [
+        {"role": "assistant", "content": "Thinking..."},
+        {"role": "assistant", "content": "Let me check", "tool_calls": [{"id": "call_1", "function": {"name": "get_weather"}}]}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "assistant", "content": "Thinking..."},
+        {"role": "assistant", "content": "Let me check", "tool_calls": [{"id": "call_1", "function": {"name": "get_weather"}}]}
+      ],
+      "merged_count": 0
+    }
+  },
+  {
+    "description": "Merge consecutive system messages",
+    "inputs": {
+      "messages": [
+        {"role": "system", "content": "You are helpful."},
+        {"role": "system", "content": "Be concise."},
+        {"role": "user", "content": "Hi"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "system", "content": "You are helpful.\n\nBe concise."},
+        {"role": "user", "content": "Hi"}
+      ],
+      "merged_count": 1
+    }
+  },
+  {
+    "description": "Custom separator",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Line 1"},
+        {"role": "user", "content": "Line 2"}
+      ],
+      "separator": " | "
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Line 1 | Line 2"}
+      ],
+      "merged_count": 1
+    }
+  },
+  {
+    "description": "Passthrough when no consecutive same roles",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"},
+        {"role": "user", "content": "Bye"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"},
+        {"role": "user", "content": "Bye"}
+      ],
+      "merged_count": 0
+    }
+  },
+  {
+    "description": "Handle empty messages array",
+    "inputs": {
+      "messages": []
+    },
+    "expected": {
+      "messages": [],
+      "merged_count": 0
+    }
+  },
+  {
+    "description": "Merge multiple consecutive messages",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Part 1"},
+        {"role": "user", "content": "Part 2"},
+        {"role": "user", "content": "Part 3"},
+        {"role": "assistant", "content": "Got it"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Part 1\n\nPart 2\n\nPart 3"},
+        {"role": "assistant", "content": "Got it"}
+      ],
+      "merged_count": 2
+    }
+  },
+  {
+    "description": "Preserve tool call flow",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "What's the weather?"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_weather"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Sunny, 72F"},
+        {"role": "assistant", "content": "The weather is sunny!"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "What's the weather?"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_weather"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Sunny, 72F"},
+        {"role": "assistant", "content": "The weather is sunny!"}
+      ],
+      "merged_count": 0
+    }
+  }
+]

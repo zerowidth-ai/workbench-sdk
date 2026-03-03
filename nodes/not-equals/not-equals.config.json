@@ -1,5 +1,6 @@
 {
   "display_name": "Not Equals",
+  "tagline": "Check inequality",
   "description": "Checks if two values are not equal, with deep comparison for objects and arrays",
   "icon": "not-equals",
   "category": "logic",

@@ -1,0 +1,46 @@
+[
+  {
+    "description": "Decode simple string",
+    "inputs": {
+      "encoded": "SGVsbG8gV29ybGQ="
+    },
+    "expected": {
+      "text": "Hello World",
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Decode empty string",
+    "inputs": {
+      "encoded": ""
+    },
+    "expected": {
+      "text": "",
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Decode with special characters",
+    "inputs": {
+      "encoded": "SGVsbG8hIEAjJCU="
+    },
+    "expected": {
+      "text": "Hello! @#$%",
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Decode unicode",
+    "inputs": {
+      "encoded": "SMOpbGxvIFfDtnJsZA=="
+    },
+    "expected": {
+      "text": "Héllo Wörld",
+      "success": true,
+      "error": null
+    }
+  }
+]

@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: GPT-4 Turbo Preview",
+  "tagline": "Large Language Model",
   "description": "The preview GPT-4 model with improved instruction following, JSON mode, reproducible outputs, parallel function calling, and more. Training data: up to Dec 2023.\n\n**Note:** heavily rate limited by OpenAI while in preview.",
   "category": "llm",
   "provider": "openai",
@@ -40,7 +41,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

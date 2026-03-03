@@ -1,0 +1,134 @@
+[
+  {
+    "description": "Basic conversation to text",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "What's 2+2?"},
+        {"role": "assistant", "content": "4"}
+      ]
+    },
+    "expected": {
+      "text": "User: What's 2+2?\n\nAssistant: 4",
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Exclude system messages by default",
+    "inputs": {
+      "messages": [
+        {"role": "system", "content": "You are helpful"},
+        {"role": "user", "content": "Hi"},
+        {"role": "assistant", "content": "Hello!"}
+      ]
+    },
+    "expected": {
+      "text": "User: Hi\n\nAssistant: Hello!",
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Include system messages when flag is true",
+    "inputs": {
+      "messages": [
+        {"role": "system", "content": "You are helpful"},
+        {"role": "user", "content": "Hi"}
+      ],
+      "include_system": true
+    },
+    "expected": {
+      "text": "System: You are helpful\n\nUser: Hi",
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Custom separator",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "A"},
+        {"role": "assistant", "content": "B"}
+      ],
+      "separator": "\n---\n"
+    },
+    "expected": {
+      "text": "User: A\n---\nAssistant: B",
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Uppercase role format",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hi"}
+      ],
+      "role_format": "uppercase"
+    },
+    "expected": {
+      "text": "USER: Hi",
+      "message_count": 1
+    }
+  },
+  {
+    "description": "Lowercase role format",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hi"}
+      ],
+      "role_format": "lowercase"
+    },
+    "expected": {
+      "text": "user: Hi",
+      "message_count": 1
+    }
+  },
+  {
+    "description": "No role labels",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hi"},
+        {"role": "assistant", "content": "Hello"}
+      ],
+      "role_format": "none"
+    },
+    "expected": {
+      "text": "Hi\n\nHello",
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Skip tool messages",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "What's the weather?"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "1"}]},
+        {"role": "tool", "tool_call_id": "1", "content": "Sunny"},
+        {"role": "assistant", "content": "It's sunny!"}
+      ]
+    },
+    "expected": {
+      "text": "User: What's the weather?\n\nAssistant: \n\nAssistant: It's sunny!",
+      "message_count": 3
+    }
+  },
+  {
+    "description": "Handle empty messages array",
+    "inputs": {
+      "messages": []
+    },
+    "expected": {
+      "text": "",
+      "message_count": 0
+    }
+  },
+  {
+    "description": "Handle complex content array",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": [{"type": "text", "text": "Hello"}, {"type": "text", "text": "World"}]}
+      ]
+    },
+    "expected": {
+      "text": "User: Hello World",
+      "message_count": 1
+    }
+  }
+]

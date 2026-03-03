@@ -12,6 +12,7 @@ from src.integrations.google_custom_search import GoogleCustomSearchIntegration
 from src.integrations.newsdata_io import NewsDataIntegration
 from src.integrations.openai import OpenAIIntegration
 from src.integrations.knowledge_base_interface import KnowledgeBaseInterface
+from src.integrations.airtable import AirtableIntegration
 
 __all__ = [
     "OpenRouterIntegration",
@@ -22,4 +23,5 @@ __all__ = [
     "NewsDataIntegration",
     "OpenAIIntegration",
     "KnowledgeBaseInterface",
+    "AirtableIntegration",
 ]

@@ -1,0 +1,50 @@
+[
+  {
+    "description": "Create record with Name field",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "fields": {
+        "Name": "Test Record from CI"
+      }
+    },
+    "expected": {
+      "record": "object",
+      "id": "string",
+      "fields": "object",
+      "created_time": "string"
+    }
+  },
+  {
+    "description": "Create record with all fields",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "fields": {
+        "Name": "Full Test Record",
+        "Status": "Active",
+        "Count": 42
+      }
+    },
+    "expected": {
+      "record": "object",
+      "id": "string",
+      "fields": "object"
+    }
+  },
+  {
+    "description": "Create with typecast enabled",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "fields": {
+        "Name": "Typecast Test",
+        "Count": "99"
+      },
+      "typecast": true
+    },
+    "expected": {
+      "id": "string"
+    }
+  }
+]

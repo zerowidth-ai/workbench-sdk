@@ -1,5 +1,6 @@
 {
   "display_name": "Throw Error",
+  "tagline": "Throw a test error",
   "description": "Throws an error with a custom message and optional context for testing error handling.",
   "icon": "alert-triangle",
   "category": "testing",

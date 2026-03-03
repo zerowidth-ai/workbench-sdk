@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: gpt-oss-safeguard-20b",
+  "tagline": "Large Language Model",
   "description": "gpt-oss-safeguard-20b is a safety reasoning model from OpenAI built upon gpt-oss-20b. This open-weight, 21B-parameter Mixture-of-Experts (MoE) model offers lower latency for safety tasks like content classification, LLM filtering, and trust & safety labeling.\n\nLearn more about this model in OpenAI's gpt-oss-safeguard [user guide](https://cookbook.openai.com/articles/gpt-oss-safeguard-guide).",
   "category": "llm",
   "provider": "openai",
@@ -36,7 +37,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

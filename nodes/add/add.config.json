@@ -1,5 +1,6 @@
 {
   "display_name": "Add",
+  "tagline": "Add two numbers",
   "description": "Adds two numbers together",
   "category": "math",
   "is_plugin": true,

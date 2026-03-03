@@ -1,0 +1,44 @@
+[
+  {
+    "description": "Update page title",
+    "inputs": {
+      "page_id": "${NOTION_TEST_PAGE_ID}",
+      "properties": {
+        "Name": {
+          "title": [
+            {
+              "text": {
+                "content": "Updated via Test"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "expected": {
+      "page": "object",
+      "id": "string",
+      "last_edited_time": "string"
+    }
+  },
+  {
+    "description": "Update multiple properties",
+    "inputs": {
+      "page_id": "${NOTION_TEST_PAGE_ID}",
+      "properties": {
+        "Status": {
+          "select": {
+            "name": "Inactive"
+          }
+        },
+        "Count": {
+          "number": 0
+        }
+      }
+    },
+    "expected": {
+      "page": "object",
+      "id": "string"
+    }
+  }
+]

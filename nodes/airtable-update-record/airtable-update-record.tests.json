@@ -1,0 +1,44 @@
+[
+  {
+    "description": "Update record Name field",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "record_id": "${AIRTABLE_TEST_RECORD_ID}",
+      "fields": {
+        "Name": "Updated via Test"
+      }
+    },
+    "expected": {
+      "record": "object",
+      "id": "string",
+      "fields": "object"
+    }
+  },
+  {
+    "description": "Update multiple fields",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "record_id": "${AIRTABLE_TEST_RECORD_ID}",
+      "fields": {
+        "Status": "Inactive",
+        "Count": 0
+      }
+    },
+    "expected": {
+      "record": "object",
+      "id": "string"
+    }
+  },
+  {
+    "description": "Error on invalid record ID",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "record_id": "recINVALIDXXXXXX",
+      "fields": { "Name": "Should Fail" }
+    },
+    "expectedError": "Airtable API error"
+  }
+]

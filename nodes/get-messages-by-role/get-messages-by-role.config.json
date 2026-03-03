@@ -1,5 +1,6 @@
 {
   "display_name": "Get Messages by Role",
+  "tagline": "Filter messages by role",
   "description": "Filter messages by specific role (user, assistant, system, etc.).",
   "icon": "filter",
   "category": "messages",

@@ -18,7 +18,12 @@ export default async ({inputs, settings, config, nodeConfig}) => {
 
             const value = inputs[input.name];
             if (value !== null && value !== undefined) {
-                params[input.name] = value;
+                // Flatten tools array to handle both individual tools and arrays of tools
+                if (input.name === 'tools' && Array.isArray(value)) {
+                    params.tools = value.flat();
+                } else {
+                    params[input.name] = value;
+                }
             }
         }
 

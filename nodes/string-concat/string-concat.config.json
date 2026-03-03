@@ -1,5 +1,6 @@
 {
   "display_name": "String Concatenate",
+  "tagline": "Join strings together",
   "description": "Joins two or more strings together",
   "category": "text",
   "inputs": [

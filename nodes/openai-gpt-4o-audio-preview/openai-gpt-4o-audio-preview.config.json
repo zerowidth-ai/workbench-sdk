@@ -1,6 +1,7 @@
 {
   "display_name": "OpenAI: GPT-4o Audio",
-  "description": "The gpt-4o-audio-preview model adds support for audio inputs as prompts. This enhancement allows the model to detect nuances within audio recordings and add depth to generated user experiences. Audio outputs are currently not supported. Audio tokens are priced at $40 per million input audio tokens.",
+  "tagline": "Large Language Model",
+  "description": "The gpt-4o-audio-preview model adds support for audio inputs as prompts. This enhancement allows the model to detect nuances within audio recordings and add depth to generated user experiences. Audio outputs are currently not supported. Audio tokens are priced at $40 per million input and $80 per million output audio tokens.",
   "category": "llm",
   "provider": "openai",
   "accepts_plugins": true,
@@ -40,7 +41,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

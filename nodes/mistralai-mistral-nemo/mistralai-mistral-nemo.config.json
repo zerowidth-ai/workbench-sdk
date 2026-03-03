@@ -1,5 +1,6 @@
 {
   "display_name": "Mistral: Mistral Nemo",
+  "tagline": "Large Language Model",
   "description": "A 12B parameter model with a 128k token context length built by Mistral in collaboration with NVIDIA.\n\nThe model is multilingual, supporting English, French, German, Spanish, Italian, Portuguese, Chinese, Japanese, Korean, Arabic, and Hindi.\n\nIt supports function calling and is released under the Apache 2.0 license.",
   "category": "llm",
   "provider": "mistralai",
@@ -40,7 +41,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

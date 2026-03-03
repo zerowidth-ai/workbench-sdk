@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: GPT-4 (older v0314)",
+  "tagline": "Large Language Model",
   "description": "GPT-4-0314 is the first version of GPT-4 released, with a context length of 8,192 tokens, and was supported until June 14. Training data: up to Sep 2021.",
   "category": "llm",
   "provider": "openai",
@@ -40,7 +41,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

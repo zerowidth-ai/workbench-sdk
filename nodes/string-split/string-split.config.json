@@ -1,5 +1,6 @@
 {
   "display_name": "String Split",
+  "tagline": "Split text apart",
   "description": "Splits a string into an array using a delimiter",
   "category": "text",
   "inputs": [

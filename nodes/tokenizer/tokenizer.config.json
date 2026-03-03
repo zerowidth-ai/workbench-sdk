@@ -1,5 +1,6 @@
 {
   "display_name": "Tokenizer",
+  "tagline": "Tokenize text",
   "description": "Convert text, messages, or arrays of messages into arrays of token numbers using cl200k_base or cl100k_base tokenizers.",
   "icon": "hash",
   "category": "text",

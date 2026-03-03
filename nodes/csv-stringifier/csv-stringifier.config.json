@@ -1,5 +1,6 @@
 {
   "display_name": "CSV Stringifier",
+  "tagline": "Convert to CSV",
   "description": "Converts an array of objects or arrays into a CSV string",
   "icon": "table",
   "category": "data",

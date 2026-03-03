@@ -1,5 +1,6 @@
 {
   "display_name": "Mode",
+  "tagline": "Find most frequent value",
   "description": "Finds most frequent value(s) in array of numbers",
   "category": "math",
   "inputs": [

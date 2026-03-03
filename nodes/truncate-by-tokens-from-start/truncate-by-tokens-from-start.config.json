@@ -1,5 +1,6 @@
 {
   "display_name": "Truncate by Tokens from Start",
+  "tagline": "Truncate from start",
   "description": "Keep only the first messages that fit within the specified token limit.",
   "icon": "scissors",
   "category": "messages",

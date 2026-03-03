@@ -1,5 +1,6 @@
 {
   "display_name": "Timestamp",
+  "tagline": "Get current time",
   "description": "Generate current timestamp in various formats. Runs as a constant to provide current time at flow start.",
   "icon": "clock",
   "category": "date",

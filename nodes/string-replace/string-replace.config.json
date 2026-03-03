@@ -1,5 +1,6 @@
 {
   "display_name": "String Replace",
+  "tagline": "Find and replace text",
   "description": "Replaces occurrences of text within a string",
   "category": "text",
   "inputs": [

@@ -1,0 +1,30 @@
+{
+  "display_name": "Dedupe Messages",
+  "tagline": "Remove duplicate messages",
+  "description": "Removes consecutive duplicate messages from a conversation. Messages are considered duplicates if they have the same role and content. Useful for cleaning up retry artifacts.",
+  "icon": "copy-slash",
+  "category": "messages",
+  "inputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "Array of message objects to deduplicate",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "Array of messages with consecutive duplicates removed"
+    },
+    {
+      "name": "removed_count",
+      "display_name": "Removed Count",
+      "type": "number",
+      "description": "Number of duplicate messages that were removed"
+    }
+  ]
+}

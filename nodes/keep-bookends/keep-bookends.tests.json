@@ -1,0 +1,185 @@
+[
+  {
+    "description": "Keep first 2 and last 2, removing middle",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 2"},
+        {"role": "user", "content": "Message 3"},
+        {"role": "assistant", "content": "Message 4"},
+        {"role": "user", "content": "Message 5"},
+        {"role": "assistant", "content": "Message 6"}
+      ],
+      "keep_first": 2,
+      "keep_last": 2
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 2"},
+        {"role": "user", "content": "Message 5"},
+        {"role": "assistant", "content": "Message 6"}
+      ],
+      "removed_count": 2
+    }
+  },
+  {
+    "description": "System messages always preserved",
+    "inputs": {
+      "messages": [
+        {"role": "system", "content": "You are helpful"},
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 2"},
+        {"role": "user", "content": "Message 3"},
+        {"role": "assistant", "content": "Message 4"},
+        {"role": "user", "content": "Message 5"}
+      ],
+      "keep_first": 1,
+      "keep_last": 1
+    },
+    "expected": {
+      "messages": [
+        {"role": "system", "content": "You are helpful"},
+        {"role": "user", "content": "Message 1"},
+        {"role": "user", "content": "Message 5"}
+      ],
+      "removed_count": 3
+    }
+  },
+  {
+    "description": "Multiple system messages preserved",
+    "inputs": {
+      "messages": [
+        {"role": "system", "content": "System 1"},
+        {"role": "system", "content": "System 2"},
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 2"},
+        {"role": "user", "content": "Message 3"},
+        {"role": "assistant", "content": "Message 4"}
+      ],
+      "keep_first": 1,
+      "keep_last": 1
+    },
+    "expected": {
+      "messages": [
+        {"role": "system", "content": "System 1"},
+        {"role": "system", "content": "System 2"},
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 4"}
+      ],
+      "removed_count": 2
+    }
+  },
+  {
+    "description": "Overlap - keep all when first + last >= total",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 2"},
+        {"role": "user", "content": "Message 3"}
+      ],
+      "keep_first": 2,
+      "keep_last": 2
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 2"},
+        {"role": "user", "content": "Message 3"}
+      ],
+      "removed_count": 0
+    }
+  },
+  {
+    "description": "Keep first only (keep_last = 0)",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 2"},
+        {"role": "user", "content": "Message 3"},
+        {"role": "assistant", "content": "Message 4"}
+      ],
+      "keep_first": 2,
+      "keep_last": 0
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 2"}
+      ],
+      "removed_count": 2
+    }
+  },
+  {
+    "description": "Keep last only (keep_first = 0)",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 2"},
+        {"role": "user", "content": "Message 3"},
+        {"role": "assistant", "content": "Message 4"}
+      ],
+      "keep_first": 0,
+      "keep_last": 2
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Message 3"},
+        {"role": "assistant", "content": "Message 4"}
+      ],
+      "removed_count": 2
+    }
+  },
+  {
+    "description": "Empty messages array",
+    "inputs": {
+      "messages": [],
+      "keep_first": 5,
+      "keep_last": 5
+    },
+    "expected": {
+      "messages": [],
+      "removed_count": 0
+    }
+  },
+  {
+    "description": "Only system messages",
+    "inputs": {
+      "messages": [
+        {"role": "system", "content": "System 1"},
+        {"role": "system", "content": "System 2"}
+      ],
+      "keep_first": 1,
+      "keep_last": 1
+    },
+    "expected": {
+      "messages": [
+        {"role": "system", "content": "System 1"},
+        {"role": "system", "content": "System 2"}
+      ],
+      "removed_count": 0
+    }
+  },
+  {
+    "description": "System messages in middle are still preserved and moved to front",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Message 1"},
+        {"role": "system", "content": "Late system message"},
+        {"role": "assistant", "content": "Message 2"},
+        {"role": "user", "content": "Message 3"},
+        {"role": "assistant", "content": "Message 4"}
+      ],
+      "keep_first": 1,
+      "keep_last": 1
+    },
+    "expected": {
+      "messages": [
+        {"role": "system", "content": "Late system message"},
+        {"role": "user", "content": "Message 1"},
+        {"role": "assistant", "content": "Message 4"}
+      ],
+      "removed_count": 2
+    }
+  }
+]

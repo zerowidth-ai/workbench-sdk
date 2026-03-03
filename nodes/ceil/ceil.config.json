@@ -1,5 +1,6 @@
 {
   "display_name": "Ceil",
+  "tagline": "Round numbers up",
   "description": "Rounds up to nearest integer",
   "category": "math",
   "inputs": [

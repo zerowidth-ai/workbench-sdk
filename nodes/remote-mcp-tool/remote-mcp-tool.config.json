@@ -1,0 +1,21 @@
+{
+  "display_name": "Remote MCP Tool",
+  "tagline": "Connect MCP server",
+  "description": "Connect a remote MCP (Model Context Protocol) server as a tool provider for an LLM node.",
+  "icon": "fa-plug",
+  "category": "tools",
+  "is_constant": true,
+  "inputs": [],
+  "outputs": [],
+  "settings": [
+    {
+      "name": "mcp_integration",
+      "display_name": "MCP Integration",
+      "type": "string",
+      "description": "The name of the MCP integration from config.keys.mcp to use for this tool server.",
+      "required": true
+    }
+  ],
+  "timeout": 30000,
+  "retry_limit": 1
+}

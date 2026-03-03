@@ -1,0 +1,87 @@
+{
+  "display_name": "Airtable List Records",
+  "tagline": "List Airtable records",
+  "description": "List and query records from an Airtable table with optional filtering, sorting, and pagination.",
+  "icon": "table",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "base_id",
+      "display_name": "Base ID",
+      "type": "string",
+      "description": "The Airtable base ID (starts with 'app')",
+      "required": true
+    },
+    {
+      "name": "table_name",
+      "display_name": "Table Name",
+      "type": "string",
+      "description": "The table name or ID",
+      "required": true
+    },
+    {
+      "name": "filter_formula",
+      "display_name": "Filter Formula",
+      "type": "string",
+      "description": "Airtable formula to filter records (e.g., \"{Status} = 'Active'\")",
+      "required": false
+    },
+    {
+      "name": "sort_field",
+      "display_name": "Sort Field",
+      "type": "string",
+      "description": "Field name to sort by",
+      "required": false
+    },
+    {
+      "name": "sort_direction",
+      "display_name": "Sort Direction",
+      "type": "string",
+      "description": "Sort direction: 'asc' or 'desc'",
+      "required": false,
+      "default": "asc"
+    },
+    {
+      "name": "max_records",
+      "display_name": "Max Records",
+      "type": "number",
+      "description": "Maximum number of records to return",
+      "required": false
+    },
+    {
+      "name": "page_size",
+      "display_name": "Page Size",
+      "type": "number",
+      "description": "Number of records per page (max 100)",
+      "required": false
+    },
+    {
+      "name": "offset",
+      "display_name": "Offset",
+      "type": "string",
+      "description": "Pagination offset from previous request",
+      "required": false
+    },
+    {
+      "name": "view",
+      "display_name": "View",
+      "type": "string",
+      "description": "Name or ID of a view to use",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "records",
+      "display_name": "Records",
+      "type": "array",
+      "description": "Array of record objects with id, fields, and createdTime"
+    },
+    {
+      "name": "offset",
+      "display_name": "Offset",
+      "type": "string",
+      "description": "Pagination offset for next page (if more records exist)"
+    }
+  ]
+}

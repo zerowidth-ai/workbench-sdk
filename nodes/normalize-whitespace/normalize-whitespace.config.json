@@ -1,0 +1,56 @@
+{
+  "display_name": "Normalize Whitespace",
+  "tagline": "Normalize whitespace",
+  "description": "Normalizes whitespace in text by collapsing multiple spaces, removing extra newlines, and trimming.",
+  "icon": "text-paragraph",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The text to normalize",
+      "required": true
+    },
+    {
+      "name": "collapse_spaces",
+      "display_name": "Collapse Spaces",
+      "type": "boolean",
+      "description": "Collapse multiple spaces into single space",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "collapse_newlines",
+      "display_name": "Collapse Newlines",
+      "type": "boolean",
+      "description": "Collapse multiple newlines into single newline",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "trim",
+      "display_name": "Trim",
+      "type": "boolean",
+      "description": "Trim leading and trailing whitespace",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "trim_lines",
+      "display_name": "Trim Lines",
+      "type": "boolean",
+      "description": "Trim whitespace from each line",
+      "required": false,
+      "default": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The normalized text"
+    }
+  ]
+}

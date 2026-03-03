@@ -1,0 +1,24 @@
+{
+  "display_name": "Base64 Encode",
+  "tagline": "Encode to Base64",
+  "description": "Encodes a string to Base64 format.",
+  "icon": "lock",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The text to encode",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "encoded",
+      "display_name": "Encoded",
+      "type": "string",
+      "description": "The Base64 encoded string"
+    }
+  ]
+}

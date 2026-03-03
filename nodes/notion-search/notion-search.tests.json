@@ -1,0 +1,46 @@
+[
+  {
+    "description": "Search all accessible content",
+    "inputs": {},
+    "expected": {
+      "results": "array",
+      "has_more": "boolean"
+    }
+  },
+  {
+    "description": "Search with query string",
+    "inputs": {
+      "query": "Test"
+    },
+    "expected": {
+      "results": "array"
+    }
+  },
+  {
+    "description": "Search only pages",
+    "inputs": {
+      "filter_type": "page"
+    },
+    "expected": {
+      "results": "array"
+    }
+  },
+  {
+    "description": "Search only databases",
+    "inputs": {
+      "filter_type": "database"
+    },
+    "expected": {
+      "results": "array"
+    }
+  },
+  {
+    "description": "Search with pagination limit",
+    "inputs": {
+      "page_size": 5
+    },
+    "expected": {
+      "results": "array"
+    }
+  }
+]

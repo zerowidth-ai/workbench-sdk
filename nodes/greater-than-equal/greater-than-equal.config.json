@@ -1,5 +1,6 @@
 {
   "display_name": "Greater Than or Equal",
+  "tagline": "Compare two numbers",
   "description": "Checks if the first number is greater than or equal to the second number",
   "icon": "greater-than-equal",
   "category": "math",

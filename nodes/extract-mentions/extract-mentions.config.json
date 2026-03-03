@@ -1,5 +1,6 @@
 {
   "display_name": "Extract Mentions",
+  "tagline": "Extract mentions",
   "description": "Extract all @mentions from text",
   "category": "text",
   "is_macro": true,

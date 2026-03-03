@@ -1,5 +1,6 @@
 {
   "display_name": "Boolean Inverter",
+  "tagline": "Invert boolean value",
   "description": "Inverts the input boolean value",
   "icon": "toggle-off",
   "category": "logic",

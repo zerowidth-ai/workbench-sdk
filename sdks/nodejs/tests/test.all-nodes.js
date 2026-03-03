@@ -6,6 +6,28 @@ import dotenv from "dotenv";
 import { getDirname } from "../src/utilities/helpers.js";
 import { loadIntegrations } from "../src/utilities/loaders.js";
 
+/**
+ * Recursively substitute ${VAR} patterns with environment variable values
+ */
+function substituteEnvVars(obj) {
+  if (typeof obj === 'string') {
+    return obj.replace(/\$\{([^}]+)\}/g, (match, varName) => {
+      const value = process.env[varName];
+      return value !== undefined ? value : match;
+    });
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => substituteEnvVars(item));
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const result = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = substituteEnvVars(value);
+    }
+    return result;
+  }
+  return obj;
+}
 
 // Custom test functions
 const customTests = {
@@ -68,16 +90,22 @@ async function runNodeTest(config, nodeDir, testCase, testResults) {
   const processFunction = await import(nodeProcessPath).then(module => module.default);
   const nodeConfig = JSON.parse(fs.readFileSync(nodeConfigPath, "utf-8"));
   
+  // Substitute environment variables in inputs (e.g., ${AIRTABLE_TEST_BASE_ID})
+  const substitutedInputs = substituteEnvVars(testCase.inputs);
+
   // Merge default values from nodeConfig into testCase.inputs
-  const inputsWithDefaults = { ...testCase.inputs };
+  const inputsWithDefaults = { ...substitutedInputs };
   for (const inputDef of nodeConfig.inputs) {
     if (inputsWithDefaults[inputDef.name] === undefined && inputDef.default !== undefined) {
       inputsWithDefaults[inputDef.name] = inputDef.default;
     }
   }
-  
+
+  // Substitute environment variables in settings as well
+  const substitutedSettings = substituteEnvVars(testCase.settings || {});
+
   // Apply default settings from node nodeConfiguration
-  const settingsWithDefaults = { ...(testCase.settings || {}) };
+  const settingsWithDefaults = { ...substitutedSettings };
   if (nodeConfig.settings) {
     for (const settingDef of nodeConfig.settings) {
       if (settingDef.default !== undefined && settingsWithDefaults[settingDef.name] === undefined) {
@@ -314,7 +342,9 @@ async function runTests() {
   const integrations = await loadIntegrations({
     keys: {
       openrouter: process.env.OPENROUTER_API_KEY,
-      newsdata_io: process.env.NEWSDATA_IO_API_KEY
+      newsdata_io: process.env.NEWSDATA_IO_API_KEY,
+      airtable: process.env.AIRTABLE_API_KEY,
+      notion: process.env.NOTION_API_KEY
     }
   });
 

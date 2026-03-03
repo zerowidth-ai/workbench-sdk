@@ -1,5 +1,6 @@
 {
   "display_name": "Simple Agent (beta)",
+  "tagline": "Run a simple agent",
   "description": "A simple AI agent that accepts tools and processes messages. Perfect template for creating starter agents.",
   "category": "ai",
   "is_macro": true,

@@ -1,5 +1,6 @@
 {
   "display_name": "Set Object Property",
+  "tagline": "Set object property",
   "description": "Set or add a key-value pair to an object, returning a new object with the property set. Can also create a new object from scratch if the input object is empty or null.",
   "icon": "fa-edit",
   "category": "data",

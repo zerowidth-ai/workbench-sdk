@@ -1,5 +1,6 @@
 {
   "display_name": "Truncate by Tokens Preserve System",
+  "tagline": "Truncate preserving system",
   "description": "Always keep system messages, truncate other messages to fit within the specified token limit.",
   "icon": "shield",
   "category": "messages",

@@ -1,0 +1,89 @@
+[
+  {
+    "description": "Filter tools by name - keep matching",
+    "inputs": {
+      "tools": [
+        {"name": "create_event", "description": "Create a calendar event", "parameters": {}},
+        {"name": "send_email", "description": "Send an email", "parameters": {}},
+        {"name": "search_docs", "description": "Search documents", "parameters": {}}
+      ],
+      "include": ["create_event", "search_docs"]
+    },
+    "expected": {
+      "tools": [
+        {"name": "create_event", "description": "Create a calendar event", "parameters": {}},
+        {"name": "search_docs", "description": "Search documents", "parameters": {}}
+      ]
+    }
+  },
+  {
+    "description": "Empty include returns empty array",
+    "inputs": {
+      "tools": [
+        {"name": "create_event", "description": "Create a calendar event", "parameters": {}}
+      ],
+      "include": []
+    },
+    "expected": {
+      "tools": []
+    }
+  },
+  {
+    "description": "No matching tools returns empty array",
+    "inputs": {
+      "tools": [
+        {"name": "create_event", "description": "Create a calendar event", "parameters": {}}
+      ],
+      "include": ["nonexistent_tool"]
+    },
+    "expected": {
+      "tools": []
+    }
+  },
+  {
+    "description": "Empty tools input returns empty array",
+    "inputs": {
+      "tools": [],
+      "include": ["create_event"]
+    },
+    "expected": {
+      "tools": []
+    }
+  },
+  {
+    "description": "Preserves tool structure with all fields",
+    "inputs": {
+      "tools": [
+        {
+          "name": "complex_tool",
+          "description": "A tool with all fields",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "param1": {"type": "string"}
+            },
+            "required": ["param1"]
+          },
+          "strict": true
+        }
+      ],
+      "include": ["complex_tool"]
+    },
+    "expected": {
+      "tools": [
+        {
+          "name": "complex_tool",
+          "description": "A tool with all fields",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "param1": {"type": "string"}
+            },
+            "required": ["param1"]
+          },
+          "strict": true
+        }
+      ]
+    }
+  }
+]

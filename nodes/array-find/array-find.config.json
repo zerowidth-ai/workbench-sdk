@@ -1,5 +1,6 @@
 {
   "display_name": "Array Find",
+  "tagline": "Find in list",
   "description": "Finds elements in an array that match given criteria",
   "category": "lists",
   "inputs": [

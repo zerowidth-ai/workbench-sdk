@@ -1,5 +1,6 @@
 {
   "display_name": "If/Else",
+  "tagline": "Route conditionally",
   "description": "Routes data based on a condition",
   "category": "logic",
   "inputs": [

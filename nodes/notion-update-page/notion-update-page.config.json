@@ -1,0 +1,57 @@
+{
+  "display_name": "Notion Update Page",
+  "tagline": "Update Notion page",
+  "description": "Update properties of an existing Notion page",
+  "icon": "edit",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "page_id",
+      "display_name": "Page ID",
+      "type": "string",
+      "required": true,
+      "description": "The ID of the page to update"
+    },
+    {
+      "name": "properties",
+      "display_name": "Properties",
+      "type": "object",
+      "required": true,
+      "description": "Properties to update"
+    },
+    {
+      "name": "icon",
+      "display_name": "Icon",
+      "type": "object",
+      "required": false,
+      "description": "New page icon (emoji or external URL)"
+    },
+    {
+      "name": "cover",
+      "display_name": "Cover",
+      "type": "object",
+      "required": false,
+      "description": "New page cover image (external URL)"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "page",
+      "display_name": "Page",
+      "type": "object",
+      "description": "The updated page object"
+    },
+    {
+      "name": "id",
+      "display_name": "ID",
+      "type": "string",
+      "description": "The page ID"
+    },
+    {
+      "name": "last_edited_time",
+      "display_name": "Last Edited Time",
+      "type": "string",
+      "description": "When the page was last edited"
+    }
+  ]
+}

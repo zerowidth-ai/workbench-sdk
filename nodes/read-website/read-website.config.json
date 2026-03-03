@@ -1,5 +1,6 @@
 {
   "display_name": "Read Website (beta)",
+  "tagline": "Read website content",
   "description": "Simple website reader - scrapes content and extracts main text",
   "category": "third-party",
   "provider": "firecrawl",

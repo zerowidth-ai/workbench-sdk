@@ -1,0 +1,71 @@
+{
+  "display_name": "Notion Create Page",
+  "tagline": "Create Notion page",
+  "description": "Create a new page in a Notion database or as a child of another page",
+  "icon": "plus",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "parent_type",
+      "display_name": "Parent Type",
+      "type": "string",
+      "required": true,
+      "description": "Type of parent: 'database_id' or 'page_id'"
+    },
+    {
+      "name": "parent_id",
+      "display_name": "Parent ID",
+      "type": "string",
+      "required": true,
+      "description": "The ID of the parent database or page"
+    },
+    {
+      "name": "properties",
+      "display_name": "Properties",
+      "type": "object",
+      "required": true,
+      "description": "Page properties (for database pages, must match database schema)"
+    },
+    {
+      "name": "children",
+      "display_name": "Children",
+      "type": "array",
+      "required": false,
+      "description": "Block content to add to the page"
+    },
+    {
+      "name": "icon",
+      "display_name": "Icon",
+      "type": "object",
+      "required": false,
+      "description": "Page icon (emoji or external URL)"
+    },
+    {
+      "name": "cover",
+      "display_name": "Cover",
+      "type": "object",
+      "required": false,
+      "description": "Page cover image (external URL)"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "page",
+      "display_name": "Page",
+      "type": "object",
+      "description": "The created page object"
+    },
+    {
+      "name": "id",
+      "display_name": "ID",
+      "type": "string",
+      "description": "The created page ID"
+    },
+    {
+      "name": "url",
+      "display_name": "URL",
+      "type": "string",
+      "description": "The page URL"
+    }
+  ]
+}

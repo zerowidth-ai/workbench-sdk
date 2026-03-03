@@ -1,5 +1,6 @@
 {
   "display_name": "Message Role Swap",
+  "tagline": "Swap message roles",
   "description": "Swap message roles between assistant and user in a messages array, returning a new array with swapped roles",
   "icon": "swap-horizontal",
   "category": "messages",

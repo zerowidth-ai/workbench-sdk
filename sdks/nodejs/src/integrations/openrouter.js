@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { emitAPICallEvent } from '../utilities/sanitizeAPICall.js';
 
 export default class OpenRouterIntegration {
     constructor(apiKey, options = {}) {
@@ -107,10 +108,11 @@ export default class OpenRouterIntegration {
           delete payload.tools;
         }
 
+        const apiCallStartTime = Date.now();
         try {
-            
+
             payload.stream = true;
-            
+
             const stream = await this.client.chat.completions.create(JSON.parse(JSON.stringify(payload)));
 
             let content = "";
@@ -252,8 +254,53 @@ export default class OpenRouterIntegration {
             };
 
 
+            // Emit API call event after stream is consumed
+            await emitAPICallEvent(engineConfig || this._engineConfig, {
+                timestamp: apiCallStartTime,
+                integration: 'openrouter',
+                nodeId: nodeConfig?.id || null,
+                nodeType: nodeConfig?.type || null,
+                request: {
+                    method: 'POST',
+                    url: `${this.client.baseURL}/chat/completions`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
+                        'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
+                        'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
+                    },
+                    body: payload
+                },
+                response: { status: 200, statusText: 'OK' },
+                duration: Date.now() - apiCallStartTime,
+                error: null
+            });
+
             return result;
         } catch (error) {
+            // Emit API call event for error case
+            await emitAPICallEvent(engineConfig || this._engineConfig, {
+                timestamp: apiCallStartTime,
+                integration: 'openrouter',
+                nodeId: nodeConfig?.id || null,
+                nodeType: nodeConfig?.type || null,
+                request: {
+                    method: 'POST',
+                    url: `${this.client.baseURL}/chat/completions`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
+                    },
+                    body: payload
+                },
+                response: {
+                    status: error.response?.status || 0,
+                    statusText: error.response?.statusText || 'Error'
+                },
+                duration: Date.now() - apiCallStartTime,
+                error: error.message
+            });
+
             // Enhanced error handling with detailed information
             let errorMessage = 'OpenRouter API Error';
             let errorDetails = {};

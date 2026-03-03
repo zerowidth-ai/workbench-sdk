@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: GPT-5 Chat",
+  "tagline": "Large Language Model",
   "description": "GPT-5 Chat is designed for advanced, natural, multimodal, and context-aware conversations for enterprise applications.",
   "category": "llm",
   "provider": "openai",

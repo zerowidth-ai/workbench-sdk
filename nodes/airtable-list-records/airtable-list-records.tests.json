@@ -1,0 +1,46 @@
+[
+  {
+    "description": "List all records from test table",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}"
+    },
+    "expected": {
+      "records": "array"
+    }
+  },
+  {
+    "description": "Filter records by Status field",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "filter_formula": "{Status} = 'Active'"
+    },
+    "expected": {
+      "records": "array"
+    }
+  },
+  {
+    "description": "Sort records by Name ascending",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "sort_field": "Name",
+      "sort_direction": "asc"
+    },
+    "expected": {
+      "records": "array"
+    }
+  },
+  {
+    "description": "Limit results with max_records",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "max_records": 1
+    },
+    "expected": {
+      "records": "array"
+    }
+  }
+]

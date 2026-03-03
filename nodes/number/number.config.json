@@ -1,5 +1,6 @@
 {
   "display_name": "Number",
+  "tagline": "Set a number value",
   "description": "A simple number node that outputs a constant numeric value",
   "icon": "calculator",
   "category": "math",

@@ -1,5 +1,6 @@
 {
   "display_name": "Loop End",
+  "tagline": "End a loop",
   "description": "Loop exit point that decides whether to continue looping or exit. Tracks loop count and evaluates conditions to send value to loop_back or loop_end output.",
   "category": "logic",
   "is_plugin": false,

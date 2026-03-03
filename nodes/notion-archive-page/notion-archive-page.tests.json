@@ -1,0 +1,26 @@
+[
+  {
+    "description": "Archive a page",
+    "inputs": {
+      "page_id": "${NOTION_TEST_PAGE_TO_ARCHIVE}",
+      "archived": true
+    },
+    "expected": {
+      "page": "object",
+      "id": "string",
+      "archived": true
+    }
+  },
+  {
+    "description": "Restore an archived page",
+    "inputs": {
+      "page_id": "${NOTION_TEST_PAGE_TO_ARCHIVE}",
+      "archived": false
+    },
+    "expected": {
+      "page": "object",
+      "id": "string",
+      "archived": false
+    }
+  }
+]

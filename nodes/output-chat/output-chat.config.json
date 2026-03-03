@@ -1,5 +1,6 @@
 {
   "display_name": "Chat Output",
+  "tagline": "Send chat response",
   "description": "Outputs a chat message to the user",
   "icon": "comment",
   "category": "i/o",

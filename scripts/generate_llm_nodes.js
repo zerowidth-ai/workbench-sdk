@@ -66,7 +66,7 @@ function loadConfig() {
 // Parameter mappings from OpenRouter to our system
 const PARAMETER_MAPPINGS = {
   'tools': {
-    type: 'tool',
+    type: 'tool or array of tools',
     description: 'Array of tools to use',
     default: null,
     allow_multiple: true
@@ -436,13 +436,6 @@ class LLMNodeGenerator {
 
     // Add primary input based on model type
     if (this.isChatModel(model)) {
-      inputs.push({
-        name: "system_prompt",
-        display_name: "System Prompt",
-        type: "string or message",
-        description: "System prompt to instruct the model",
-        default: null
-      });
       
       inputs.push({
         name: "messages",
@@ -450,6 +443,13 @@ class LLMNodeGenerator {
         type: "conversation or message or string",
         description: "Array of chat messages that make up the conversation",
         required: true
+      });
+      inputs.push({
+        name: "system_prompt",
+        display_name: "System Prompt",
+        type: "string or message",
+        description: "System prompt to instruct the model",
+        default: null
       });
     } else {
       inputs.push({
@@ -763,7 +763,12 @@ class LLMNodeGenerator {
 
             const value = inputs[input.name];
             if (value !== null && value !== undefined) {
-                params[input.name] = value;
+                // Flatten tools array to handle both individual tools and arrays of tools
+                if (input.name === 'tools' && Array.isArray(value)) {
+                    params.tools = value.flat();
+                } else {
+                    params[input.name] = value;
+                }
             }
         }
 
@@ -867,7 +872,17 @@ ${isChat ? chatProcessing : completionProcessing}
             continue
         value = inputs.get(input_def["name"])
         if value is not None:
-            params[input_def["name"]] = value
+            # Flatten tools array to handle both individual tools and arrays of tools
+            if input_def["name"] == "tools" and isinstance(value, list):
+                flat_tools = []
+                for item in value:
+                    if isinstance(item, list):
+                        flat_tools.extend(item)
+                    else:
+                        flat_tools.append(item)
+                params["tools"] = flat_tools
+            else:
+                params[input_def["name"]] = value
 ${imageGenSetup}
     response = await openrouter.chat_completion(
         model="${modelId}",
@@ -942,51 +957,95 @@ ${returnValues}
 
   /**
    * Generate conversation building logic for JS
+   *
+   * This filters the conversation to only include messages related to internal tools
+   * (tools handled by the engine via plugin links). External/manual tools that the
+   * application handles are excluded, except for any pending external tool calls
+   * which are placed at the end for the application to handle.
    */
   generateConversationBuildingLogic() {
-    return `// Build conversation output: slice from end of input messages until we hit a non-tool message without tool_calls
+    return `// Get the set of internal tool names (tools handled by engine plugins)
+        // If internal_tool_names is undefined, we're in backward-compatible mode (include all)
+        // If it's an empty array, there are no internal tools (include none from history)
+        const hasInternalToolTracking = config.internal_tool_names !== undefined;
+        const internalToolNames = new Set(config.internal_tool_names || []);
+
+        // Build conversation output: only include messages related to internal tools
         let conversationMessages = [];
+
         if (Array.isArray(messages) && messages.length > 0) {
             // Work backwards from the end
             for (let i = messages.length - 1; i >= 0; i--) {
                 const msg = messages[i];
                 if (!msg || typeof msg !== 'object') continue;
-                
+
                 const isTool = msg.role === 'tool';
                 const hasToolCalls = msg.tool_calls && Array.isArray(msg.tool_calls) && msg.tool_calls.length > 0;
-                
-                // Include this message if it's a tool message or has tool_calls
-                if (isTool || hasToolCalls) {
-                    conversationMessages.unshift(msg);
+
+                if (isTool) {
+                    // Only include tool result if it's for an internal tool
+                    const toolName = msg.name;
+                    if (!hasInternalToolTracking || internalToolNames.has(toolName)) {
+                        conversationMessages.unshift(msg);
+                    }
+                    // Skip external tool results
+                } else if (hasToolCalls) {
+                    // Filter to only internal tool calls
+                    const internalCalls = !hasInternalToolTracking
+                        ? msg.tool_calls
+                        : msg.tool_calls.filter(tc => internalToolNames.has(tc.function?.name));
+
+                    if (internalCalls.length > 0) {
+                        conversationMessages.unshift({
+                            ...msg,
+                            tool_calls: internalCalls
+                        });
+                    }
+                    // External tool calls from history are dropped
                 } else {
                     // Stop when we hit a message that is not tool and has no tool_calls
                     break;
                 }
             }
         }
-        
-        // Append the final output message
+
+        // Append the final output message — always include all tool_calls on the response
+        // The internal/external split only applies to historical messages above, not the fresh response
         const finalMessage = {
             content: response.content,
             role: response.role
         };
-        if (response.tool_calls) {
+
+        if (response.tool_calls && Array.isArray(response.tool_calls) && response.tool_calls.length > 0) {
             finalMessage.tool_calls = response.tool_calls;
         }
+
         if (response.images) {
             finalMessage.images = response.images;
         }
         conversationMessages.push(finalMessage);
-        
+
         const conversation = conversationMessages;`;
   }
 
   /**
    * Generate conversation building logic for Python
+   *
+   * This filters the conversation to only include messages related to internal tools
+   * (tools handled by the engine via plugin links). External/manual tools that the
+   * application handles are excluded, except for any pending external tool calls
+   * which are placed at the end for the application to handle.
    */
   generatePythonConversationBuildingLogic() {
-    return `    # Build conversation output: collect tool-related messages from end of input
+    return `    # Get the set of internal tool names (tools handled by engine plugins)
+    # If internal_tool_names is not in config, we're in backward-compatible mode (include all)
+    # If it's an empty list, there are no internal tools (include none from history)
+    has_internal_tool_tracking = "internal_tool_names" in config
+    internal_tool_names: set[str] = set(config.get("internal_tool_names", []))
+
+    # Build conversation output: only include messages related to internal tools
     conversation_messages: list[dict[str, Any]] = []
+
     if isinstance(messages, list) and len(messages) > 0:
         # Work backwards from the end
         for i in range(len(messages) - 1, -1, -1):
@@ -1002,20 +1061,45 @@ ${returnValues}
                 and len(tool_calls) > 0
             )
 
-            # Include this message if it's a tool message or has tool_calls
-            if is_tool or has_tool_calls:
-                conversation_messages.insert(0, msg)
+            if is_tool:
+                # Only include tool result if it's for an internal tool
+                tool_name = msg.get("name")
+                if not has_internal_tool_tracking or tool_name in internal_tool_names:
+                    conversation_messages.insert(0, msg)
+                # Skip external tool results
+            elif has_tool_calls:
+                # Filter to only internal tool calls
+                if not has_internal_tool_tracking:
+                    internal_calls = tool_calls
+                else:
+                    internal_calls = [
+                        tc for tc in tool_calls
+                        if tc.get("function", {}).get("name") in internal_tool_names
+                    ]
+
+                if len(internal_calls) > 0:
+                    filtered_msg = {**msg, "tool_calls": internal_calls}
+                    conversation_messages.insert(0, filtered_msg)
+                # External tool calls from history are dropped
             else:
                 # Stop when we hit a message that is not tool and has no tool_calls
                 break
 
-    # Append the final output message
+    # Append the final output message — always include all tool_calls on the response
+    # The internal/external split only applies to historical messages above, not the fresh response
     final_message: dict[str, Any] = {
         "content": response.get("content"),
         "role": response.get("role"),
     }
-    if response.get("tool_calls"):
-        final_message["tool_calls"] = response.get("tool_calls")
+
+    response_tool_calls = response.get("tool_calls")
+    if (
+        response_tool_calls is not None
+        and isinstance(response_tool_calls, list)
+        and len(response_tool_calls) > 0
+    ):
+        final_message["tool_calls"] = response_tool_calls
+
     if response.get("images"):
         final_message["images"] = response.get("images")
     conversation_messages.append(final_message)

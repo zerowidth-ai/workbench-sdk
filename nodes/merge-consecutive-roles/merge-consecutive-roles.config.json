@@ -1,0 +1,38 @@
+{
+  "display_name": "Merge Consecutive Roles",
+  "tagline": "Merge consecutive messages",
+  "description": "Merges consecutive messages with the same role into a single message. Tool messages and assistant messages with tool_calls are never merged to preserve tool call sequences.",
+  "icon": "arrows-merge",
+  "category": "messages",
+  "inputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "Array of message objects to merge",
+      "required": true
+    },
+    {
+      "name": "separator",
+      "display_name": "Separator",
+      "type": "string",
+      "description": "String to join merged content with",
+      "required": false,
+      "default": "\n\n"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "Array of messages with consecutive same-role messages merged"
+    },
+    {
+      "name": "merged_count",
+      "display_name": "Merged Count",
+      "type": "number",
+      "description": "Number of messages that were merged into others"
+    }
+  ]
+}

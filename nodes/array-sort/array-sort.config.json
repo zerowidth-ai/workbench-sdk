@@ -1,5 +1,6 @@
 {
   "display_name": "Array Sort",
+  "tagline": "Sort a list",
   "description": "Sorts array elements in ascending or descending order",
   "category": "lists",
   "inputs": [

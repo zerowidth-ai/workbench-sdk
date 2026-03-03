@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: GPT-3.5 Turbo Instruct",
+  "tagline": "Large Language Model",
   "description": "This model is a variant of GPT-3.5 Turbo tuned for instructional prompts and omitting chat-related optimizations. Training data: up to Sep 2021.",
   "category": "llm",
   "provider": "openai",

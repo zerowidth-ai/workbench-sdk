@@ -1,0 +1,56 @@
+{
+  "display_name": "Airtable Get Record",
+  "tagline": "Get Airtable record",
+  "description": "Get a single record from an Airtable table by its ID.",
+  "icon": "table",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "base_id",
+      "display_name": "Base ID",
+      "type": "string",
+      "description": "The Airtable base ID (starts with 'app')",
+      "required": true
+    },
+    {
+      "name": "table_name",
+      "display_name": "Table Name",
+      "type": "string",
+      "description": "The table name or ID",
+      "required": true
+    },
+    {
+      "name": "record_id",
+      "display_name": "Record ID",
+      "type": "string",
+      "description": "The record ID (starts with 'rec')",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "record",
+      "display_name": "Record",
+      "type": "object",
+      "description": "The record object with id, fields, and createdTime"
+    },
+    {
+      "name": "id",
+      "display_name": "ID",
+      "type": "string",
+      "description": "The record ID"
+    },
+    {
+      "name": "fields",
+      "display_name": "Fields",
+      "type": "object",
+      "description": "The record fields"
+    },
+    {
+      "name": "created_time",
+      "display_name": "Created Time",
+      "type": "string",
+      "description": "When the record was created"
+    }
+  ]
+}

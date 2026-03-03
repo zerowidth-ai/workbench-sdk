@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: GPT-3.5 Turbo 16k",
+  "tagline": "Large Language Model",
   "description": "This model offers four times the context length of gpt-3.5-turbo, allowing it to support approximately 20 pages of text in a single request at a higher cost. Training data: up to Sep 2021.",
   "category": "llm",
   "provider": "openai",
@@ -40,7 +41,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

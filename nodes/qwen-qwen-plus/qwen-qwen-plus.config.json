@@ -1,5 +1,6 @@
 {
   "display_name": "Qwen: Qwen-Plus",
+  "tagline": "Large Language Model",
   "description": "Qwen-Plus, based on the Qwen2.5 foundation model, is a 131K context model with a balanced performance, speed, and cost combination.",
   "category": "llm",
   "provider": "qwen",
@@ -34,7 +35,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

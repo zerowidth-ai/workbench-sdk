@@ -1,0 +1,36 @@
+{
+  "display_name": "Base64 Decode",
+  "tagline": "Decode Base64 data",
+  "description": "Decodes a Base64 encoded string.",
+  "icon": "unlock",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "encoded",
+      "display_name": "Encoded",
+      "type": "string",
+      "description": "The Base64 encoded string to decode",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The decoded text"
+    },
+    {
+      "name": "success",
+      "display_name": "Success",
+      "type": "boolean",
+      "description": "Whether decoding succeeded"
+    },
+    {
+      "name": "error",
+      "display_name": "Error",
+      "type": "string",
+      "description": "Error message if decoding failed"
+    }
+  ]
+}

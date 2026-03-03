@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: GPT-5 Mini",
+  "tagline": "Large Language Model",
   "description": "GPT-5 Mini is a compact version of GPT-5, designed to handle lighter-weight reasoning tasks. It provides the same instruction-following and safety-tuning benefits as GPT-5, but with reduced latency and cost. GPT-5 Mini is the successor to OpenAI's o4-mini model.",
   "category": "llm",
   "provider": "openai",
@@ -34,7 +35,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

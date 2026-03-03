@@ -18,11 +18,19 @@ async def process(
         if not isinstance(max_tokens, int) or max_tokens < 0:
             raise Exception("Max tokens must be a non-negative integer")
 
-        tokenizer = settings.get('tokenizer', 'cl200k_base')
-        if tokenizer not in ['cl200k_base', 'cl100k_base']:
-            raise Exception(f"Unsupported tokenizer: {tokenizer}. Only cl200k_base and cl100k_base are supported.")
+        tokenizer = settings.get('tokenizer', 'o200k_base')
 
-        encoding_name = 'cl200k_base' if tokenizer == 'cl200k_base' else 'cl100k_base'
+        # Map tokenizer names (cl200k_base was a mistake, should be o200k_base)
+        encoding_map = {
+            'cl200k_base': 'o200k_base',  # Backwards compatibility
+            'o200k_base': 'o200k_base',
+            'cl100k_base': 'cl100k_base',
+        }
+
+        if tokenizer not in encoding_map:
+            raise Exception(f"Unsupported tokenizer: {tokenizer}. Supported: o200k_base, cl100k_base")
+
+        encoding_name = encoding_map[tokenizer]
         encoding = tiktoken.get_encoding(encoding_name)
 
         # Helper function to extract text content from message

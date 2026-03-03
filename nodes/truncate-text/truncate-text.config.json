@@ -1,0 +1,68 @@
+{
+  "display_name": "Truncate Text",
+  "tagline": "Truncate text length",
+  "description": "Truncates text to a maximum length with options for where to cut and what suffix to add.",
+  "icon": "text-wrap",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The text to truncate",
+      "required": true
+    },
+    {
+      "name": "max_length",
+      "display_name": "Max Length",
+      "type": "number",
+      "description": "Maximum length of output (including suffix)",
+      "required": true
+    },
+    {
+      "name": "position",
+      "display_name": "Position",
+      "type": "string",
+      "description": "Where to truncate: end, start, or middle",
+      "required": false,
+      "default": "end",
+      "options": ["end", "start", "middle"]
+    },
+    {
+      "name": "suffix",
+      "display_name": "Suffix",
+      "type": "string",
+      "description": "String to add at truncation point",
+      "required": false,
+      "default": "..."
+    },
+    {
+      "name": "word_boundary",
+      "display_name": "Word Boundary",
+      "type": "boolean",
+      "description": "Whether to respect word boundaries when truncating",
+      "required": false,
+      "default": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The truncated text"
+    },
+    {
+      "name": "was_truncated",
+      "display_name": "Was Truncated",
+      "type": "boolean",
+      "description": "Whether the text was actually truncated"
+    },
+    {
+      "name": "original_length",
+      "display_name": "Original Length",
+      "type": "number",
+      "description": "Length of the original text"
+    }
+  ]
+}

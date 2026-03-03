@@ -1,0 +1,36 @@
+{
+  "display_name": "YAML to JSON",
+  "tagline": "Convert YAML to JSON",
+  "description": "Parses a YAML string into a JSON object.",
+  "icon": "file-code",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "yaml",
+      "display_name": "YAML",
+      "type": "string",
+      "description": "The YAML string to parse",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "json",
+      "display_name": "JSON",
+      "type": "any",
+      "description": "The parsed JSON object"
+    },
+    {
+      "name": "success",
+      "display_name": "Success",
+      "type": "boolean",
+      "description": "Whether parsing succeeded"
+    },
+    {
+      "name": "error",
+      "display_name": "Error",
+      "type": "string",
+      "description": "Error message if parsing failed"
+    }
+  ]
+}

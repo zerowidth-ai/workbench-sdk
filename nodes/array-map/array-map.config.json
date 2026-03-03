@@ -1,5 +1,6 @@
 {
   "display_name": "Array Get Property",
+  "tagline": "Get property from each",
   "description": "Extracts a specific property from each object in an array",
   "category": "lists",
   "inputs": [

@@ -1,5 +1,6 @@
 {
   "display_name": "Google: Gemma 2 27B",
+  "tagline": "Large Language Model",
   "description": "Gemma 2 27B by Google is an open model built from the same research and technology used to create the [Gemini models](/models?q=gemini).\n\nGemma models are well-suited for a variety of text generation tasks, including question answering, summarization, and reasoning.\n\nSee the [launch announcement](https://blog.google/technology/developers/google-gemma-2/) for more details. Usage of Gemma is subject to Google's [Gemma Terms of Use](https://ai.google.dev/gemma/terms).",
   "category": "llm",
   "provider": "google",

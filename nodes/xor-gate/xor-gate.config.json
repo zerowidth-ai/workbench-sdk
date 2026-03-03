@@ -1,5 +1,6 @@
 {
   "display_name": "XOR Gate",
+  "tagline": "Logic XOR gate",
   "description": "A logic gate that outputs true if inputs are different, false if they are the same",
   "category": "logic",
   "inputs": [

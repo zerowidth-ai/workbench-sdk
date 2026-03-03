@@ -1,5 +1,6 @@
 {
   "display_name": "String Match",
+  "tagline": "Match text patterns",
   "description": "Performs regex matching on text with capture groups",
   "category": "text",
   "inputs": [

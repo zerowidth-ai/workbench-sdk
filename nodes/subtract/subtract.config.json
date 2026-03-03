@@ -1,5 +1,6 @@
 {
   "display_name": "Subtract",
+  "tagline": "Subtract two numbers",
   "description": "Subtracts second number from first",
   "category": "math",
   "is_plugin": true,

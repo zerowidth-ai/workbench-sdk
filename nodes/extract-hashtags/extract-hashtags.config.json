@@ -1,5 +1,6 @@
 {
   "display_name": "Extract Hashtags",
+  "tagline": "Extract hashtags",
   "description": "Extract all hashtags from text",
   "category": "text",
   "is_macro": true,

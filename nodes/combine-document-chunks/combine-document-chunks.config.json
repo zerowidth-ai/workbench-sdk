@@ -1,5 +1,6 @@
 {
   "display_name": "Combine Document Chunks",
+  "tagline": "Combine document chunks",
   "description": "Retrieve all chunks for a document and combine them into a single markdown content string",
   "category": "knowledge",
   "is_plugin": true,

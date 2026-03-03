@@ -1,5 +1,6 @@
 {
   "display_name": "Array Unique",
+  "tagline": "Remove duplicates",
   "description": "Removes duplicate elements from an array",
   "category": "lists",
   "inputs": [

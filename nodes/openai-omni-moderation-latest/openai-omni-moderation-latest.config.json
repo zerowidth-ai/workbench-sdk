@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: Omni Moderation Latest",
+  "tagline": "Moderate content",
   "description": "Identify potentially harmful content in text and images using OpenAI's omni-moderation-latest model. This model supports more categorization options and multi-modal inputs compared to the legacy text-moderation-latest model.",
   "icon": "shield-check",
   "category": "moderation",

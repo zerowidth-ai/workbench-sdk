@@ -1,5 +1,6 @@
 {
   "display_name": "Mistral: Codestral 2508",
+  "tagline": "Large Language Model",
   "description": "Mistral's cutting-edge language model for coding released end of July 2025. Codestral specializes in low-latency, high-frequency tasks such as fill-in-the-middle (FIM), code correction and test generation.\n\n[Blog Post](https://mistral.ai/news/codestral-25-08)",
   "category": "llm",
   "provider": "mistralai",
@@ -37,7 +38,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

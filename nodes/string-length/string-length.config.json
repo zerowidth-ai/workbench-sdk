@@ -1,5 +1,6 @@
 {
   "display_name": "String Length",
+  "tagline": "Measure string length",
   "description": "Counts the number of characters in a string",
   "category": "text",
   "inputs": [

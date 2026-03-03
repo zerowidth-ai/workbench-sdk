@@ -1,5 +1,6 @@
 {
   "display_name": "Array Length",
+  "tagline": "Count list items",
   "description": "Measures the length of an array.",
   "icon": "ruler",
   "category": "lists",

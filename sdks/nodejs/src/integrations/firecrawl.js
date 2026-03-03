@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { emitAPICallEvent } from '../utilities/sanitizeAPICall.js';
 
 export default class FirecrawlIntegration {
     constructor(apiKey, options = {}) {
@@ -35,15 +36,22 @@ export default class FirecrawlIntegration {
                 }
             });
 
+            const requestHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` };
+            const startTime = Date.now();
+
             const response = await axios({
                 url: url,
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.apiKey}`
-                },
+                headers: requestHeaders,
                 data: params,
                 timeout: this.options.timeout
+            });
+
+            await emitAPICallEvent(this._engineConfig, {
+                timestamp: startTime, integration: 'firecrawl', nodeId: null, nodeType: null,
+                request: { method: 'POST', url, headers: requestHeaders, body: params },
+                response: { status: response.status, statusText: response.statusText },
+                duration: Date.now() - startTime, error: null
             });
 
             if (response.status >= 400) {
@@ -53,6 +61,8 @@ export default class FirecrawlIntegration {
             return response.data;
 
         } catch (error) {
+            // Note: emitAPICallEvent for error case is handled by the catch in the caller
+            // since errors from axios.post throw before we can capture the response
             if (error.response) {
                 const status = error.response.status;
                 const statusText = error.response.statusText;

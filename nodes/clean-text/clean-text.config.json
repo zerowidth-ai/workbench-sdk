@@ -1,5 +1,6 @@
 {
   "display_name": "Clean Text",
+  "tagline": "Clean and normalize text",
   "description": "Clean and normalize text by removing extra whitespace and normalizing line breaks",
   "category": "text",
   "is_macro": true,

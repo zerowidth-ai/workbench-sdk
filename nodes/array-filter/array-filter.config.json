@@ -1,5 +1,6 @@
 {
   "display_name": "Array Filter",
+  "tagline": "Filter list items",
   "description": "Filters array elements based on a condition",
   "category": "lists",
   "inputs": [

@@ -1,5 +1,6 @@
 {
   "display_name": "Firecrawl: Scrape URL",
+  "tagline": "Scrape web content",
   "description": "Scrape content from any URL with advanced options including format selection, content filtering, mobile emulation, and more",
   "category": "third-party",
   "provider": "firecrawl",

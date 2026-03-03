@@ -1,5 +1,6 @@
 {
   "display_name": "Get Last N Messages",
+  "tagline": "Get recent messages",
   "description": "Extract the most recent N messages from an array of messages.",
   "icon": "arrow-down",
   "category": "messages",

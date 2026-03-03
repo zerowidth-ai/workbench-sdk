@@ -1,5 +1,6 @@
 {
   "display_name": "Delete Object Property",
+  "tagline": "Remove object property",
   "description": "Remove a specific property from an object, returning a new object without that property.",
   "icon": "fa-trash",
   "category": "data",

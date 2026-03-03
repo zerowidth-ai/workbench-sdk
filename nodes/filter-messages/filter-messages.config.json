@@ -1,5 +1,6 @@
 {
   "display_name": "Filter Messages",
+  "tagline": "Filter messages",
   "description": "Filter messages by custom criteria (length, content, role, etc.).",
   "icon": "funnel",
   "category": "messages",

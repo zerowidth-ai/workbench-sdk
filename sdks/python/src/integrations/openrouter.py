@@ -11,6 +11,8 @@ import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+from src.utilities.sanitize_api_call import emit_api_call_event
+
 try:
     from openai import AsyncOpenAI
     HAS_OPENAI = True
@@ -207,8 +209,20 @@ class OpenRouterIntegration:
         """Handle streaming completion response."""
         import json as json_module
 
+        api_call_start_time = int(time.time() * 1000)
+
+        # Extract OpenRouter-specific params for extra_body (not supported by OpenAI SDK directly)
+        extra_body: dict[str, Any] = {}
+        if "provider" in payload:
+            extra_body["provider"] = payload.pop("provider")
+        if "reasoning" in payload:
+            extra_body["reasoning"] = payload.pop("reasoning")
+
         # Create streaming request
-        stream = await self.client.chat.completions.create(**payload)
+        stream = await self.client.chat.completions.create(
+            **payload,
+            extra_body=extra_body if extra_body else None
+        )
 
         content = ""
         role = "assistant"
@@ -325,6 +339,29 @@ class OpenRouterIntegration:
         if cost_data:
             result["cost_total"] = cost_data.total_cost
             result["cost_itemized"] = cost_data.itemized_costs
+
+        # Emit API call event after stream is consumed
+        _cfg = engine_config or getattr(self, "_engine_config", None)
+        await emit_api_call_event(_cfg, {
+            "timestamp": api_call_start_time,
+            "integration": "openrouter",
+            "nodeId": node_config.get("id") if node_config else None,
+            "nodeType": node_config.get("type") if node_config else None,
+            "request": {
+                "method": "POST",
+                "url": f"{self.base_url}/chat/completions",
+                "headers": {
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": self.referer,
+                    "X-Title": self.title,
+                    "Authorization": f"Bearer {self.api_key}",
+                },
+                "body": payload,
+            },
+            "response": {"status": 200, "statusText": "OK"},
+            "duration": int(time.time() * 1000) - api_call_start_time,
+            "error": None,
+        })
 
         return result
 

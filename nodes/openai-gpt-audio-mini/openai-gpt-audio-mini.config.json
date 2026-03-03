@@ -1,0 +1,145 @@
+{
+  "display_name": "OpenAI: GPT Audio Mini",
+  "tagline": "Large Language Model",
+  "description": "A cost-efficient version of GPT Audio. The new snapshot features an upgraded decoder for more natural sounding voices and maintains better voice consistency. Input is priced at $0.60 per million tokens and output is priced at $2.40 per million tokens.",
+  "category": "llm",
+  "provider": "openai",
+  "accepts_plugins": false,
+  "model_id": "openai/gpt-audio-mini",
+  "context_length": 128000,
+  "supported_parameters": [
+    "frequency_penalty",
+    "logit_bias",
+    "logprobs",
+    "max_tokens",
+    "presence_penalty",
+    "response_format",
+    "seed",
+    "stop",
+    "structured_outputs",
+    "temperature",
+    "top_logprobs",
+    "top_p"
+  ],
+  "inputs": [
+    {
+      "name": "prompt",
+      "display_name": "Prompt",
+      "type": "string",
+      "description": "Text prompt for completion",
+      "required": true
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "string or object",
+      "description": "Output format specification",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
+      "default": null
+    },
+    {
+      "name": "stop",
+      "display_name": "Stop",
+      "type": "string or array",
+      "description": "Custom stop sequences",
+      "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "content",
+      "display_name": "Content",
+      "can_stream": true,
+      "type": "string",
+      "description": "The generated completion text"
+    },
+    {
+      "name": "usage",
+      "display_name": "Token Usage",
+      "type": "object",
+      "description": "Token usage statistics"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost for processing this request (USD)"
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array",
+      "description": "Detailed breakdown of costs"
+    },
+    {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Log Probabilities",
+      "type": "object",
+      "description": "Token probabilities and logprobs from the model"
+    }
+  ],
+  "pricing": {
+    "reference": "https://openrouter.ai/models",
+    "items": [
+      {
+        "key": "input_cost_per_million",
+        "label": "Input Tokens (per 1M)",
+        "cost": 0.6,
+        "currency": "USD"
+      },
+      {
+        "key": "output_cost_per_million",
+        "label": "Output Tokens (per 1M)",
+        "cost": 2.4,
+        "currency": "USD"
+      }
+    ]
+  }
+}

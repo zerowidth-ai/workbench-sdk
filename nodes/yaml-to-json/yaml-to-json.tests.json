@@ -1,0 +1,112 @@
+[
+  {
+    "description": "Parse simple object",
+    "inputs": {
+      "yaml": "name: Alice\nage: 30"
+    },
+    "expected": {
+      "json": {"name": "Alice", "age": 30},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse nested object",
+    "inputs": {
+      "yaml": "user:\n  name: Bob\n  active: true"
+    },
+    "expected": {
+      "json": {"user": {"name": "Bob", "active": true}},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse array of primitives",
+    "inputs": {
+      "yaml": "tags:\n  - a\n  - b\n  - c"
+    },
+    "expected": {
+      "json": {"tags": ["a", "b", "c"]},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse array of objects",
+    "inputs": {
+      "yaml": "users:\n  - name: Alice\n  - name: Bob"
+    },
+    "expected": {
+      "json": {"users": [{"name": "Alice"}, {"name": "Bob"}]},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse boolean values",
+    "inputs": {
+      "yaml": "enabled: true\ndebug: false"
+    },
+    "expected": {
+      "json": {"enabled": true, "debug": false},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse null value",
+    "inputs": {
+      "yaml": "value: null"
+    },
+    "expected": {
+      "json": {"value": null},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse numeric values",
+    "inputs": {
+      "yaml": "count: 42\nprice: 19.99"
+    },
+    "expected": {
+      "json": {"count": 42, "price": 19.99},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse quoted string",
+    "inputs": {
+      "yaml": "url: \"http://example.com\""
+    },
+    "expected": {
+      "json": {"url": "http://example.com"},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse empty object",
+    "inputs": {
+      "yaml": "{}"
+    },
+    "expected": {
+      "json": {},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Handle empty string",
+    "inputs": {
+      "yaml": ""
+    },
+    "expected": {
+      "json": null,
+      "success": true,
+      "error": null
+    }
+  }
+]

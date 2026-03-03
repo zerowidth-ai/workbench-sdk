@@ -1,5 +1,6 @@
 {
   "display_name": "String",
+  "tagline": "Set a text value",
   "description": "A simple string node that outputs a string",
   "icon": "string",
   "category": "text",

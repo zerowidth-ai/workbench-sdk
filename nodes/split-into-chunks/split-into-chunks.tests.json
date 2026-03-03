@@ -1,0 +1,74 @@
+[
+  {
+    "description": "Split by characters",
+    "inputs": {
+      "text": "Hello World",
+      "chunk_size": 5,
+      "chunk_by": "characters"
+    },
+    "expected": {
+      "chunks": ["Hello", " Worl", "d"],
+      "chunk_count": 3
+    }
+  },
+  {
+    "description": "Split by words",
+    "inputs": {
+      "text": "one two three four five six",
+      "chunk_size": 2,
+      "chunk_by": "words"
+    },
+    "expected": {
+      "chunks": ["one two", "three four", "five six"],
+      "chunk_count": 3
+    }
+  },
+  {
+    "description": "Split by sentences",
+    "inputs": {
+      "text": "First sentence. Second sentence. Third sentence.",
+      "chunk_size": 2,
+      "chunk_by": "sentences"
+    },
+    "expected": {
+      "chunks": ["First sentence. Second sentence.", "Third sentence."],
+      "chunk_count": 2
+    }
+  },
+  {
+    "description": "With overlap",
+    "inputs": {
+      "text": "one two three four five",
+      "chunk_size": 3,
+      "chunk_by": "words",
+      "overlap": 1
+    },
+    "expected": {
+      "chunks": ["one two three", "three four five"],
+      "chunk_count": 2
+    }
+  },
+  {
+    "description": "Text shorter than chunk size",
+    "inputs": {
+      "text": "Short",
+      "chunk_size": 100,
+      "chunk_by": "characters"
+    },
+    "expected": {
+      "chunks": ["Short"],
+      "chunk_count": 1
+    }
+  },
+  {
+    "description": "Handle empty string",
+    "inputs": {
+      "text": "",
+      "chunk_size": 10
+    },
+    "expected": {
+      "chunks": [],
+      "chunk_count": 0
+    }
+  }
+]

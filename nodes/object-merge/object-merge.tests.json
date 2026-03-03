@@ -1,0 +1,146 @@
+[
+  {
+    "description": "Merge two simple objects",
+    "inputs": {
+      "objects": [
+        {"a": 1, "b": 2},
+        {"c": 3, "d": 4}
+      ]
+    },
+    "expected": {
+      "merged": {"a": 1, "b": 2, "c": 3, "d": 4}
+    }
+  },
+  {
+    "description": "Later objects override earlier ones",
+    "inputs": {
+      "objects": [
+        {"a": 1, "b": 2},
+        {"b": 99, "c": 3}
+      ]
+    },
+    "expected": {
+      "merged": {"a": 1, "b": 99, "c": 3}
+    }
+  },
+  {
+    "description": "Deep merge nested objects",
+    "inputs": {
+      "objects": [
+        {"user": {"name": "Alice", "age": 30}},
+        {"user": {"email": "alice@example.com"}}
+      ]
+    },
+    "expected": {
+      "merged": {"user": {"name": "Alice", "age": 30, "email": "alice@example.com"}}
+    }
+  },
+  {
+    "description": "Deep merge with override in nested object",
+    "inputs": {
+      "objects": [
+        {"config": {"debug": true, "timeout": 1000}},
+        {"config": {"debug": false, "retries": 3}}
+      ]
+    },
+    "expected": {
+      "merged": {"config": {"debug": false, "timeout": 1000, "retries": 3}}
+    }
+  },
+  {
+    "description": "Arrays replace by default",
+    "inputs": {
+      "objects": [
+        {"tags": ["a", "b"]},
+        {"tags": ["c", "d"]}
+      ],
+      "array_mode": "replace"
+    },
+    "expected": {
+      "merged": {"tags": ["c", "d"]}
+    }
+  },
+  {
+    "description": "Arrays concat when array_mode is concat",
+    "inputs": {
+      "objects": [
+        {"tags": ["a", "b"]},
+        {"tags": ["c", "d"]}
+      ],
+      "array_mode": "concat"
+    },
+    "expected": {
+      "merged": {"tags": ["a", "b", "c", "d"]}
+    }
+  },
+  {
+    "description": "Merge three objects",
+    "inputs": {
+      "objects": [
+        {"a": 1},
+        {"b": 2},
+        {"c": 3}
+      ]
+    },
+    "expected": {
+      "merged": {"a": 1, "b": 2, "c": 3}
+    }
+  },
+  {
+    "description": "Handle single object input",
+    "inputs": {
+      "objects": {"a": 1, "b": 2}
+    },
+    "expected": {
+      "merged": {"a": 1, "b": 2}
+    }
+  },
+  {
+    "description": "Handle null values in objects",
+    "inputs": {
+      "objects": [
+        {"a": 1, "b": 2},
+        {"b": null, "c": 3}
+      ]
+    },
+    "expected": {
+      "merged": {"a": 1, "b": null, "c": 3}
+    }
+  },
+  {
+    "description": "Skip non-object items in array",
+    "inputs": {
+      "objects": [
+        {"a": 1},
+        "not an object",
+        null,
+        {"b": 2}
+      ]
+    },
+    "expected": {
+      "merged": {"a": 1, "b": 2}
+    }
+  },
+  {
+    "description": "Empty objects array returns empty object",
+    "inputs": {
+      "objects": []
+    },
+    "expected": {
+      "merged": {}
+    }
+  },
+  {
+    "description": "Deeply nested merge",
+    "inputs": {
+      "objects": [
+        {"level1": {"level2": {"level3": {"a": 1}}}},
+        {"level1": {"level2": {"level3": {"b": 2}}}},
+        {"level1": {"level2": {"level3": {"c": 3}}}}
+      ]
+    },
+    "expected": {
+      "merged": {"level1": {"level2": {"level3": {"a": 1, "b": 2, "c": 3}}}}
+    }
+  }
+]

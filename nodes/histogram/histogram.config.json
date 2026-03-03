@@ -1,5 +1,6 @@
 {
   "display_name": "Histogram",
+  "tagline": "Group numbers into bins",
   "description": "Groups numbers into bins and counts frequency",
   "category": "math",
   "inputs": [

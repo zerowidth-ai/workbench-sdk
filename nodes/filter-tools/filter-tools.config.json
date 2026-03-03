@@ -1,0 +1,29 @@
+{
+  "display_name": "Filter Tools",
+  "tagline": "Filter tools by name",
+  "description": "Filter tools by name for dynamic tool selection",
+  "icon": "filter",
+  "category": "tools",
+  "inputs": [
+    {
+      "name": "tools",
+      "display_name": "Tools",
+      "type": "array",
+      "description": "Array of tool definitions to filter"
+    },
+    {
+      "name": "include",
+      "display_name": "Include",
+      "type": "array",
+      "description": "Array of tool names to include"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "tools",
+      "display_name": "Tools",
+      "type": "array",
+      "description": "Filtered array of tool definitions"
+    }
+  ]
+}

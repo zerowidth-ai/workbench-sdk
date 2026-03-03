@@ -1,0 +1,40 @@
+{
+  "display_name": "Strip HTML",
+  "tagline": "Remove HTML tags",
+  "description": "Removes HTML tags from text, optionally preserving whitespace and decoding entities.",
+  "icon": "code",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "html",
+      "display_name": "HTML",
+      "type": "string",
+      "description": "The HTML string to strip tags from",
+      "required": true
+    },
+    {
+      "name": "preserve_line_breaks",
+      "display_name": "Preserve Line Breaks",
+      "type": "boolean",
+      "description": "Convert br, p, div tags to newlines before stripping",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "decode_entities",
+      "display_name": "Decode Entities",
+      "type": "boolean",
+      "description": "Decode HTML entities like &amp; to &",
+      "required": false,
+      "default": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The plain text with HTML tags removed"
+    }
+  ]
+}

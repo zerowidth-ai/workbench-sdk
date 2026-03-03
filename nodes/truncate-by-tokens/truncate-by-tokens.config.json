@@ -1,5 +1,6 @@
 {
   "display_name": "Truncate by Tokens",
+  "tagline": "Truncate by token limit",
   "description": "Keep only the most recent messages that fit within the specified token limit.",
   "icon": "scissors",
   "category": "messages",

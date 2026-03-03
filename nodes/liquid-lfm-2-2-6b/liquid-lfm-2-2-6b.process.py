@@ -1,5 +1,5 @@
 """
-LiquidAI/LFM2-2.6B - LLM node for the zv1 engine.
+LiquidAI: LFM2-2.6B - LLM node for the zv1 engine.
 """
 
 from typing import Any
@@ -13,7 +13,7 @@ async def process(
     node_config: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Process function for the LiquidAI/LFM2-2.6B node.
+    Process function for the LiquidAI: LFM2-2.6B node.
 
     Args:
         inputs: Node inputs containing messages/prompt and parameters.
@@ -41,7 +41,17 @@ async def process(
             continue
         value = inputs.get(input_def["name"])
         if value is not None:
-            params[input_def["name"]] = value
+            # Flatten tools array to handle both individual tools and arrays of tools
+            if input_def["name"] == "tools" and isinstance(value, list):
+                flat_tools = []
+                for item in value:
+                    if isinstance(item, list):
+                        flat_tools.extend(item)
+                    else:
+                        flat_tools.append(item)
+                params["tools"] = flat_tools
+            else:
+                params[input_def["name"]] = value
 
     response = await openrouter.chat_completion(
         model="liquid/lfm-2.2-6b",

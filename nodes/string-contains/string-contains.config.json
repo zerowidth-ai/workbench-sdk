@@ -1,5 +1,6 @@
 {
   "display_name": "String Contains",
+  "tagline": "Check for substring",
   "description": "Checks if a string contains a specific substring",
   "category": "text",
   "inputs": [

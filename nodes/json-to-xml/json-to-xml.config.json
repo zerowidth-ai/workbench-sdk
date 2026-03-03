@@ -1,0 +1,48 @@
+{
+  "display_name": "JSON to XML",
+  "tagline": "Convert JSON to XML",
+  "description": "Converts a JSON object to XML format. Useful for Claude prompts which work well with XML structure.",
+  "icon": "code-slash",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "json",
+      "display_name": "JSON",
+      "type": "object",
+      "description": "The JSON object to convert to XML",
+      "required": true
+    },
+    {
+      "name": "root_element",
+      "display_name": "Root Element",
+      "type": "string",
+      "description": "Name of the root XML element",
+      "required": false,
+      "default": "root"
+    },
+    {
+      "name": "pretty",
+      "display_name": "Pretty Print",
+      "type": "boolean",
+      "description": "Whether to format with indentation and newlines",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "indent",
+      "display_name": "Indent",
+      "type": "number",
+      "description": "Number of spaces for indentation (when pretty is true)",
+      "required": false,
+      "default": 2
+    }
+  ],
+  "outputs": [
+    {
+      "name": "xml",
+      "display_name": "XML",
+      "type": "string",
+      "description": "The XML formatted string"
+    }
+  ]
+}

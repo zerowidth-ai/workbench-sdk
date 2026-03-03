@@ -1,5 +1,6 @@
 {
   "display_name": "Random Number",
+  "tagline": "Generate random numbers",
   "description": "Generates random numbers with configurable range and distribution",
   "icon": "dice",
   "category": "math",

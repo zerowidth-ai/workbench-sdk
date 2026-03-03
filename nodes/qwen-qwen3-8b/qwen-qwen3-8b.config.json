@@ -1,5 +1,6 @@
 {
   "display_name": "Qwen: Qwen3 8B",
+  "tagline": "Large Language Model",
   "description": "Qwen3-8B is a dense 8.2B parameter causal language model from the Qwen3 series, designed for both reasoning-heavy tasks and efficient dialogue. It supports seamless switching between \"thinking\" mode for math, coding, and logical inference, and \"non-thinking\" mode for general conversation. The model is fine-tuned for instruction-following, agent integration, creative writing, and multilingual use across 100+ languages and dialects. It natively supports a 32K token context window and can extend to 131K tokens with YaRN scaling.",
   "category": "llm",
   "provider": "qwen",
@@ -7,22 +8,14 @@
   "model_id": "qwen/qwen3-8b",
   "context_length": 32000,
   "supported_parameters": [
-    "frequency_penalty",
     "include_reasoning",
-    "logit_bias",
-    "logprobs",
     "max_tokens",
-    "presence_penalty",
     "reasoning",
-    "repetition_penalty",
     "response_format",
-    "stop",
     "structured_outputs",
     "temperature",
     "tool_choice",
     "tools",
-    "top_k",
-    "top_logprobs",
     "top_p"
   ],
   "inputs": [
@@ -43,17 +36,10 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true
-    },
-    {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
     },
     {
       "name": "include_reasoning",
@@ -70,13 +56,6 @@
       "default": null
     },
     {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "reasoning",
       "display_name": "Reasoning",
       "type": "boolean",
@@ -88,13 +67,6 @@
       "display_name": "Response Format",
       "type": "string or object",
       "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "stop",
-      "display_name": "Stop",
-      "type": "string or array",
-      "description": "Custom stop sequences",
       "default": null
     },
     {
@@ -179,12 +151,6 @@
       "description": "Why the completion finished"
     },
     {
-      "name": "logprobs",
-      "display_name": "Log Probabilities",
-      "type": "object",
-      "description": "Token probabilities and logprobs from the model"
-    },
-    {
       "name": "reasoning",
       "display_name": "Reasoning",
       "type": "string",
@@ -210,7 +176,7 @@
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.25,
+        "cost": 0.39999999999999997,
         "currency": "USD"
       }
     ]

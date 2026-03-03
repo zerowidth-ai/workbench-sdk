@@ -1,5 +1,6 @@
 {
   "display_name": "Less Than",
+  "tagline": "Compare two numbers",
   "description": "Checks if the first number is less than the second number",
   "icon": "less-than",
   "category": "math",

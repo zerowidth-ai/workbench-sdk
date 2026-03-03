@@ -1,5 +1,6 @@
 {
   "display_name": "Floor",
+  "tagline": "Round numbers down",
   "description": "Rounds down to nearest integer",
   "category": "math",
   "inputs": [

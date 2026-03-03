@@ -1,5 +1,6 @@
 {
   "display_name": "System Prompt",
+  "tagline": "Set system instructions",
   "description": "Draft a text-based system prompt for an LLM, with configurable variables.",
   "icon": "fa-comment",
   "category": "messages",

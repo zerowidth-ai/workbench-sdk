@@ -7,7 +7,10 @@ Provides web scraping capabilities through the Firecrawl API.
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any
+
+from src.utilities.sanitize_api_call import emit_api_call_event
 
 try:
     import httpx
@@ -73,8 +76,18 @@ class FirecrawlIntegration:
         # Remove empty params
         clean_params = self._clean_params(params)
 
+        start_time = int(time.time() * 1000)
+        request_url = f"{self.base_url}/scrape"
+
         try:
             response = await self.client.post("/scrape", json=clean_params)
+
+            await emit_api_call_event(getattr(self, "_engine_config", None), {
+                "timestamp": start_time, "integration": "firecrawl", "nodeId": None, "nodeType": None,
+                "request": {"method": "POST", "url": request_url, "headers": dict(self.client.headers), "body": clean_params},
+                "response": {"status": response.status_code, "statusText": response.reason_phrase or ""},
+                "duration": int(time.time() * 1000) - start_time, "error": None,
+            })
 
             if response.status_code >= 400:
                 error_data = response.json() if response.content else {}

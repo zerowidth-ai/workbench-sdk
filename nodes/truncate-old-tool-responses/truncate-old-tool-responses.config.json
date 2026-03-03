@@ -1,0 +1,46 @@
+{
+  "display_name": "Truncate Old Tool Responses",
+  "tagline": "Compress old tool responses",
+  "description": "Replaces tool response content with a placeholder for messages outside the recent window. Keeps recent tool responses intact while compressing older ones to save context tokens.",
+  "icon": "scissors",
+  "category": "messages",
+  "inputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "Array of message objects to process",
+      "required": true
+    },
+    {
+      "name": "keep_recent",
+      "display_name": "Keep Recent",
+      "type": "number",
+      "description": "Number of recent messages to keep tool responses intact",
+      "required": false,
+      "default": 20
+    },
+    {
+      "name": "placeholder",
+      "display_name": "Placeholder",
+      "type": "string",
+      "description": "Replacement content for truncated tool responses",
+      "required": false,
+      "default": "[Truncated]"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "Array of messages with old tool responses truncated"
+    },
+    {
+      "name": "truncated_count",
+      "display_name": "Truncated Count",
+      "type": "number",
+      "description": "Number of tool responses that were truncated"
+    }
+  ]
+}

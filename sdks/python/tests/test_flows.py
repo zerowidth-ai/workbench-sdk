@@ -50,6 +50,39 @@ def get_flows_dir() -> Path:
     return Path(__file__).parent / "flows"
 
 
+def normalize_for_comparison(data: Any) -> Any:
+    """
+    Normalize data for comparison to handle common differences:
+    - tool_calls: null vs []
+    - Key ordering in dicts
+    - Content strings: strip trailing whitespace (LLMs vary in newline formatting)
+    """
+    if data is None:
+        return data
+    if isinstance(data, dict):
+        normalized = {}
+        for key, value in sorted(data.items()):
+            # Normalize tool_calls: null to [] for comparison
+            if key == "tool_calls" and value is None:
+                normalized[key] = []
+            # Normalize content strings: strip trailing whitespace
+            elif key == "content" and isinstance(value, str):
+                normalized[key] = value.rstrip()
+            else:
+                normalized[key] = normalize_for_comparison(value)
+        return normalized
+    if isinstance(data, list):
+        return [normalize_for_comparison(item) for item in data]
+    return data
+
+
+def outputs_match(actual: Any, expected: Any) -> bool:
+    """
+    Compare outputs with normalization for common differences.
+    """
+    return normalize_for_comparison(actual) == normalize_for_comparison(expected)
+
+
 def validate_against_schema(result: dict[str, Any], schema: dict[str, Any]) -> list[str]:
     """
     Validate result against expected schema.
@@ -194,19 +227,52 @@ async def run_flow_test(test_file: str, test_results: TestResults) -> bool:
 
         print(f"  [RESULT] {json.dumps(result_dict)}")
 
-        # If we expected an error but got success, that's a failure
+        # If we expected an error, check if any node in the timeline has an error
         if expected_error:
-            print(f"  [FAIL] Expected error but flow succeeded for {test_file}")
-            test_results.failed += 1
-            test_results.failures.append({
-                "file": test_file,
-                "error": "Expected error but flow succeeded",
-            })
-            return False
+            # Check timeline for node errors (flow may complete without throwing)
+            node_errors = [
+                entry for entry in result.timeline
+                if isinstance(entry, dict) and entry.get("status") == "error"
+            ]
+
+            if node_errors:
+                # Found expected node error(s)
+                error_entry = node_errors[0]  # Check first error
+                error_message = error_entry.get("error_message", "")
+
+                print(f"  [EXPECTED ERROR] {test_file}")
+                print(f"    Node: {error_entry.get('node_id')}")
+                print(f"    Error Message: {error_message}")
+
+                # Validate error message if specified
+                if expected_error.get("message") and expected_error["message"] not in error_message:
+                    print(
+                        f"    [FAIL] Expected error message to contain "
+                        f"'{expected_error['message']}' but got '{error_message}'"
+                    )
+                    test_results.failed += 1
+                    test_results.failures.append({
+                        "file": test_file,
+                        "error": "Error message mismatch",
+                    })
+                    return False
+
+                print(f"    [PASS] Error matches expectations")
+                test_results.passed += 1
+                return True
+            else:
+                # No node errors found - flow truly succeeded when we expected failure
+                print(f"  [FAIL] Expected error but flow succeeded for {test_file}")
+                test_results.failed += 1
+                test_results.failures.append({
+                    "file": test_file,
+                    "error": "Expected error but flow succeeded",
+                })
+                return False
 
         # Check expected output
         if expected is not None:
-            if result.outputs != expected:
+            if not outputs_match(result.outputs, expected):
                 error_msg = (
                     f"Output mismatch: expected {json.dumps(expected)}, "
                     f"got {json.dumps(result.outputs)}"

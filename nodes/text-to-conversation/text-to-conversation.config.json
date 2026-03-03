@@ -1,0 +1,46 @@
+{
+  "display_name": "Text to Conversation",
+  "tagline": "Convert text to chat",
+  "description": "Parses a text transcript back into a conversation message array. Recognizes role labels like 'User:', 'Assistant:', 'System:'.",
+  "icon": "chat-text",
+  "category": "messages",
+  "inputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The text transcript to parse",
+      "required": true
+    },
+    {
+      "name": "separator",
+      "display_name": "Separator",
+      "type": "string",
+      "description": "Pattern that separates messages (regex supported)",
+      "required": false,
+      "default": "\\n\\n"
+    },
+    {
+      "name": "default_role",
+      "display_name": "Default Role",
+      "type": "string",
+      "description": "Role to use when no label is detected",
+      "required": false,
+      "default": "user"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "The parsed conversation message array"
+    },
+    {
+      "name": "message_count",
+      "display_name": "Message Count",
+      "type": "number",
+      "description": "Number of messages parsed"
+    }
+  ]
+}

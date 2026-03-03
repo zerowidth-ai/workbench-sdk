@@ -1,0 +1,115 @@
+[
+  {
+    "description": "Truncate at end",
+    "inputs": {
+      "text": "Hello world, this is a long text",
+      "max_length": 15
+    },
+    "expected": {
+      "text": "Hello world,...",
+      "was_truncated": true,
+      "original_length": 32
+    }
+  },
+  {
+    "description": "Truncate at start",
+    "inputs": {
+      "text": "Hello world, this is a long text",
+      "max_length": 15,
+      "position": "start"
+    },
+    "expected": {
+      "text": "... a long text",
+      "was_truncated": true,
+      "original_length": 32
+    }
+  },
+  {
+    "description": "Truncate in middle",
+    "inputs": {
+      "text": "Hello world, this is a long text that goes on",
+      "max_length": 20,
+      "position": "middle"
+    },
+    "expected": {
+      "text": "Hello w...goes on",
+      "was_truncated": true,
+      "original_length": 45
+    }
+  },
+  {
+    "description": "No truncation needed",
+    "inputs": {
+      "text": "Short text",
+      "max_length": 20
+    },
+    "expected": {
+      "text": "Short text",
+      "was_truncated": false,
+      "original_length": 10
+    }
+  },
+  {
+    "description": "Custom suffix",
+    "inputs": {
+      "text": "Hello world, this is a long text",
+      "max_length": 20,
+      "suffix": " [...]"
+    },
+    "expected": {
+      "text": "Hello world, t [...]",
+      "was_truncated": true,
+      "original_length": 32
+    }
+  },
+  {
+    "description": "Empty suffix",
+    "inputs": {
+      "text": "Hello world, this is a long text",
+      "max_length": 10,
+      "suffix": ""
+    },
+    "expected": {
+      "text": "Hello worl",
+      "was_truncated": true,
+      "original_length": 32
+    }
+  },
+  {
+    "description": "Exact length match",
+    "inputs": {
+      "text": "Hello",
+      "max_length": 5
+    },
+    "expected": {
+      "text": "Hello",
+      "was_truncated": false,
+      "original_length": 5
+    }
+  },
+  {
+    "description": "Very short max length",
+    "inputs": {
+      "text": "Hello world",
+      "max_length": 5
+    },
+    "expected": {
+      "text": "He...",
+      "was_truncated": true,
+      "original_length": 11
+    }
+  },
+  {
+    "description": "Max length shorter than suffix",
+    "inputs": {
+      "text": "Hello world",
+      "max_length": 2,
+      "suffix": "..."
+    },
+    "expected": {
+      "text": "..",
+      "was_truncated": true,
+      "original_length": 11
+    }
+  }
+]

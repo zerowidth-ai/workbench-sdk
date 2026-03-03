@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { isOAuthKey, OAuthRefreshManager } from '../utilities/oauth.js';
+import { emitAPICallEvent } from '../utilities/sanitizeAPICall.js';
 
 export default class HubSpotIntegration {
   constructor(oauthKey, options = {}) {
@@ -61,18 +62,28 @@ export default class HubSpotIntegration {
 
     while (retries <= maxRetries) {
       try {
+        const requestHeaders = {
+          'Authorization': `Bearer ${this.oauthKey.accessToken}`,
+          'Content-Type': 'application/json',
+          ...options.headers
+        };
+        const callStartTime = Date.now();
+
         const response = await axios({
           method,
           url: fullUrl,
-          headers: {
-            'Authorization': `Bearer ${this.oauthKey.accessToken}`,
-            'Content-Type': 'application/json',
-            ...options.headers
-          },
+          headers: requestHeaders,
           data: options.data,
           params: options.params,
           timeout: options.timeout || this.options.timeout,
           validateStatus: () => true // Don't throw on HTTP errors
+        });
+
+        await emitAPICallEvent(this._engineConfig, {
+          timestamp: callStartTime, integration: 'hubspot', nodeId: null, nodeType: null,
+          request: { method, url: fullUrl, headers: requestHeaders, body: options.data || null },
+          response: { status: response.status, statusText: response.statusText },
+          duration: Date.now() - callStartTime, error: null
         });
 
         // Check if response indicates token refresh is needed

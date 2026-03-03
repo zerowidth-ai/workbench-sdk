@@ -1,0 +1,38 @@
+{
+  "display_name": "Notion Append Blocks",
+  "tagline": "Append to Notion page",
+  "description": "Append block content to a Notion page or block",
+  "icon": "plus-square",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "block_id",
+      "display_name": "Block ID",
+      "type": "string",
+      "required": true,
+      "description": "The ID of the page or block to append to"
+    },
+    {
+      "name": "children",
+      "display_name": "Children",
+      "type": "array",
+      "required": true,
+      "description": "Array of block objects to append"
+    },
+    {
+      "name": "after",
+      "display_name": "After",
+      "type": "string",
+      "required": false,
+      "description": "Block ID to insert after (appends to end if not specified)"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "results",
+      "display_name": "Results",
+      "type": "array",
+      "description": "Array of created block objects"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "display_name": "Airtable Delete Record",
+  "tagline": "Delete Airtable record",
+  "description": "Delete a record from an Airtable table.",
+  "icon": "table",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "base_id",
+      "display_name": "Base ID",
+      "type": "string",
+      "description": "The Airtable base ID (starts with 'app')",
+      "required": true
+    },
+    {
+      "name": "table_name",
+      "display_name": "Table Name",
+      "type": "string",
+      "description": "The table name or ID",
+      "required": true
+    },
+    {
+      "name": "record_id",
+      "display_name": "Record ID",
+      "type": "string",
+      "description": "The record ID to delete (starts with 'rec')",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "deleted",
+      "display_name": "Deleted",
+      "type": "boolean",
+      "description": "Whether the record was successfully deleted"
+    },
+    {
+      "name": "record_id",
+      "display_name": "Record ID",
+      "type": "string",
+      "description": "The deleted record ID"
+    }
+  ]
+}

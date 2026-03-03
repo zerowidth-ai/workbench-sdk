@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: GPT-5.1-Codex-Mini",
+  "tagline": "Large Language Model",
   "description": "GPT-5.1-Codex-Mini is a smaller and faster version of GPT-5.1-Codex",
   "category": "llm",
   "provider": "openai",
@@ -34,7 +35,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

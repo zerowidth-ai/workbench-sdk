@@ -1,0 +1,54 @@
+{
+  "display_name": "Notion Get Page",
+  "tagline": "Get Notion page",
+  "description": "Retrieve a page by ID from Notion",
+  "icon": "file",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "page_id",
+      "display_name": "Page ID",
+      "type": "string",
+      "required": true,
+      "description": "The ID of the page to retrieve"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "page",
+      "display_name": "Page",
+      "type": "object",
+      "description": "The page object"
+    },
+    {
+      "name": "id",
+      "display_name": "ID",
+      "type": "string",
+      "description": "The page ID"
+    },
+    {
+      "name": "properties",
+      "display_name": "Properties",
+      "type": "object",
+      "description": "The page properties"
+    },
+    {
+      "name": "created_time",
+      "display_name": "Created Time",
+      "type": "string",
+      "description": "When the page was created"
+    },
+    {
+      "name": "last_edited_time",
+      "display_name": "Last Edited Time",
+      "type": "string",
+      "description": "When the page was last edited"
+    },
+    {
+      "name": "archived",
+      "display_name": "Archived",
+      "type": "boolean",
+      "description": "Whether the page is archived"
+    }
+  ]
+}

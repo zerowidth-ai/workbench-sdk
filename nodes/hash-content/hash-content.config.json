@@ -1,0 +1,33 @@
+{
+  "display_name": "Hash Content",
+  "tagline": "Hash content",
+  "description": "Generates a hash of the input content. Useful for cache keys, deduplication, or content verification.",
+  "icon": "hash",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "content",
+      "display_name": "Content",
+      "type": "any",
+      "description": "The content to hash (strings, objects, or arrays are supported)",
+      "required": true
+    },
+    {
+      "name": "algorithm",
+      "display_name": "Algorithm",
+      "type": "string",
+      "description": "Hash algorithm to use",
+      "required": false,
+      "default": "sha256",
+      "options": ["sha256", "sha1", "md5"]
+    }
+  ],
+  "outputs": [
+    {
+      "name": "hash",
+      "display_name": "Hash",
+      "type": "string",
+      "description": "The hex-encoded hash"
+    }
+  ]
+}

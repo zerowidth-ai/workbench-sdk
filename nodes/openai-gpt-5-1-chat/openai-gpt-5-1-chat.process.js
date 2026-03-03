@@ -26,7 +26,7 @@ export default async ({inputs, settings, config, nodeConfig}) => {
 
         // Build parameters object from config inputs
         const params = {};
-        const configInputs = [{"name":"system_prompt","display_name":"System Prompt","type":"string or message","description":"System prompt to instruct the model","default":null},{"name":"messages","display_name":"Conversation","type":"conversation or message or string","description":"Array of chat messages that make up the conversation","required":true},{"name":"tools","display_name":"Tools","type":"tool","description":"Array of tools to use","default":null,"allow_multiple":true},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null},{"name":"tool_choice","display_name":"Tool Choice","type":"string","description":"Tool selection control","default":null}];
+        const configInputs = [{"name":"system_prompt","display_name":"System Prompt","type":"string or message","description":"System prompt to instruct the model","default":null},{"name":"messages","display_name":"Conversation","type":"conversation or message or string","description":"Array of chat messages that make up the conversation","required":true},{"name":"tools","display_name":"Tools","type":"tool or array of tools","description":"Array of tools to use","default":null,"allow_multiple":true},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null},{"name":"tool_choice","display_name":"Tool Choice","type":"string","description":"Tool selection control","default":null}];
         
         for (const input of configInputs) {
 
@@ -34,7 +34,12 @@ export default async ({inputs, settings, config, nodeConfig}) => {
 
             const value = inputs[input.name];
             if (value !== null && value !== undefined) {
-                params[input.name] = value;
+                // Flatten tools array to handle both individual tools and arrays of tools
+                if (input.name === 'tools' && Array.isArray(value)) {
+                    params.tools = value.flat();
+                } else {
+                    params[input.name] = value;
+                }
             }
         }
 
@@ -46,40 +51,67 @@ export default async ({inputs, settings, config, nodeConfig}) => {
             ...params
         }, nodeConfig, config);
 
-        // Build conversation output: slice from end of input messages until we hit a non-tool message without tool_calls
+        // Get the set of internal tool names (tools handled by engine plugins)
+        // If internal_tool_names is undefined, we're in backward-compatible mode (include all)
+        // If it's an empty array, there are no internal tools (include none from history)
+        const hasInternalToolTracking = config.internal_tool_names !== undefined;
+        const internalToolNames = new Set(config.internal_tool_names || []);
+
+        // Build conversation output: only include messages related to internal tools
         let conversationMessages = [];
+
         if (Array.isArray(messages) && messages.length > 0) {
             // Work backwards from the end
             for (let i = messages.length - 1; i >= 0; i--) {
                 const msg = messages[i];
                 if (!msg || typeof msg !== 'object') continue;
-                
+
                 const isTool = msg.role === 'tool';
                 const hasToolCalls = msg.tool_calls && Array.isArray(msg.tool_calls) && msg.tool_calls.length > 0;
-                
-                // Include this message if it's a tool message or has tool_calls
-                if (isTool || hasToolCalls) {
-                    conversationMessages.unshift(msg);
+
+                if (isTool) {
+                    // Only include tool result if it's for an internal tool
+                    const toolName = msg.name;
+                    if (!hasInternalToolTracking || internalToolNames.has(toolName)) {
+                        conversationMessages.unshift(msg);
+                    }
+                    // Skip external tool results
+                } else if (hasToolCalls) {
+                    // Filter to only internal tool calls
+                    const internalCalls = !hasInternalToolTracking
+                        ? msg.tool_calls
+                        : msg.tool_calls.filter(tc => internalToolNames.has(tc.function?.name));
+
+                    if (internalCalls.length > 0) {
+                        conversationMessages.unshift({
+                            ...msg,
+                            tool_calls: internalCalls
+                        });
+                    }
+                    // External tool calls from history are dropped
                 } else {
                     // Stop when we hit a message that is not tool and has no tool_calls
                     break;
                 }
             }
         }
-        
-        // Append the final output message
+
+        // Append the final output message — always include all tool_calls on the response
+        // The internal/external split only applies to historical messages above, not the fresh response
         const finalMessage = {
             content: response.content,
             role: response.role
         };
-        if (response.tool_calls) {
+
+        if (response.tool_calls && Array.isArray(response.tool_calls) && response.tool_calls.length > 0) {
             finalMessage.tool_calls = response.tool_calls;
         }
+
         if (response.images) {
             finalMessage.images = response.images;
         }
         conversationMessages.push(finalMessage);
-        
+
         const conversation = conversationMessages;
 
         return {

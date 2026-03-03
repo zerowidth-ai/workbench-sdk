@@ -1,5 +1,6 @@
 {
   "display_name": "Temperature",
+  "tagline": "Set AI temperature",
   "description": "A temperature slider useful for controlling randomness in model outputs. Lower values (0.0-0.3) produce very deterministic outputs ideal for factual content, code, or documentation. Medium values (0.4-0.7) balance creativity and coherence for general conversation and controlled creative writing. Higher values (0.8-1.0) introduce more randomness for brainstorming, poetry, and ideation. Values above 1.0 become very random and may be incoherent, suitable only for experimental purposes.",
   "icon": "thermometer",
   "category": "ai",

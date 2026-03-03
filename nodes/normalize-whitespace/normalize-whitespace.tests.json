@@ -1,0 +1,76 @@
+[
+  {
+    "description": "Collapse multiple spaces",
+    "inputs": {
+      "text": "Hello    World"
+    },
+    "expected": {
+      "text": "Hello World"
+    }
+  },
+  {
+    "description": "Collapse multiple newlines",
+    "inputs": {
+      "text": "Line 1\n\n\n\nLine 2"
+    },
+    "expected": {
+      "text": "Line 1\nLine 2"
+    }
+  },
+  {
+    "description": "Trim leading and trailing",
+    "inputs": {
+      "text": "   Hello World   "
+    },
+    "expected": {
+      "text": "Hello World"
+    }
+  },
+  {
+    "description": "Trim each line",
+    "inputs": {
+      "text": "  Line 1  \n  Line 2  ",
+      "trim_lines": true
+    },
+    "expected": {
+      "text": "Line 1\nLine 2"
+    }
+  },
+  {
+    "description": "All options together",
+    "inputs": {
+      "text": "   Hello    World   \n\n\n   Foo    Bar   "
+    },
+    "expected": {
+      "text": "Hello World \n Foo Bar"
+    }
+  },
+  {
+    "description": "Disable collapse spaces",
+    "inputs": {
+      "text": "Hello    World",
+      "collapse_spaces": false
+    },
+    "expected": {
+      "text": "Hello    World"
+    }
+  },
+  {
+    "description": "Handle empty string",
+    "inputs": {
+      "text": ""
+    },
+    "expected": {
+      "text": ""
+    }
+  },
+  {
+    "description": "Handle tabs",
+    "inputs": {
+      "text": "Hello\t\t\tWorld"
+    },
+    "expected": {
+      "text": "Hello World"
+    }
+  }
+]

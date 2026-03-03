@@ -1,0 +1,31 @@
+{
+  "display_name": "Generate UUID",
+  "tagline": "Generate unique ID",
+  "description": "Generates a random UUID v4.",
+  "icon": "fingerprint",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "count",
+      "display_name": "Count",
+      "type": "number",
+      "description": "Number of UUIDs to generate",
+      "required": false,
+      "default": 1
+    }
+  ],
+  "outputs": [
+    {
+      "name": "uuid",
+      "display_name": "UUID",
+      "type": "string",
+      "description": "The generated UUID (first one if count > 1)"
+    },
+    {
+      "name": "uuids",
+      "display_name": "UUIDs",
+      "type": "array",
+      "description": "Array of generated UUIDs (when count > 1)"
+    }
+  ]
+}

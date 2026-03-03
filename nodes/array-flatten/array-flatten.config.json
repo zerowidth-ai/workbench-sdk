@@ -1,5 +1,6 @@
 {
   "display_name": "Array Flatten",
+  "tagline": "Flatten nested lists",
   "description": "Flattens nested arrays into a single array",
   "category": "lists",
   "inputs": [

@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: GPT-4o Search Preview",
+  "tagline": "Large Language Model",
   "description": "GPT-4o Search Previewis a specialized model for web search in Chat Completions. It is trained to understand and execute web search queries.",
   "category": "llm",
   "provider": "openai",

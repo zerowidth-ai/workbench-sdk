@@ -1,0 +1,32 @@
+{
+  "display_name": "JSON to YAML",
+  "tagline": "Convert JSON to YAML",
+  "description": "Converts a JSON object to YAML format. Useful for configuration files or human-readable output.",
+  "icon": "file-code",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "json",
+      "display_name": "JSON",
+      "type": "object",
+      "description": "The JSON object to convert to YAML",
+      "required": true
+    },
+    {
+      "name": "indent",
+      "display_name": "Indent",
+      "type": "number",
+      "description": "Number of spaces for indentation",
+      "required": false,
+      "default": 2
+    }
+  ],
+  "outputs": [
+    {
+      "name": "yaml",
+      "display_name": "YAML",
+      "type": "string",
+      "description": "The YAML formatted string"
+    }
+  ]
+}

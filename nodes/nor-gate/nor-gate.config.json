@@ -1,5 +1,6 @@
 {
   "display_name": "NOR Gate",
+  "tagline": "Logic NOR gate",
   "description": "A logic gate that outputs true only if both inputs are false",
   "category": "logic",
   "inputs": [

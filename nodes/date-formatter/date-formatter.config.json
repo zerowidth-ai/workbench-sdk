@@ -1,5 +1,6 @@
 {
   "display_name": "Date Formatter",
+  "tagline": "Format dates",
   "description": "Formats a date or timestamp into a string using various formats",
   "icon": "calendar",
   "category": "date",

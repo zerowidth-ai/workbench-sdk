@@ -1,9 +1,10 @@
 {
   "display_name": "DeepSeek: R1 Distill Llama 70B",
+  "tagline": "Large Language Model",
   "description": "DeepSeek R1 Distill Llama 70B is a distilled large language model based on [Llama-3.3-70B-Instruct](/meta-llama/llama-3.3-70b-instruct), using outputs from [DeepSeek R1](/deepseek/deepseek-r1). The model combines advanced distillation techniques to achieve high performance across multiple benchmarks, including:\n\n- AIME 2024 pass@1: 70.0\n- MATH-500 pass@1: 94.5\n- CodeForces Rating: 1633\n\nThe model leverages fine-tuning from DeepSeek R1's outputs, enabling competitive performance comparable to larger frontier models.",
   "category": "llm",
   "provider": "deepseek",
-  "accepts_plugins": true,
+  "accepts_plugins": false,
   "model_id": "deepseek/deepseek-r1-distill-llama-70b",
   "context_length": 131072,
   "supported_parameters": [
@@ -20,8 +21,6 @@
     "stop",
     "structured_outputs",
     "temperature",
-    "tool_choice",
-    "tools",
     "top_k",
     "top_p"
   ],
@@ -39,14 +38,6 @@
       "type": "conversation or message or string",
       "description": "Array of chat messages that make up the conversation",
       "required": true
-    },
-    {
-      "name": "tools",
-      "display_name": "Tools",
-      "type": "tool",
-      "description": "Array of tools to use",
-      "default": null,
-      "allow_multiple": true
     },
     {
       "name": "frequency_penalty",
@@ -112,13 +103,6 @@
       "default": null
     },
     {
-      "name": "tool_choice",
-      "display_name": "Tool Choice",
-      "type": "string",
-      "description": "Tool selection control",
-      "default": null
-    },
-    {
       "name": "top_p",
       "display_name": "Top P",
       "type": "number",
@@ -154,12 +138,6 @@
       "can_stream": true,
       "type": "string",
       "description": "Role of the response (usually 'assistant')"
-    },
-    {
-      "name": "tool_calls",
-      "display_name": "Tool Calls",
-      "type": "array of tools",
-      "description": "Tool calls made by the model"
     },
     {
       "name": "usage",

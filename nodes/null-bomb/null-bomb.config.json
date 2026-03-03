@@ -1,5 +1,6 @@
 {
   "display_name": "Null Bomb",
+  "tagline": "Test null handling",
   "description": "Randomly returns null/undefined based on probability, useful for testing null handling in flows.",
   "icon": "bomb",
   "category": "testing",

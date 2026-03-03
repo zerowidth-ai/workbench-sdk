@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { emitAPICallEvent } from '../utilities/sanitizeAPICall.js';
 
 export default class GoogleCustomSearchIntegration {
     constructor(apiKey, options = {}) {
@@ -41,15 +42,23 @@ export default class GoogleCustomSearchIntegration {
                 }
             });
 
+            const queryParams = { key: this.apiKey, cx: this.cx, ...params };
+            const startTime = Date.now();
+            // Build full URL with query params for event (sanitizer will redact key)
+            const fullUrl = `${url}?${new URLSearchParams(queryParams).toString()}`;
+
             const response = await axios({
                 url: url,
                 method: 'GET',
-                params: {
-                    key: this.apiKey,
-                    cx: this.cx,
-                    ...params
-                },
+                params: queryParams,
                 timeout: this.options.timeout
+            });
+
+            await emitAPICallEvent(this._engineConfig, {
+                timestamp: startTime, integration: 'google_custom_search', nodeId: null, nodeType: null,
+                request: { method: 'GET', url: fullUrl, headers: {}, body: null },
+                response: { status: response.status, statusText: response.statusText },
+                duration: Date.now() - startTime, error: null
             });
 
             if (response.status >= 400) {

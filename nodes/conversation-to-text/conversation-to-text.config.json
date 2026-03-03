@@ -1,0 +1,55 @@
+{
+  "display_name": "Conversation to Text",
+  "tagline": "Convert chat to text",
+  "description": "Converts a conversation message array into a readable text transcript. Useful for logging, display, or feeding to models expecting plain text.",
+  "icon": "file-text",
+  "category": "messages",
+  "inputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "The conversation message array to convert",
+      "required": true
+    },
+    {
+      "name": "include_system",
+      "display_name": "Include System",
+      "type": "boolean",
+      "description": "Whether to include system messages in the output",
+      "required": false,
+      "default": false
+    },
+    {
+      "name": "separator",
+      "display_name": "Separator",
+      "type": "string",
+      "description": "String to separate messages",
+      "required": false,
+      "default": "\n\n"
+    },
+    {
+      "name": "role_format",
+      "display_name": "Role Format",
+      "type": "string",
+      "description": "How to format role labels",
+      "required": false,
+      "default": "capitalized",
+      "options": ["capitalized", "uppercase", "lowercase", "none"]
+    }
+  ],
+  "outputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The conversation as a text transcript"
+    },
+    {
+      "name": "message_count",
+      "display_name": "Message Count",
+      "type": "number",
+      "description": "Number of messages included in the output"
+    }
+  ]
+}

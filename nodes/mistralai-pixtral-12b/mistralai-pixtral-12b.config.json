@@ -1,5 +1,6 @@
 {
   "display_name": "Mistral: Pixtral 12B",
+  "tagline": "Large Language Model",
   "description": "The first multi-modal, text+image-to-text model from Mistral AI. Its weights were launched via torrent: https://x.com/mistralai/status/1833758285167722836.",
   "category": "llm",
   "provider": "mistralai",
@@ -41,7 +42,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

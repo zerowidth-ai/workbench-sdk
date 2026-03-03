@@ -1,5 +1,6 @@
 {
   "display_name": "Loop Start",
+  "tagline": "Start a loop",
   "description": "Entry point for loops - receives values and passes them through. Refires on each new value, enabling iterative processing.",
   "category": "logic",
   "is_plugin": false,

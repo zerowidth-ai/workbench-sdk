@@ -1,5 +1,6 @@
 {
   "display_name": "Get First N Messages",
+  "tagline": "Get first messages",
   "description": "Extract the first N messages from an array of messages.",
   "icon": "arrow-up",
   "category": "messages",

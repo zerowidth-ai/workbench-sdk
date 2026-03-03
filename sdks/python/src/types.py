@@ -455,6 +455,112 @@ def convert_import_to_node_type(
     # Check if any node accepts plugins
     accepts_plugins = any(n.get("type") == "input-plugins" for n in nodes)
 
+    # Create the process function for this import
+    async def import_process(
+        *,
+        inputs: dict[str, Any],
+        settings: dict[str, Any],
+        config: dict[str, Any],
+        node_config: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Process function for imported flow - runs the sub-flow as a child engine."""
+        # Lazy import to avoid circular dependency
+        from src.engine import Zv1
+
+        logger.debug(f"Processing import node with inputs: {list(inputs.keys())}")
+
+        # Get the import definition from the node config
+        import_definition = node_config.get("import_definition", processed_def)
+
+        # Create child engine config - inherit from parent but may override some settings
+        child_config = {
+            **config,
+            # Don't propagate callbacks to child engine unless explicitly requested
+            "on_node_start": config.get("on_node_start") if config.get("include_internal_events") else None,
+            "on_node_complete": config.get("on_node_complete") if config.get("include_internal_events") else None,
+            "on_node_error": config.get("on_node_error") if config.get("include_internal_events") else None,
+        }
+
+        # Handle knowledge database for this import if present
+        knowledge_db_path = import_definition.get("knowledge_db_path")
+        if knowledge_db_path:
+            try:
+                from src.integrations.sqlite import SQLiteIntegration
+                sqlite_integration = SQLiteIntegration(
+                    knowledge_db_path,
+                    timeout=config.get("sqlite_timeout", 5000),
+                )
+                child_config["integrations"] = {
+                    **config.get("integrations", {}),
+                    "sqlite": sqlite_integration,
+                    "knowledge_base": sqlite_integration,
+                }
+                logger.debug(f"Created SQLite integration for import with knowledge database: {knowledge_db_path}")
+            except ImportError as e:
+                logger.warning(f"Failed to load SQLite integration for import: {e}")
+
+        # Create child engine with the import's flow definition
+        child_flow = {
+            "nodes": import_definition.get("nodes", []),
+            "links": import_definition.get("links", []),
+            "imports": import_definition.get("imports", []),
+        }
+
+        child_engine = Zv1(child_flow, child_config)
+        await child_engine.initialize()
+
+        # Map inputs from parent to child flow's input nodes
+        # The import's input nodes define what keys they expect
+        child_input_nodes = [
+            n for n in import_definition.get("nodes", [])
+            if n.get("type") in ("input-data", "input-chat", "input-prompt")
+        ]
+
+        input_data: dict[str, Any] = {}
+        for input_node in child_input_nodes:
+            node_type = input_node.get("type")
+            node_settings = input_node.get("settings", {})
+
+            # Determine the key this input node expects
+            if node_type == "input-data":
+                data_key = node_settings.get("key", "data")
+            elif node_type == "input-chat":
+                data_key = node_settings.get("key", "chat")
+            else:  # input-prompt
+                data_key = node_settings.get("key", "prompt")
+
+            # Get the value from parent inputs
+            if data_key in inputs:
+                input_data[data_key] = inputs[data_key]
+                logger.debug(f"Mapped input '{data_key}' to child flow")
+
+        logger.debug(f"Final input data for imported flow: {list(input_data.keys())}")
+
+        # Run the child flow
+        result = await child_engine.run(input_data)
+
+        # Cleanup the child engine
+        await child_engine.cleanup()
+
+        # Map outputs from child flow back to parent
+        # The result.outputs contains keys like "data", "chat" from output nodes
+        final_outputs: dict[str, Any] = {}
+
+        if result.outputs:
+            final_outputs = result.outputs.copy()
+
+        # Also handle terminal nodes if present (for flows without explicit output nodes)
+        if result.terminal_nodes:
+            for terminal_node in result.terminal_nodes:
+                if terminal_node.get("outputs"):
+                    for output_name, output_value in terminal_node["outputs"].items():
+                        # Use a namespaced key to avoid collisions
+                        key = f"{terminal_node['node_id']}_{output_name}"
+                        final_outputs[key] = output_value
+
+        logger.debug(f"Import node execution result: {list(final_outputs.keys())}")
+        return final_outputs
+
     return {
         "config": {
             "display_name": processed_def.get("display_name", "Imported Flow"),
@@ -470,5 +576,5 @@ def convert_import_to_node_type(
             "outputs": outputs,
             "import_definition": processed_def,
         },
-        "process": None,  # Process function created at runtime by engine
+        "process": import_process,
     }

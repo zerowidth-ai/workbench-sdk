@@ -7,7 +7,10 @@ Provides access to OpenAI's embeddings and moderation APIs.
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any
+
+from src.utilities.sanitize_api_call import emit_api_call_event
 
 try:
     import httpx
@@ -74,14 +77,19 @@ class OpenAIIntegration:
         Raises:
             Exception: On API errors.
         """
+        request_url = f"{self.base_url}/embeddings"
+        request_body = {"model": model, "input": input_text}
+        start_time = int(time.time() * 1000)
+
         try:
-            response = await self.client.post(
-                f"{self.base_url}/embeddings",
-                json={
-                    "model": model,
-                    "input": input_text,
-                },
-            )
+            response = await self.client.post(request_url, json=request_body)
+
+            await emit_api_call_event(getattr(self, "_engine_config", None), {
+                "timestamp": start_time, "integration": "openai", "nodeId": None, "nodeType": None,
+                "request": {"method": "POST", "url": request_url, "headers": dict(self.client.headers), "body": request_body},
+                "response": {"status": response.status_code, "statusText": response.reason_phrase or ""},
+                "duration": int(time.time() * 1000) - start_time, "error": None,
+            })
 
             if response.status_code >= 400:
                 try:
@@ -151,13 +159,18 @@ class OpenAIIntegration:
             if not isinstance(moderation_input, (str, list)):
                 moderation_input = [moderation_input]
 
-            response = await self.client.post(
-                f"{self.base_url}/moderations",
-                json={
-                    "model": "omni-moderation-latest",
-                    "input": moderation_input,
-                },
-            )
+            mod_url = f"{self.base_url}/moderations"
+            mod_body = {"model": "omni-moderation-latest", "input": moderation_input}
+            mod_start = int(time.time() * 1000)
+
+            response = await self.client.post(mod_url, json=mod_body)
+
+            await emit_api_call_event(getattr(self, "_engine_config", None), {
+                "timestamp": mod_start, "integration": "openai", "nodeId": None, "nodeType": None,
+                "request": {"method": "POST", "url": mod_url, "headers": dict(self.client.headers), "body": mod_body},
+                "response": {"status": response.status_code, "statusText": response.reason_phrase or ""},
+                "duration": int(time.time() * 1000) - mod_start, "error": None,
+            })
 
             if response.status_code >= 400:
                 try:

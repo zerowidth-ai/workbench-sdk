@@ -1,5 +1,6 @@
 {
   "display_name": "Input Chat",
+  "tagline": "Receive chat messages",
   "description": "Accepts chat messages as input to the conversation flow",
   "icon": "message-circle",
   "category": "i/o",

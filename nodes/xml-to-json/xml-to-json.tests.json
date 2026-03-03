@@ -1,0 +1,113 @@
+[
+  {
+    "description": "Parse simple XML",
+    "inputs": {
+      "xml": "<root><name>Alice</name><age>30</age></root>"
+    },
+    "expected": {
+      "json": {"root": {"name": "Alice", "age": 30}},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Remove root element",
+    "inputs": {
+      "xml": "<root><name>Alice</name></root>",
+      "remove_root": true
+    },
+    "expected": {
+      "json": {"name": "Alice"},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse nested XML",
+    "inputs": {
+      "xml": "<root><user><name>Bob</name><active>true</active></user></root>"
+    },
+    "expected": {
+      "json": {"root": {"user": {"name": "Bob", "active": true}}},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse repeated elements as array",
+    "inputs": {
+      "xml": "<root><item>a</item><item>b</item><item>c</item></root>"
+    },
+    "expected": {
+      "json": {"root": {"item": ["a", "b", "c"]}},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse boolean values",
+    "inputs": {
+      "xml": "<root><enabled>true</enabled><debug>false</debug></root>"
+    },
+    "expected": {
+      "json": {"root": {"enabled": true, "debug": false}},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse numeric values",
+    "inputs": {
+      "xml": "<root><count>42</count><price>19.99</price></root>"
+    },
+    "expected": {
+      "json": {"root": {"count": 42, "price": 19.99}},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Decode XML entities",
+    "inputs": {
+      "xml": "<root><text>&lt;script&gt;alert(&apos;xss&apos;)&lt;/script&gt;</text></root>"
+    },
+    "expected": {
+      "json": {"root": {"text": "<script>alert('xss')</script>"}},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse empty element",
+    "inputs": {
+      "xml": "<root></root>"
+    },
+    "expected": {
+      "json": {"root": null},
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Handle empty string",
+    "inputs": {
+      "xml": ""
+    },
+    "expected": {
+      "json": null,
+      "success": true,
+      "error": null
+    }
+  },
+  {
+    "description": "Parse with whitespace and newlines",
+    "inputs": {
+      "xml": "<root>\n  <name>Alice</name>\n  <age>30</age>\n</root>"
+    },
+    "expected": {
+      "json": {"root": {"name": "Alice", "age": 30}},
+      "success": true,
+      "error": null
+    }
+  }
+]

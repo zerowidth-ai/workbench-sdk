@@ -1,5 +1,6 @@
 {
   "display_name": "JSON Stringifier",
+  "tagline": "Convert to JSON string",
   "description": "Converts an object or array to a JSON string",
   "icon": "code",
   "category": "data",

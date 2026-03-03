@@ -1,5 +1,6 @@
 {
   "display_name": "Query Knowledge Base",
+  "tagline": "Query knowledge base",
   "description": "Execute SQL queries against the orchestration's knowledge database",
   "category": "knowledge",
   "is_plugin": true,

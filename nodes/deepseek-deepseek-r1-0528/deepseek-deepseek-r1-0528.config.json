@@ -1,11 +1,12 @@
 {
   "display_name": "DeepSeek: R1 0528",
+  "tagline": "Large Language Model",
   "description": "May 28th update to the [original DeepSeek R1](/deepseek/deepseek-r1) Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active in an inference pass.\n\nFully open-source model.",
   "category": "llm",
   "provider": "deepseek",
   "accepts_plugins": true,
   "model_id": "deepseek/deepseek-r1-0528",
-  "context_length": 131072,
+  "context_length": 163840,
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
@@ -45,7 +46,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true
@@ -213,13 +214,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.44999999999999996,
+        "cost": 0.39999999999999997,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 2.1500000000000004,
+        "cost": 1.75,
         "currency": "USD"
       }
     ]

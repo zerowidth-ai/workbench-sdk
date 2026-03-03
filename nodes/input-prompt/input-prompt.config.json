@@ -1,5 +1,6 @@
 {
   "display_name": "Prompt Input",
+  "tagline": "Receive a prompt",
   "description": "For direct instructing with a single text prompt instead of a conversation.",
   "icon": "arrow-to-right",
   "category": "i/o",

@@ -1,5 +1,6 @@
 {
   "display_name": "Google Custom Search",
+  "tagline": "Search with Google",
   "description": "Search the web using Google Custom Search API with advanced filtering and pagination options",
   "category": "third-party",
   "provider": "google",

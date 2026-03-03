@@ -1,5 +1,6 @@
 {
   "display_name": "Extract Text Content",
+  "tagline": "Extract message text",
   "description": "Extract text content from messages, supporting multi-modal content and optional role prefixes.",
   "icon": "type",
   "category": "messages",

@@ -1,0 +1,100 @@
+[
+  {
+    "description": "Count basic text",
+    "inputs": {
+      "text": "Hello world"
+    },
+    "expected": {
+      "characters": 11,
+      "characters_no_spaces": 10,
+      "words": 2,
+      "sentences": 1,
+      "paragraphs": 1,
+      "lines": 1
+    }
+  },
+  {
+    "description": "Count multiple sentences",
+    "inputs": {
+      "text": "Hello world. How are you? I am fine!"
+    },
+    "expected": {
+      "characters": 36,
+      "characters_no_spaces": 29,
+      "words": 8,
+      "sentences": 3,
+      "paragraphs": 1,
+      "lines": 1
+    }
+  },
+  {
+    "description": "Count multiple paragraphs",
+    "inputs": {
+      "text": "First paragraph.\n\nSecond paragraph.\n\nThird paragraph."
+    },
+    "expected": {
+      "characters": 53,
+      "characters_no_spaces": 46,
+      "words": 6,
+      "sentences": 3,
+      "paragraphs": 3,
+      "lines": 5
+    }
+  },
+  {
+    "description": "Count multiple lines",
+    "inputs": {
+      "text": "Line 1\nLine 2\nLine 3"
+    },
+    "expected": {
+      "characters": 20,
+      "characters_no_spaces": 15,
+      "words": 6,
+      "sentences": 1,
+      "paragraphs": 1,
+      "lines": 3
+    }
+  },
+  {
+    "description": "Handle empty string",
+    "inputs": {
+      "text": ""
+    },
+    "expected": {
+      "characters": 0,
+      "characters_no_spaces": 0,
+      "words": 0,
+      "sentences": 0,
+      "paragraphs": 0,
+      "lines": 0
+    }
+  },
+  {
+    "description": "Handle whitespace only",
+    "inputs": {
+      "text": "   \n\n   "
+    },
+    "expected": {
+      "characters": 8,
+      "characters_no_spaces": 0,
+      "words": 0,
+      "sentences": 0,
+      "paragraphs": 0,
+      "lines": 3
+    }
+  },
+  {
+    "description": "Count long text",
+    "inputs": {
+      "text": "The quick brown fox jumps over the lazy dog. This is a sample sentence with multiple words."
+    },
+    "expected": {
+      "characters": 91,
+      "characters_no_spaces": 75,
+      "words": 17,
+      "sentences": 2,
+      "paragraphs": 1,
+      "lines": 1
+    }
+  }
+]

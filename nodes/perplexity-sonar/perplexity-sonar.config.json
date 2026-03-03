@@ -1,5 +1,6 @@
 {
   "display_name": "Perplexity: Sonar",
+  "tagline": "Large Language Model",
   "description": "Sonar is lightweight, affordable, fast, and simple to use — now featuring citations and the ability to customize sources. It is designed for companies seeking to integrate lightweight question-and-answer features optimized for speed.",
   "category": "llm",
   "provider": "perplexity",

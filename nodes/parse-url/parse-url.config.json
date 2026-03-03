@@ -1,0 +1,72 @@
+{
+  "display_name": "Parse URL",
+  "tagline": "Parse URL components",
+  "description": "Parses a URL into its components: protocol, host, pathname, query parameters, etc.",
+  "icon": "link",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "url",
+      "display_name": "URL",
+      "type": "string",
+      "description": "The URL to parse",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "protocol",
+      "display_name": "Protocol",
+      "type": "string",
+      "description": "The protocol (e.g., 'https:')"
+    },
+    {
+      "name": "host",
+      "display_name": "Host",
+      "type": "string",
+      "description": "The host including port (e.g., 'example.com:8080')"
+    },
+    {
+      "name": "hostname",
+      "display_name": "Hostname",
+      "type": "string",
+      "description": "The hostname without port (e.g., 'example.com')"
+    },
+    {
+      "name": "port",
+      "display_name": "Port",
+      "type": "string",
+      "description": "The port number if specified"
+    },
+    {
+      "name": "pathname",
+      "display_name": "Pathname",
+      "type": "string",
+      "description": "The path (e.g., '/path/to/page')"
+    },
+    {
+      "name": "search",
+      "display_name": "Search",
+      "type": "string",
+      "description": "The query string including ? (e.g., '?foo=bar')"
+    },
+    {
+      "name": "query",
+      "display_name": "Query",
+      "type": "object",
+      "description": "The query parameters as an object"
+    },
+    {
+      "name": "hash",
+      "display_name": "Hash",
+      "type": "string",
+      "description": "The fragment identifier including # (e.g., '#section')"
+    },
+    {
+      "name": "origin",
+      "display_name": "Origin",
+      "type": "string",
+      "description": "The origin (protocol + host)"
+    }
+  ]
+}

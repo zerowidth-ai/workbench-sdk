@@ -1,5 +1,6 @@
 {
   "display_name": "Text Scratch Pad",
+  "tagline": "Accumulate text",
   "description": "Accumulate text input over multiple executions. Each new input gets concatenated to the existing content with an optional delimiter.",
   "icon": "edit",
   "category": "text",

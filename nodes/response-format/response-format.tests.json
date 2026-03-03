@@ -2,6 +2,21 @@
   {
     "description": "Create response format from settings",
     "inputs": {},
+    "settings": {
+      "name": "response",
+      "strict": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "response": {
+            "type": "string",
+            "description": "The model's response"
+          }
+        },
+        "required": ["response"],
+        "additionalProperties": false
+      }
+    },
     "expected": {
       "response_format": {
         "type": "json_schema",
@@ -28,6 +43,21 @@
     "inputs": {
       "name": "weather_response"
     },
+    "settings": {
+      "name": "response",
+      "strict": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "response": {
+            "type": "string",
+            "description": "The model's response"
+          }
+        },
+        "required": ["response"],
+        "additionalProperties": false
+      }
+    },
     "expected": {
       "response_format": {
         "type": "json_schema",
@@ -53,6 +83,21 @@
     "description": "Override strict mode from input",
     "inputs": {
       "strict": false
+    },
+    "settings": {
+      "name": "response",
+      "strict": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "response": {
+            "type": "string",
+            "description": "The model's response"
+          }
+        },
+        "required": ["response"],
+        "additionalProperties": false
+      }
     },
     "expected": {
       "response_format": {
@@ -97,6 +142,10 @@
         "required": ["location", "temperature", "conditions"],
         "additionalProperties": false
       }
+    },
+    "settings": {
+      "name": "response",
+      "strict": true
     },
     "expected": {
       "response_format": {

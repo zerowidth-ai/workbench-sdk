@@ -1,5 +1,6 @@
 {
   "display_name": "Has Object Property",
+  "tagline": "Check object property",
   "description": "Check if an object has a specific property/key.",
   "icon": "fa-search",
   "category": "data",

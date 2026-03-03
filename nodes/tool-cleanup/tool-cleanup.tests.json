@@ -1,0 +1,160 @@
+[
+  {
+    "description": "Passthrough when no tool calls present",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi there!"},
+        {"role": "user", "content": "How are you?"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi there!"},
+        {"role": "user", "content": "How are you?"}
+      ],
+      "inserted_count": 0
+    }
+  },
+  {
+    "description": "Passthrough when all tool calls have responses",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "What's the weather?"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_weather", "arguments": "{}"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Sunny, 72F"},
+        {"role": "assistant", "content": "The weather is sunny and 72F!"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "What's the weather?"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_weather", "arguments": "{}"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Sunny, 72F"},
+        {"role": "assistant", "content": "The weather is sunny and 72F!"}
+      ],
+      "inserted_count": 0
+    }
+  },
+  {
+    "description": "Insert synthetic response when user message comes before tool response",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "What's the weather?"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_weather", "arguments": "{}"}}]},
+        {"role": "user", "content": "Never mind"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "What's the weather?"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_weather", "arguments": "{}"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Tool call was not executed"},
+        {"role": "user", "content": "Never mind"}
+      ],
+      "inserted_count": 1
+    }
+  },
+  {
+    "description": "Insert multiple synthetic responses for multiple unanswered tool calls",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Get weather and time"},
+        {"role": "assistant", "content": null, "tool_calls": [
+          {"id": "call_1", "function": {"name": "get_weather", "arguments": "{}"}},
+          {"id": "call_2", "function": {"name": "get_time", "arguments": "{}"}}
+        ]},
+        {"role": "user", "content": "Cancel that"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Get weather and time"},
+        {"role": "assistant", "content": null, "tool_calls": [
+          {"id": "call_1", "function": {"name": "get_weather", "arguments": "{}"}},
+          {"id": "call_2", "function": {"name": "get_time", "arguments": "{}"}}
+        ]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Tool call was not executed"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "Tool call was not executed"},
+        {"role": "user", "content": "Cancel that"}
+      ],
+      "inserted_count": 2
+    }
+  },
+  {
+    "description": "Insert synthetic response at end of conversation",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "What's the weather?"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_weather", "arguments": "{}"}}]}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "What's the weather?"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_weather", "arguments": "{}"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Tool call was not executed"}
+      ],
+      "inserted_count": 1
+    }
+  },
+  {
+    "description": "Partial tool responses - backfill missing ones in order",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Get weather and time"},
+        {"role": "assistant", "content": null, "tool_calls": [
+          {"id": "call_1", "function": {"name": "get_weather", "arguments": "{}"}},
+          {"id": "call_2", "function": {"name": "get_time", "arguments": "{}"}},
+          {"id": "call_3", "function": {"name": "get_date", "arguments": "{}"}}
+        ]},
+        {"role": "tool", "tool_call_id": "call_2", "content": "3:00 PM"},
+        {"role": "user", "content": "Thanks"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Get weather and time"},
+        {"role": "assistant", "content": null, "tool_calls": [
+          {"id": "call_1", "function": {"name": "get_weather", "arguments": "{}"}},
+          {"id": "call_2", "function": {"name": "get_time", "arguments": "{}"}},
+          {"id": "call_3", "function": {"name": "get_date", "arguments": "{}"}}
+        ]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Tool call was not executed"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "3:00 PM"},
+        {"role": "tool", "tool_call_id": "call_3", "content": "Tool call was not executed"},
+        {"role": "user", "content": "Thanks"}
+      ],
+      "inserted_count": 2
+    }
+  },
+  {
+    "description": "Handle empty messages array",
+    "inputs": {
+      "messages": []
+    },
+    "expected": {
+      "messages": [],
+      "inserted_count": 0
+    }
+  },
+  {
+    "description": "Handle system messages passthrough",
+    "inputs": {
+      "messages": [
+        {"role": "system", "content": "You are a helpful assistant"},
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "system", "content": "You are a helpful assistant"},
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"}
+      ],
+      "inserted_count": 0
+    }
+  }
+]

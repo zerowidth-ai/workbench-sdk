@@ -1,0 +1,149 @@
+[
+  {
+    "description": "Remove consecutive duplicate user messages",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi there!"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi there!"}
+      ],
+      "removed_count": 1
+    }
+  },
+  {
+    "description": "Remove multiple consecutive duplicates",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "user", "content": "Hello"},
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"}
+      ],
+      "removed_count": 2
+    }
+  },
+  {
+    "description": "Keep non-consecutive duplicates",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"},
+        {"role": "user", "content": "Hello"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"},
+        {"role": "user", "content": "Hello"}
+      ],
+      "removed_count": 0
+    }
+  },
+  {
+    "description": "Same content different role is not a duplicate",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hello"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hello"}
+      ],
+      "removed_count": 0
+    }
+  },
+  {
+    "description": "Passthrough when no duplicates",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"},
+        {"role": "user", "content": "How are you?"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"},
+        {"role": "user", "content": "How are you?"}
+      ],
+      "removed_count": 0
+    }
+  },
+  {
+    "description": "Handle empty messages array",
+    "inputs": {
+      "messages": []
+    },
+    "expected": {
+      "messages": [],
+      "removed_count": 0
+    }
+  },
+  {
+    "description": "Handle complex content (array format)",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": [{"type": "text", "text": "Hello"}]},
+        {"role": "user", "content": [{"type": "text", "text": "Hello"}]},
+        {"role": "assistant", "content": "Hi!"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": [{"type": "text", "text": "Hello"}]},
+        {"role": "assistant", "content": "Hi!"}
+      ],
+      "removed_count": 1
+    }
+  },
+  {
+    "description": "Different complex content is not a duplicate",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": [{"type": "text", "text": "Hello"}]},
+        {"role": "user", "content": [{"type": "text", "text": "Hello!"}, {"type": "text", "text": "World"}]}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": [{"type": "text", "text": "Hello"}]},
+        {"role": "user", "content": [{"type": "text", "text": "Hello!"}, {"type": "text", "text": "World"}]}
+      ],
+      "removed_count": 0
+    }
+  },
+  {
+    "description": "Dedupe system messages too",
+    "inputs": {
+      "messages": [
+        {"role": "system", "content": "You are helpful"},
+        {"role": "system", "content": "You are helpful"},
+        {"role": "user", "content": "Hi"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "system", "content": "You are helpful"},
+        {"role": "user", "content": "Hi"}
+      ],
+      "removed_count": 1
+    }
+  }
+]

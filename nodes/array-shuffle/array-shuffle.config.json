@@ -1,5 +1,6 @@
 {
   "display_name": "Array Shuffle",
+  "tagline": "Shuffle list randomly",
   "description": "Randomly reorders elements in an array",
   "category": "lists",
   "inputs": [

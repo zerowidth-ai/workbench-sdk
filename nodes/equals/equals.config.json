@@ -1,5 +1,6 @@
 {
   "display_name": "Equals",
+  "tagline": "Check equality",
   "description": "Checks if two values are equal, with deep comparison for objects and arrays",
   "icon": "equals",
   "category": "logic",

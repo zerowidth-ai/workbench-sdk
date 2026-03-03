@@ -1,5 +1,6 @@
 {
   "display_name": "Mean",
+  "tagline": "Calculate the average",
   "description": "Calculates arithmetic mean (average) of numbers",
   "category": "math",
   "inputs": [

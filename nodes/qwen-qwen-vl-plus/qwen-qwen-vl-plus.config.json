@@ -1,5 +1,6 @@
 {
   "display_name": "Qwen: Qwen VL Plus",
+  "tagline": "Large Language Model",
   "description": "Qwen's Enhanced Large Visual Language Model. Significantly upgraded for detailed recognition capabilities and text recognition abilities, supporting ultra-high pixel resolutions up to millions of pixels and extreme aspect ratios for image input. It delivers significant performance across a broad range of visual tasks.\n",
   "category": "llm",
   "provider": "qwen",

@@ -1,5 +1,6 @@
 {
   "display_name": "Semantic Search",
+  "tagline": "Search by meaning",
   "description": "Search knowledge base using semantic similarity and vector embeddings",
   "category": "knowledge",
   "is_constant": false,

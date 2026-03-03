@@ -1,20 +1,19 @@
 {
   "display_name": "DeepSeek: R1",
+  "tagline": "Large Language Model",
   "description": "DeepSeek R1 is here: Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active in an inference pass.\n\nFully open-source model & [technical report](https://api-docs.deepseek.com/news/news250120).\n\nMIT licensed: Distill & commercialize freely!",
   "category": "llm",
   "provider": "deepseek",
   "accepts_plugins": true,
   "model_id": "deepseek/deepseek-r1",
-  "context_length": 163840,
+  "context_length": 64000,
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
     "max_tokens",
-    "min_p",
     "presence_penalty",
     "reasoning",
     "repetition_penalty",
-    "response_format",
     "seed",
     "stop",
     "temperature",
@@ -41,7 +40,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true
@@ -79,13 +78,6 @@
       "display_name": "Reasoning",
       "type": "boolean",
       "description": "Internal reasoning mode",
-      "default": null
-    },
-    {
-      "name": "response_format",
-      "display_name": "Response Format",
-      "type": "string or object",
-      "description": "Output format specification",
       "default": null
     },
     {
@@ -209,7 +201,7 @@
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 2.4,
+        "cost": 2.5,
         "currency": "USD"
       }
     ]

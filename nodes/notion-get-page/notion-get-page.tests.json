@@ -1,0 +1,14 @@
+[
+  {
+    "description": "Get page by ID",
+    "inputs": {
+      "page_id": "${NOTION_TEST_PAGE_ID}"
+    },
+    "expected": {
+      "page": "object",
+      "id": "string",
+      "properties": "object",
+      "created_time": "string"
+    }
+  }
+]

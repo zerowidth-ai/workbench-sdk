@@ -1,6 +1,7 @@
 {
-  "display_name": "LiquidAI/LFM2-8B-A1B",
-  "description": "Model created via inbox interface",
+  "display_name": "LiquidAI: LFM2-8B-A1B",
+  "tagline": "Large Language Model",
+  "description": "LFM2-8B-A1B is an efficient on-device Mixture-of-Experts (MoE) model from Liquid AI’s LFM2 family, built for fast, high-quality inference on edge hardware. It uses 8.3B total parameters with only ~1.5B active per token, delivering strong performance while keeping compute and memory usage low—making it ideal for phones, tablets, and laptops.",
   "category": "llm",
   "provider": "liquid",
   "accepts_plugins": false,

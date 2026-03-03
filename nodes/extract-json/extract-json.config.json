@@ -1,0 +1,44 @@
+{
+  "display_name": "Extract JSON",
+  "tagline": "Extract JSON data",
+  "description": "Extracts JSON from LLM responses that may contain markdown code blocks, explanatory text, or other formatting. Returns the first valid JSON object or array found.",
+  "icon": "braces",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The text containing JSON to extract",
+      "required": true
+    },
+    {
+      "name": "return_all",
+      "display_name": "Return All",
+      "type": "boolean",
+      "description": "Return all JSON objects found instead of just the first",
+      "required": false,
+      "default": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "json",
+      "display_name": "JSON",
+      "type": "any",
+      "description": "The extracted JSON (object, array, or null if not found). If return_all is true, returns array of all found JSON."
+    },
+    {
+      "name": "found",
+      "display_name": "Found",
+      "type": "boolean",
+      "description": "Whether valid JSON was found"
+    },
+    {
+      "name": "raw_match",
+      "display_name": "Raw Match",
+      "type": "string",
+      "description": "The raw string that was parsed (useful for debugging)"
+    }
+  ]
+}

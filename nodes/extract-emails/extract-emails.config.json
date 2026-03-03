@@ -1,5 +1,6 @@
 {
   "display_name": "Extract Emails",
+  "tagline": "Extract email addresses",
   "description": "Extract all email addresses from text using regex patterns",
   "category": "text",
   "is_macro": true,

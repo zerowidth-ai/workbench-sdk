@@ -1,5 +1,6 @@
 {
   "display_name": "Mistral: Mistral 7B Instruct v0.2",
+  "tagline": "Large Language Model",
   "description": "A high-performing, industry-standard 7.3B parameter model, with optimizations for speed and context length.\n\nAn improved version of [Mistral 7B Instruct](/modelsmistralai/mistral-7b-instruct-v0.1), with the following changes:\n\n- 32k context window (vs 8k context in v0.1)\n- Rope-theta = 1e6\n- No Sliding-Window Attention",
   "category": "llm",
   "provider": "mistralai",

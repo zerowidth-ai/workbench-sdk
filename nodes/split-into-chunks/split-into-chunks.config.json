@@ -1,0 +1,54 @@
+{
+  "display_name": "Split Into Chunks",
+  "tagline": "Split text into chunks",
+  "description": "Splits text into smaller chunks by character count, word count, or sentence count. Useful for processing long content in batches.",
+  "icon": "layout-split",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The text to split into chunks",
+      "required": true
+    },
+    {
+      "name": "chunk_size",
+      "display_name": "Chunk Size",
+      "type": "number",
+      "description": "Maximum size of each chunk",
+      "required": true
+    },
+    {
+      "name": "chunk_by",
+      "display_name": "Chunk By",
+      "type": "string",
+      "description": "Unit for chunking",
+      "required": false,
+      "default": "characters",
+      "options": ["characters", "words", "sentences"]
+    },
+    {
+      "name": "overlap",
+      "display_name": "Overlap",
+      "type": "number",
+      "description": "Number of units to overlap between chunks",
+      "required": false,
+      "default": 0
+    }
+  ],
+  "outputs": [
+    {
+      "name": "chunks",
+      "display_name": "Chunks",
+      "type": "array",
+      "description": "Array of text chunks"
+    },
+    {
+      "name": "chunk_count",
+      "display_name": "Chunk Count",
+      "type": "number",
+      "description": "Number of chunks created"
+    }
+  ]
+}

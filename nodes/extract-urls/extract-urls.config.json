@@ -1,5 +1,6 @@
 {
   "display_name": "Extract URLs",
+  "tagline": "Extract URLs",
   "description": "Extract all URLs from text using regex patterns",
   "category": "text",
   "is_macro": true,

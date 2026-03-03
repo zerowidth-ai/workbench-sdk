@@ -7,7 +7,11 @@ Provides web search capabilities through Google's Custom Search API.
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any
+from urllib.parse import urlencode
+
+from src.utilities.sanitize_api_call import emit_api_call_event
 
 try:
     import httpx
@@ -83,8 +87,18 @@ class GoogleCustomSearchIntegration:
         if self.cx:
             clean_params["cx"] = self.cx
 
+        start_time = int(time.time() * 1000)
+        full_url = f"{self.base_url}?{urlencode(clean_params)}"
+
         try:
             response = await self.client.get(self.base_url, params=clean_params)
+
+            await emit_api_call_event(getattr(self, "_engine_config", None), {
+                "timestamp": start_time, "integration": "google_custom_search", "nodeId": None, "nodeType": None,
+                "request": {"method": "GET", "url": full_url, "headers": {}, "body": None},
+                "response": {"status": response.status_code, "statusText": response.reason_phrase or ""},
+                "duration": int(time.time() * 1000) - start_time, "error": None,
+            })
 
             if response.status_code >= 400:
                 try:

@@ -1,5 +1,6 @@
 {
   "display_name": "OR Gate",
+  "tagline": "Logic OR gate",
   "description": "A logic gate that outputs true if either input is true",
   "category": "logic",
   "inputs": [

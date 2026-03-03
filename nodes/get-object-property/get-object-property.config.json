@@ -1,5 +1,6 @@
 {
   "display_name": "Get Object Property",
+  "tagline": "Get object property",
   "description": "Extract a specific property value from an object by key name.",
   "icon": "fa-key",
   "category": "data",

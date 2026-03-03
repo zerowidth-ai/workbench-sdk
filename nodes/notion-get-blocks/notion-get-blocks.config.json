@@ -1,0 +1,51 @@
+{
+  "display_name": "Notion Get Blocks",
+  "tagline": "Get Notion blocks",
+  "description": "Get children blocks of a Notion page or block",
+  "icon": "list",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "block_id",
+      "display_name": "Block ID",
+      "type": "string",
+      "required": true,
+      "description": "The ID of the page or block to get children from"
+    },
+    {
+      "name": "start_cursor",
+      "display_name": "Start Cursor",
+      "type": "string",
+      "required": false,
+      "description": "Pagination cursor for next page"
+    },
+    {
+      "name": "page_size",
+      "display_name": "Page Size",
+      "type": "number",
+      "required": false,
+      "description": "Number of results per page (max 100)",
+      "default": 100
+    }
+  ],
+  "outputs": [
+    {
+      "name": "results",
+      "display_name": "Results",
+      "type": "array",
+      "description": "Array of block objects"
+    },
+    {
+      "name": "has_more",
+      "display_name": "Has More",
+      "type": "boolean",
+      "description": "Whether there are more results"
+    },
+    {
+      "name": "next_cursor",
+      "display_name": "Next Cursor",
+      "type": "string",
+      "description": "Cursor for the next page of results"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 {
   "display_name": "Mistral: Mistral 7B Instruct v0.1",
+  "tagline": "Large Language Model",
   "description": "A 7.3B parameter model that outperforms Llama 2 13B on all benchmarks, with optimizations for speed and context length.",
   "category": "llm",
   "provider": "mistralai",

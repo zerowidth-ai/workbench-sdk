@@ -7,7 +7,10 @@ Provides access to HubSpot's CRM API with OAuth token refresh support.
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any
+
+from src.utilities.sanitize_api_call import emit_api_call_event
 
 try:
     import httpx
@@ -140,6 +143,8 @@ class HubSpotIntegration:
                 if headers:
                     request_headers.update(headers)
 
+                call_start = int(time.time() * 1000)
+
                 response = await self.client.request(
                     method=method,
                     url=full_url,
@@ -148,6 +153,13 @@ class HubSpotIntegration:
                     headers=request_headers,
                     timeout=timeout or self.timeout,
                 )
+
+                await emit_api_call_event(getattr(self, "_engine_config", None), {
+                    "timestamp": call_start, "integration": "hubspot", "nodeId": None, "nodeType": None,
+                    "request": {"method": method, "url": full_url, "headers": request_headers, "body": data},
+                    "response": {"status": response.status_code, "statusText": response.reason_phrase or ""},
+                    "duration": int(time.time() * 1000) - call_start, "error": None,
+                })
 
                 # Check if response indicates token refresh is needed
                 if OAuthRefreshManager.needs_refresh(

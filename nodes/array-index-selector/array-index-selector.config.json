@@ -1,5 +1,6 @@
 {
   "display_name": "Array Index Selector",
+  "tagline": "Select by index",
   "description": "Select a specific index from an array, safely handling cases where the index does not exist.",
   "icon": "list-ol",
   "category": "lists",

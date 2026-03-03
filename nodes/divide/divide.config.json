@@ -1,5 +1,6 @@
 {
   "display_name": "Divide",
+  "tagline": "Divide two numbers",
   "description": "Divides first number by second",
   "category": "math",
   "is_plugin": true,

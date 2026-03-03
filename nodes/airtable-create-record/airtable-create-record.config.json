@@ -1,0 +1,64 @@
+{
+  "display_name": "Airtable Create Record",
+  "tagline": "Create Airtable record",
+  "description": "Create a new record in an Airtable table.",
+  "icon": "table",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "base_id",
+      "display_name": "Base ID",
+      "type": "string",
+      "description": "The Airtable base ID (starts with 'app')",
+      "required": true
+    },
+    {
+      "name": "table_name",
+      "display_name": "Table Name",
+      "type": "string",
+      "description": "The table name or ID",
+      "required": true
+    },
+    {
+      "name": "fields",
+      "display_name": "Fields",
+      "type": "object",
+      "description": "Field name/value pairs for the new record",
+      "required": true
+    },
+    {
+      "name": "typecast",
+      "display_name": "Typecast",
+      "type": "boolean",
+      "description": "If true, Airtable will try to convert string values to appropriate types",
+      "required": false,
+      "default": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "record",
+      "display_name": "Record",
+      "type": "object",
+      "description": "The created record object"
+    },
+    {
+      "name": "id",
+      "display_name": "ID",
+      "type": "string",
+      "description": "The new record ID"
+    },
+    {
+      "name": "fields",
+      "display_name": "Fields",
+      "type": "object",
+      "description": "The record fields"
+    },
+    {
+      "name": "created_time",
+      "display_name": "Created Time",
+      "type": "string",
+      "description": "When the record was created"
+    }
+  ]
+}

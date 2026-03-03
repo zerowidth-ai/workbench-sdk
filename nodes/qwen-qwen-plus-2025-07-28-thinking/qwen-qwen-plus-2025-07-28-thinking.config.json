@@ -1,5 +1,6 @@
 {
   "display_name": "Qwen: Qwen Plus 0728 (thinking)",
+  "tagline": "Large Language Model",
   "description": "Qwen Plus 0728, based on the Qwen3 foundation model, is a 1 million context hybrid reasoning model with a balanced performance, speed, and cost combination.",
   "category": "llm",
   "provider": "qwen",
@@ -37,7 +38,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

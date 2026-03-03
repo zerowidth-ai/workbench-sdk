@@ -1,9 +1,10 @@
 {
   "display_name": "Mistral: Mistral 7B Instruct",
+  "tagline": "Large Language Model",
   "description": "A high-performing, industry-standard 7.3B parameter model, with optimizations for speed and context length.\n\n*Mistral 7B Instruct has multiple version variants, and this is intended to be the latest version.*",
   "category": "llm",
   "provider": "mistralai",
-  "accepts_plugins": true,
+  "accepts_plugins": false,
   "model_id": "mistralai/mistral-7b-instruct",
   "context_length": 32768,
   "supported_parameters": [
@@ -13,12 +14,8 @@
     "min_p",
     "presence_penalty",
     "repetition_penalty",
-    "response_format",
-    "seed",
     "stop",
     "temperature",
-    "tool_choice",
-    "tools",
     "top_k",
     "top_p"
   ],
@@ -36,14 +33,6 @@
       "type": "conversation or message or string",
       "description": "Array of chat messages that make up the conversation",
       "required": true
-    },
-    {
-      "name": "tools",
-      "display_name": "Tools",
-      "type": "tool",
-      "description": "Array of tools to use",
-      "default": null,
-      "allow_multiple": true
     },
     {
       "name": "frequency_penalty",
@@ -67,20 +56,6 @@
       "default": null
     },
     {
-      "name": "response_format",
-      "display_name": "Response Format",
-      "type": "string or object",
-      "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "seed",
-      "display_name": "Seed",
-      "type": "number",
-      "description": "Deterministic outputs",
-      "default": null
-    },
-    {
       "name": "stop",
       "display_name": "Stop",
       "type": "string or array",
@@ -92,13 +67,6 @@
       "display_name": "Temperature",
       "type": "number",
       "description": "Controls randomness (0-2)",
-      "default": null
-    },
-    {
-      "name": "tool_choice",
-      "display_name": "Tool Choice",
-      "type": "string",
-      "description": "Tool selection control",
       "default": null
     },
     {
@@ -139,12 +107,6 @@
       "description": "Role of the response (usually 'assistant')"
     },
     {
-      "name": "tool_calls",
-      "display_name": "Tool Calls",
-      "type": "array of tools",
-      "description": "Tool calls made by the model"
-    },
-    {
       "name": "usage",
       "display_name": "Token Usage",
       "type": "object",
@@ -175,13 +137,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.028,
+        "cost": 0.19999999999999998,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.054,
+        "cost": 0.19999999999999998,
         "currency": "USD"
       }
     ]

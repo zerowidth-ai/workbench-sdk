@@ -1,5 +1,6 @@
 {
   "display_name": "XNOR Gate",
+  "tagline": "Logic XNOR gate",
   "description": "A logic gate that outputs true if inputs are the same, false if they are different",
   "category": "logic",
   "inputs": [

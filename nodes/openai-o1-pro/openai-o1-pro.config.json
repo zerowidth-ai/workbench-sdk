@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: o1-pro",
+  "tagline": "Large Language Model",
   "description": "The o1 series of models are trained with reinforcement learning to think before they answer and perform complex reasoning. The o1-pro model uses more compute to think harder and provide consistently better answers.",
   "category": "llm",
   "provider": "openai",

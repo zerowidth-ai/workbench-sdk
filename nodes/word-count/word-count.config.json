@@ -1,0 +1,54 @@
+{
+  "display_name": "Word Count",
+  "tagline": "Count words in text",
+  "description": "Counts words, characters, sentences, and paragraphs in text.",
+  "icon": "text-size",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The text to analyze",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "characters",
+      "display_name": "Characters",
+      "type": "number",
+      "description": "Total number of characters (including spaces)"
+    },
+    {
+      "name": "characters_no_spaces",
+      "display_name": "Characters (No Spaces)",
+      "type": "number",
+      "description": "Number of characters excluding spaces"
+    },
+    {
+      "name": "words",
+      "display_name": "Words",
+      "type": "number",
+      "description": "Number of words"
+    },
+    {
+      "name": "sentences",
+      "display_name": "Sentences",
+      "type": "number",
+      "description": "Number of sentences"
+    },
+    {
+      "name": "paragraphs",
+      "display_name": "Paragraphs",
+      "type": "number",
+      "description": "Number of paragraphs"
+    },
+    {
+      "name": "lines",
+      "display_name": "Lines",
+      "type": "number",
+      "description": "Number of lines"
+    }
+  ]
+}

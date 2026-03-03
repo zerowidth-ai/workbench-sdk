@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: o3 Deep Research",
+  "tagline": "Large Language Model",
   "description": "o3-deep-research is OpenAI's advanced model for deep research, designed to tackle complex, multi-step research tasks.\n\nNote: This model always uses the 'web_search' tool which adds additional cost.",
   "category": "llm",
   "provider": "openai",
@@ -42,7 +43,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

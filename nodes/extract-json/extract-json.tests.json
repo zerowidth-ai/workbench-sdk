@@ -1,0 +1,146 @@
+[
+  {
+    "description": "Extract clean JSON object",
+    "inputs": {
+      "text": "{\"name\": \"Alice\", \"age\": 30}"
+    },
+    "expected": {
+      "json": {"name": "Alice", "age": 30},
+      "found": true,
+      "raw_match": "{\"name\": \"Alice\", \"age\": 30}"
+    }
+  },
+  {
+    "description": "Extract from markdown code block with json tag",
+    "inputs": {
+      "text": "Here's the data:\n```json\n{\"name\": \"Bob\"}\n```\nLet me know if you need more!"
+    },
+    "expected": {
+      "json": {"name": "Bob"},
+      "found": true,
+      "raw_match": "{\"name\": \"Bob\"}"
+    }
+  },
+  {
+    "description": "Extract from markdown code block without language tag",
+    "inputs": {
+      "text": "```\n{\"result\": true}\n```"
+    },
+    "expected": {
+      "json": {"result": true},
+      "found": true,
+      "raw_match": "{\"result\": true}"
+    }
+  },
+  {
+    "description": "Extract JSON object embedded in text",
+    "inputs": {
+      "text": "The response is {\"status\": \"success\", \"code\": 200} as expected."
+    },
+    "expected": {
+      "json": {"status": "success", "code": 200},
+      "found": true,
+      "raw_match": "{\"status\": \"success\", \"code\": 200}"
+    }
+  },
+  {
+    "description": "Extract JSON array",
+    "inputs": {
+      "text": "Here are the items: [1, 2, 3, 4, 5]"
+    },
+    "expected": {
+      "json": [1, 2, 3, 4, 5],
+      "found": true,
+      "raw_match": "[1, 2, 3, 4, 5]"
+    }
+  },
+  {
+    "description": "Extract nested JSON object",
+    "inputs": {
+      "text": "{\"user\": {\"profile\": {\"name\": \"Charlie\"}}}"
+    },
+    "expected": {
+      "json": {"user": {"profile": {"name": "Charlie"}}},
+      "found": true,
+      "raw_match": "{\"user\": {\"profile\": {\"name\": \"Charlie\"}}}"
+    }
+  },
+  {
+    "description": "Extract array of objects",
+    "inputs": {
+      "text": "Results: [{\"id\": 1}, {\"id\": 2}]"
+    },
+    "expected": {
+      "json": [{"id": 1}, {"id": 2}],
+      "found": true,
+      "raw_match": "[{\"id\": 1}, {\"id\": 2}]"
+    }
+  },
+  {
+    "description": "Return null when no JSON found",
+    "inputs": {
+      "text": "This is just plain text with no JSON at all."
+    },
+    "expected": {
+      "json": null,
+      "found": false,
+      "raw_match": null
+    }
+  },
+  {
+    "description": "Handle empty string",
+    "inputs": {
+      "text": ""
+    },
+    "expected": {
+      "json": null,
+      "found": false,
+      "raw_match": null
+    }
+  },
+  {
+    "description": "Return first JSON when multiple present (return_all false)",
+    "inputs": {
+      "text": "First: {\"a\": 1} and second: {\"b\": 2}",
+      "return_all": false
+    },
+    "expected": {
+      "json": {"a": 1},
+      "found": true,
+      "raw_match": "{\"a\": 1}"
+    }
+  },
+  {
+    "description": "Return all JSON when return_all is true",
+    "inputs": {
+      "text": "First: {\"a\": 1} and second: {\"b\": 2}",
+      "return_all": true
+    },
+    "expected": {
+      "json": [{"a": 1}, {"b": 2}],
+      "found": true,
+      "raw_match": "{\"a\": 1}"
+    }
+  },
+  {
+    "description": "Handle JSON with special characters in strings",
+    "inputs": {
+      "text": "{\"message\": \"Hello\\nWorld\", \"path\": \"C:\\\\Users\"}"
+    },
+    "expected": {
+      "json": {"message": "Hello\nWorld", "path": "C:\\Users"},
+      "found": true,
+      "raw_match": "{\"message\": \"Hello\\nWorld\", \"path\": \"C:\\\\Users\"}"
+    }
+  },
+  {
+    "description": "Extract from verbose LLM response",
+    "inputs": {
+      "text": "I've analyzed your request and here's the structured output:\n\n```json\n{\n  \"sentiment\": \"positive\",\n  \"confidence\": 0.95,\n  \"keywords\": [\"happy\", \"excited\"]\n}\n```\n\nThis analysis shows a positive sentiment with high confidence."
+    },
+    "expected": {
+      "json": {"sentiment": "positive", "confidence": 0.95, "keywords": ["happy", "excited"]},
+      "found": true
+    }
+  }
+]

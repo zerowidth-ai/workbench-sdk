@@ -1,5 +1,6 @@
 {
   "display_name": "Data Output",
+  "tagline": "Return output data",
   "description": "Outputs labeled data from the flow",
   "icon": "database",
   "category": "i/o",

@@ -1,5 +1,6 @@
 {
   "display_name": "Round",
+  "tagline": "Round a number",
   "description": "Rounds a number to nearest integer",
   "category": "math",
   "inputs": [

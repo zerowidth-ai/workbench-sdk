@@ -1,6 +1,7 @@
 {
   "id": "input-tools",
   "display_name": "Input Tools",
+  "tagline": "Provide tools to flow",
   "description": "Provides available tools/plugins to the flow.",
   "is_input": true,
   "is_plugin": true,

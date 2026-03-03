@@ -1,0 +1,65 @@
+{
+  "display_name": "Notion Query Database",
+  "tagline": "Query Notion database",
+  "description": "Query and filter entries from a Notion database",
+  "icon": "database",
+  "category": "third-party",
+  "inputs": [
+    {
+      "name": "database_id",
+      "display_name": "Database ID",
+      "type": "string",
+      "required": true,
+      "description": "The ID of the database to query"
+    },
+    {
+      "name": "filter",
+      "display_name": "Filter",
+      "type": "object",
+      "required": false,
+      "description": "Filter conditions (Notion filter object)"
+    },
+    {
+      "name": "sorts",
+      "display_name": "Sorts",
+      "type": "array",
+      "required": false,
+      "description": "Sort conditions (array of sort objects)"
+    },
+    {
+      "name": "start_cursor",
+      "display_name": "Start Cursor",
+      "type": "string",
+      "required": false,
+      "description": "Pagination cursor for next page"
+    },
+    {
+      "name": "page_size",
+      "display_name": "Page Size",
+      "type": "number",
+      "required": false,
+      "description": "Number of results per page (max 100)",
+      "default": 100
+    }
+  ],
+  "outputs": [
+    {
+      "name": "results",
+      "display_name": "Results",
+      "type": "array",
+      "description": "Array of page objects from the database"
+    },
+    {
+      "name": "has_more",
+      "display_name": "Has More",
+      "type": "boolean",
+      "description": "Whether there are more results"
+    },
+    {
+      "name": "next_cursor",
+      "display_name": "Next Cursor",
+      "type": "string",
+      "description": "Cursor for the next page of results"
+    }
+  ]
+}

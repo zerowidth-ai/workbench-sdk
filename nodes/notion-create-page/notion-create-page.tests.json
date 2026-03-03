@@ -1,0 +1,92 @@
+[
+  {
+    "description": "Create page in database with title",
+    "inputs": {
+      "parent_type": "database_id",
+      "parent_id": "${NOTION_TEST_DATABASE_ID}",
+      "properties": {
+        "Name": {
+          "title": [
+            {
+              "text": {
+                "content": "Test Page from CI"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "expected": {
+      "page": "object",
+      "id": "string",
+      "url": "string"
+    }
+  },
+  {
+    "description": "Create page with properties",
+    "inputs": {
+      "parent_type": "database_id",
+      "parent_id": "${NOTION_TEST_DATABASE_ID}",
+      "properties": {
+        "Name": {
+          "title": [
+            {
+              "text": {
+                "content": "Full Test Page"
+              }
+            }
+          ]
+        },
+        "Status": {
+          "select": {
+            "name": "Active"
+          }
+        },
+        "Count": {
+          "number": 42
+        }
+      }
+    },
+    "expected": {
+      "page": "object",
+      "id": "string"
+    }
+  },
+  {
+    "description": "Create page with content blocks",
+    "inputs": {
+      "parent_type": "database_id",
+      "parent_id": "${NOTION_TEST_DATABASE_ID}",
+      "properties": {
+        "Name": {
+          "title": [
+            {
+              "text": {
+                "content": "Page with Content"
+              }
+            }
+          ]
+        }
+      },
+      "children": [
+        {
+          "object": "block",
+          "type": "paragraph",
+          "paragraph": {
+            "rich_text": [
+              {
+                "type": "text",
+                "text": {
+                  "content": "This is a test paragraph."
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "expected": {
+      "id": "string"
+    }
+  }
+]

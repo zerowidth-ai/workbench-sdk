@@ -1,5 +1,6 @@
 {
   "display_name": "Duration Calculator",
+  "tagline": "Calculate time duration",
   "description": "Calculate duration between two timestamps in various units (seconds, minutes, hours, days)",
   "icon": "timer",
   "category": "date",

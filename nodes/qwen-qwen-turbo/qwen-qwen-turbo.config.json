@@ -1,5 +1,6 @@
 {
   "display_name": "Qwen: Qwen-Turbo",
+  "tagline": "Large Language Model",
   "description": "Qwen-Turbo, based on Qwen2.5, is a 1M context model that provides fast speed and low cost, suitable for simple tasks.",
   "category": "llm",
   "provider": "qwen",
@@ -34,7 +35,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

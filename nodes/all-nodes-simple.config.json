@@ -2,6 +2,11 @@ id,display_name,description
 absolute,Absolute,Returns absolute value of a number
 absolute-value,Absolute Value,Returns the absolute value of a number.
 add,Add,Adds two numbers together
+airtable-create-record,Airtable Create Record,Create a new record in an Airtable table.
+airtable-delete-record,Airtable Delete Record,Delete a record from an Airtable table.
+airtable-get-record,Airtable Get Record,Get a single record from an Airtable table by its ID.
+airtable-list-records,Airtable List Records,List and query records from an Airtable table with optional filtering, sorting, and pagination.
+airtable-update-record,Airtable Update Record,Update an existing record in an Airtable table.
 and-gate,AND Gate,A logic gate that outputs true if both inputs are true
 anthropic-claude-3-5-haiku,Anthropic: Claude 3.5 Haiku,Claude 3.5 Haiku features offers enhanced capabilities in speed, coding accuracy, and tool use. Engineered to excel in real-time applications, it delivers quick response times that are essential for dynamic tasks such as chat interactions and immediate coding suggestions.
 
@@ -42,6 +47,12 @@ anthropic-claude-opus-4-1,Anthropic: Claude Opus 4.1,Claude Opus 4.1 is an updat
 anthropic-claude-opus-4-5,Anthropic: Claude Opus 4.5,Claude Opus 4.5 is Anthropic’s frontier reasoning model optimized for complex software engineering, agentic workflows, and long-horizon computer use. It offers strong multimodal capabilities, competitive performance across real-world coding and reasoning benchmarks, and improved robustness to prompt injection. The model is designed to operate efficiently across varied effort levels, enabling developers to trade off speed, depth, and token usage depending on task requirements. It comes with a new parameter to control token efficiency, which can be accessed using the OpenRouter Verbosity parameter with low, medium, or high.
 
 Opus 4.5 supports advanced tool use, extended context management, and coordinated multi-agent setups, making it well-suited for autonomous research, debugging, multi-step planning, and spreadsheet/browser manipulation. It delivers substantial gains in structured reasoning, execution reliability, and alignment compared to prior Opus generations, while reducing token overhead and improving performance on long-running tasks.
+anthropic-claude-opus-4-6,Anthropic: Claude Opus 4.6,Opus 4.6 is Anthropic’s strongest model for coding and long-running professional tasks. It is built for agents that operate across entire workflows rather than single prompts, making it especially effective for large codebases, complex refactors, and multi-step debugging that unfolds over time. The model shows deeper contextual understanding, stronger problem decomposition, and greater reliability on hard engineering tasks than prior generations.
+
+Beyond coding, Opus 4.6 excels at sustained knowledge work. It produces near-production-ready documents, plans, and analyses in a single pass, and maintains coherence across very long outputs and extended sessions. This makes it a strong default for tasks that require persistence, judgment, and follow-through, such as technical design, migration planning, and end-to-end project execution.
+
+For users upgrading from earlier Opus versions, see our [official migration guide here](https://openrouter.ai/docs/guides/guides/model-migrations/claude-4-6-opus)
+
 anthropic-claude-sonnet-4,Anthropic: Claude Sonnet 4,Claude Sonnet 4 significantly enhances the capabilities of its predecessor, Sonnet 3.7, excelling in both coding and reasoning tasks with improved precision and controllability. Achieving state-of-the-art performance on SWE-bench (72.7%), Sonnet 4 balances capability and computational efficiency, making it suitable for a broad range of applications from routine coding tasks to complex software development projects. Key enhancements include improved autonomous codebase navigation, reduced error rates in agent-driven workflows, and increased reliability in following intricate instructions. Sonnet 4 is optimized for practical everyday use, providing advanced reasoning capabilities while maintaining efficiency and responsiveness in diverse internal and external scenarios.
 
 Read more at the [blog post here](https://www.anthropic.com/news/claude-4)
@@ -62,15 +73,19 @@ array-slice,Array Slice,Extracts a portion of an array between start and end ind
 array-sort,Array Sort,Sorts array elements in ascending or descending order
 array-split,Array Split,Splits an array into multiple chunks based on different criteria
 array-unique,Array Unique,Removes duplicate elements from an array
+base64-decode,Base64 Decode,Decodes a Base64 encoded string.
+base64-encode,Base64 Encode,Encodes a string to Base64 format.
 boolean,Boolean Switch,A simple switch node that outputs true or false
 boolean-inverter,Boolean Inverter,Inverts the input boolean value
 ceil,Ceil,Rounds up to nearest integer
 clean-text,Clean Text,Clean and normalize text by removing extra whitespace and normalizing line breaks
 combine-document-chunks,Combine Document Chunks,Retrieve all chunks for a document and combine them into a single markdown content string
 condition-check,Condition Check,Conditional pass-through that routes data to passed or blocked based on a condition
+conversation-to-text,Conversation to Text,Converts a conversation message array into a readable text transcript. Useful for logging, display, or feeding to models expecting plain text.
 csv-parser,CSV Parser,Parses a CSV string into an array of objects or arrays
 csv-stringifier,CSV Stringifier,Converts an array of objects or arrays into a CSV string
 date-formatter,Date Formatter,Formats a date or timestamp into a string using various formats
+dedupe-messages,Dedupe Messages,Removes consecutive duplicate messages from a conversation. Messages are considered duplicates if they have the same role and content. Useful for cleaning up retry artifacts.
 deepseek-deepseek-chat,DeepSeek: DeepSeek V3,DeepSeek-V3 is the latest model from the DeepSeek team, building upon the instruction following and coding abilities of the previous versions. Pre-trained on nearly 15 trillion tokens, the reported evaluations reveal that the model outperforms other open-source models and rivals leading closed-source models.
 
 For model details, please visit [the DeepSeek-V3 repo](https://github.com/deepseek-ai/DeepSeek-V3) for more information, or see the [launch announcement](https://api-docs.deepseek.com/news/news1226).
@@ -82,7 +97,6 @@ deepseek-deepseek-chat-v3-1,DeepSeek: DeepSeek V3.1,DeepSeek-V3.1 is a large hyb
 The model improves tool use, code generation, and reasoning efficiency, achieving performance comparable to DeepSeek-R1 on difficult benchmarks while responding more quickly. It supports structured tool calling, code agents, and search agents, making it suitable for research, coding, and agentic workflows. 
 
 It succeeds the [DeepSeek V3-0324](/deepseek/deepseek-chat-v3-0324) model and performs well on a variety of tasks.
-deepseek-deepseek-prover-v2,DeepSeek: DeepSeek Prover V2,DeepSeek Prover V2 is a 671B parameter model, speculated to be geared towards logic and mathematics. Likely an upgrade from [DeepSeek-Prover-V1.5](https://huggingface.co/deepseek-ai/DeepSeek-Prover-V1.5-RL) Not much is known about the model yet, as DeepSeek released it on Hugging Face without an announcement or description.
 deepseek-deepseek-r1,DeepSeek: R1,DeepSeek R1 is here: Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active in an inference pass.
 
 Fully open-source model & [technical report](https://api-docs.deepseek.com/news/news250120).
@@ -120,15 +134,19 @@ delete-object-property,Delete Object Property,Remove a specific property from an
 divide,Divide,Divides first number by second
 duration-calculator,Duration Calculator,Calculate duration between two timestamps in various units (seconds, minutes, hours, days)
 equals,Equals,Checks if two values are equal, with deep comparison for objects and arrays
+extract-code,Extract Code,Extracts code blocks from LLM responses that use markdown formatting. Returns the code content and detected language.
 extract-emails,Extract Emails,Extract all email addresses from text using regex patterns
 extract-hashtags,Extract Hashtags,Extract all hashtags from text
+extract-json,Extract JSON,Extracts JSON from LLM responses that may contain markdown code blocks, explanatory text, or other formatting. Returns the first valid JSON object or array found.
 extract-mentions,Extract Mentions,Extract all @mentions from text
 extract-phone-numbers,Extract Phone Numbers,Extract phone numbers from text in various formats (US, international, etc.)
 extract-text-content,Extract Text Content,Extract text content from messages, supporting multi-modal content and optional role prefixes.
 extract-urls,Extract URLs,Extract all URLs from text using regex patterns
 filter-messages,Filter Messages,Filter messages by custom criteria (length, content, role, etc.).
+filter-tools,Filter Tools,Filter tools by name for dynamic tool selection
 firecrawl-scrape,Firecrawl: Scrape URL,Scrape content from any URL with advanced options including format selection, content filtering, mobile emulation, and more
 floor,Floor,Rounds down to nearest integer
+generate-uuid,Generate UUID,Generates a random UUID v4.
 get-chunk-by-index,Get Chunk by Index,Retrieve a specific chunk from a knowledge base by document ID and chunk index
 get-first-n-messages,Get First N Messages,Extract the first N messages from an array of messages.
 get-last-n-messages,Get Last N Messages,Extract the most recent N messages from an array of messages.
@@ -137,15 +155,16 @@ get-messages-range,Get Messages Range,Extract messages from a specific range (st
 get-object-property,Get Object Property,Extract a specific property value from an object by key name.
 google-custom-search,Google Custom Search,Search the web using Google Custom Search API with advanced filtering and pagination options
 google-gemini-2-0-flash-001,Google: Gemini 2.0 Flash,Gemini Flash 2.0 offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5). It introduces notable enhancements in multimodal understanding, coding capabilities, complex instruction following, and function calling. These advancements come together to deliver more seamless and robust agentic experiences.
-google-gemini-2-0-flash-exp-free,Google: Gemini 2.0 Flash Experimental (free),Gemini Flash 2.0 offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5). It introduces notable enhancements in multimodal understanding, coding capabilities, complex instruction following, and function calling. These advancements come together to deliver more seamless and robust agentic experiences.
 google-gemini-2-0-flash-lite-001,Google: Gemini 2.0 Flash Lite,Gemini 2.0 Flash Lite offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5), all at extremely economical token prices.
 google-gemini-2-5-flash,Google: Gemini 2.5 Flash,Gemini 2.5 Flash is Google's state-of-the-art workhorse model, specifically designed for advanced reasoning, coding, mathematics, and scientific tasks. It includes built-in "thinking" capabilities, enabling it to provide responses with greater accuracy and nuanced context handling. 
 
 Additionally, Gemini 2.5 Flash is configurable through the "max tokens for reasoning" parameter, as described in the documentation (https://openrouter.ai/docs/use-cases/reasoning-tokens#max-tokens-for-reasoning).
 google-gemini-2-5-flash-image,Google: Gemini 2.5 Flash Image (Nano Banana),Gemini 2.5 Flash Image, a.k.a. "Nano Banana," is now generally available. It is a state of the art image generation model with contextual understanding. It is capable of image generation, edits, and multi-turn conversations. Aspect ratios can be controlled with the [image_config API Parameter](https://openrouter.ai/docs/features/multimodal/image-generation#image-aspect-ratio-configuration)
-google-gemini-2-5-flash-image-preview,Google: Gemini 2.5 Flash Image Preview (Nano Banana),Gemini 2.5 Flash Image Preview, a.k.a. "Nano Banana," is a state of the art image generation model with contextual understanding. It is capable of image generation, edits, and multi-turn conversations.
 google-gemini-2-5-flash-lite,Google: Gemini 2.5 Flash Lite,Gemini 2.5 Flash-Lite is a lightweight reasoning model in the Gemini 2.5 family, optimized for ultra-low latency and cost efficiency. It offers improved throughput, faster token generation, and better performance across common benchmarks compared to earlier Flash models. By default, "thinking" (i.e. multi-pass reasoning) is disabled to prioritize speed, but developers can enable it via the [Reasoning API parameter](https://openrouter.ai/docs/use-cases/reasoning-tokens) to selectively trade off cost for intelligence. 
 google-gemini-2-5-flash-lite-preview-09-2025,Google: Gemini 2.5 Flash Lite Preview 09-2025,Gemini 2.5 Flash-Lite is a lightweight reasoning model in the Gemini 2.5 family, optimized for ultra-low latency and cost efficiency. It offers improved throughput, faster token generation, and better performance across common benchmarks compared to earlier Flash models. By default, "thinking" (i.e. multi-pass reasoning) is disabled to prioritize speed, but developers can enable it via the [Reasoning API parameter](https://openrouter.ai/docs/use-cases/reasoning-tokens) to selectively trade off cost for intelligence. 
+google-gemini-2-5-flash-preview-09-2025,Google: Gemini 2.5 Flash Preview 09-2025,Gemini 2.5 Flash Preview September 2025 Checkpoint is Google's state-of-the-art workhorse model, specifically designed for advanced reasoning, coding, mathematics, and scientific tasks. It includes built-in "thinking" capabilities, enabling it to provide responses with greater accuracy and nuanced context handling. 
+
+Additionally, Gemini 2.5 Flash is configurable through the "max tokens for reasoning" parameter, as described in the documentation (https://openrouter.ai/docs/use-cases/reasoning-tokens#max-tokens-for-reasoning).
 google-gemini-2-5-pro,Google: Gemini 2.5 Pro,Gemini 2.5 Pro is Google’s state-of-the-art AI model designed for advanced reasoning, coding, mathematics, and scientific tasks. It employs “thinking” capabilities, enabling it to reason through responses with enhanced accuracy and nuanced context handling. Gemini 2.5 Pro achieves top-tier performance on multiple benchmarks, including first-place positioning on the LMArena leaderboard, reflecting superior human-preference alignment and complex problem-solving abilities.
 google-gemini-2-5-pro-preview,Google: Gemini 2.5 Pro Preview 06-05,Gemini 2.5 Pro is Google’s state-of-the-art AI model designed for advanced reasoning, coding, mathematics, and scientific tasks. It employs “thinking” capabilities, enabling it to reason through responses with enhanced accuracy and nuanced context handling. Gemini 2.5 Pro achieves top-tier performance on multiple benchmarks, including first-place positioning on the LMArena leaderboard, reflecting superior human-preference alignment and complex problem-solving abilities.
 
@@ -185,6 +204,7 @@ This model supports a wide linguistic range (trained in over 140 languages) and 
 greater-than,Greater Than,Checks if the first number is greater than the second number
 greater-than-equal,Greater Than or Equal,Checks if the first number is greater than or equal to the second number
 has-object-property,Has Object Property,Check if an object has a specific property/key.
+hash-content,Hash Content,Generates a hash of the input content. Useful for cache keys, deduplication, or content verification.
 histogram,Histogram,Groups numbers into bins and counts frequency
 histogram-fixed,Histogram Fixed Bins,Groups numbers into bins of fixed size
 http-request,HTTP Request,Makes HTTP requests (GET, POST, PUT, PATCH, DELETE, etc.) to a specified URL with optional headers, query parameters, and body.
@@ -197,14 +217,20 @@ input-plugins,Input Tools,Provides available tools/plugins to the flow.
 input-prompt,Prompt Input,For direct instructing with a single text prompt instead of a conversation.
 json-parser,JSON Parser,Parses a JSON string into an object or array
 json-stringifier,JSON Stringifier,Converts an object or array to a JSON string
+json-to-xml,JSON to XML,Converts a JSON object to XML format. Useful for Claude prompts which work well with XML structure.
+json-to-yaml,JSON to YAML,Converts a JSON object to YAML format. Useful for configuration files or human-readable output.
+keep-bookends,Keep Bookends,Keeps the first N and last M messages from a conversation, removing the middle. System messages are always preserved regardless of counts. Useful for managing context length while retaining initial context and recent messages.
 less-than,Less Than,Checks if the first number is less than the second number
 less-than-equal,Less Than or Equal,Checks if the first number is less than or equal to the second number
-liquid-lfm-2-2-6b,LiquidAI/LFM2-2.6B,LFM2 is a new generation of hybrid models developed by Liquid AI, specifically designed for edge AI and on-device deployment. It sets a new standard in terms of quality, speed, and memory efficiency.
-liquid-lfm2-8b-a1b,LiquidAI/LFM2-8B-A1B,Model created via inbox interface
+liquid-lfm-2-2-6b,LiquidAI: LFM2-2.6B,LFM2 is a new generation of hybrid models developed by Liquid AI, specifically designed for edge AI and on-device deployment. It sets a new standard in terms of quality, speed, and memory efficiency.
+liquid-lfm-2-5-1-2b-instruct-free,LiquidAI: LFM2.5-1.2B-Instruct (free),LFM2.5-1.2B-Instruct is a compact, high-performance instruction-tuned model built for fast on-device AI. It delivers strong chat quality in a 1.2B parameter footprint, with efficient edge inference and broad runtime support.
+liquid-lfm-2-5-1-2b-thinking-free,LiquidAI: LFM2.5-1.2B-Thinking (free),LFM2.5-1.2B-Thinking is a lightweight reasoning-focused model optimized for agentic tasks, data extraction, and RAG—while still running comfortably on edge devices. It supports long context (up to 32K tokens) and is designed to provide higher-quality “thinking” responses in a small 1.2B model.
+liquid-lfm2-8b-a1b,LiquidAI: LFM2-8B-A1B,LFM2-8B-A1B is an efficient on-device Mixture-of-Experts (MoE) model from Liquid AI’s LFM2 family, built for fast, high-quality inference on edge hardware. It uses 8.3B total parameters with only ~1.5B active per token, delivering strong performance while keeping compute and memory usage low—making it ideal for phones, tablets, and laptops.
 loop-end,Loop End,Loop exit point that decides whether to continue looping or exit. Tracks loop count and evaluates conditions to send value to loop_back or loop_end output.
 loop-start,Loop Start,Entry point for loops - receives values and passes them through. Refires on each new value, enabling iterative processing.
 mean,Mean,Calculates arithmetic mean (average) of numbers
 median,Median,Finds the middle value of a sorted array of numbers
+merge-consecutive-roles,Merge Consecutive Roles,Merges consecutive messages with the same role into a single message. Tool messages and assistant messages with tool_calls are never merged to preserve tool call sequences.
 merge-messages,Merge Messages,Combine consecutive messages from the same role into single messages.
 message,Message,Manually create a single message.
 message-bus,Message Bus,Combine messages from multiple sources into a single message array. Supports daisy-chaining and flexible input handling.
@@ -215,9 +241,6 @@ mistralai-codestral-2508,Mistral: Codestral 2508,Mistral's cutting-edge language
 mistralai-devstral-2512,Mistral: Devstral 2 2512,Devstral 2 is a state-of-the-art open-source model by Mistral AI specializing in agentic coding. It is a 123B-parameter dense transformer model supporting a 256K context window.
 
 Devstral 2 supports exploring codebases and orchestrating changes across multiple files while maintaining architecture-level context. It tracks framework dependencies, detects failures, and retries with corrections—solving challenges like bug fixing and modernizing legacy systems. The model can be fine-tuned to prioritize specific languages or optimize for large enterprise codebases. It is available under a modified MIT license.
-mistralai-devstral-2512-free,Mistral: Devstral 2 2512 (free),Devstral 2 is a state-of-the-art open-source model by Mistral AI specializing in agentic coding. It is a 123B-parameter dense transformer model supporting a 256K context window.
-
-Devstral 2 supports exploring codebases and orchestrating changes across multiple files while maintaining architecture-level context. It tracks framework dependencies, detects failures, and retries with corrections—solving challenges like bug fixing and modernizing legacy systems. The model can be fine-tuned to prioritize specific languages or optimize for large enterprise codebases. It is available under a modified MIT license.
 mistralai-devstral-medium,Mistral: Devstral Medium,Devstral Medium is a high-performance code generation and agentic reasoning model developed jointly by Mistral AI and All Hands AI. Positioned as a step up from Devstral Small, it achieves 61.6% on SWE-Bench Verified, placing it ahead of Gemini 2.5 Pro and GPT-4.1 in code-related tasks, at a fraction of the cost. It is designed for generalization across prompt styles and tool use in code agents and frameworks.
 
 Devstral Medium is available via API only (not open-weight), and supports enterprise deployment on private infrastructure, with optional fine-tuning capabilities.
@@ -225,18 +248,12 @@ mistralai-devstral-small,Mistral: Devstral Small 1.1,Devstral Small 1.1 is a 24B
 
 Designed for agentic coding workflows, Devstral Small 1.1 is optimized for tasks such as codebase exploration, multi-file edits, and integration into autonomous development agents like OpenHands and Cline. It achieves 53.6% on SWE-Bench Verified, surpassing all other open models on this benchmark, while remaining lightweight enough to run on a single 4090 GPU or Apple silicon machine. The model uses a Tekken tokenizer with a 131k vocabulary and is deployable via vLLM, Transformers, Ollama, LM Studio, and other OpenAI-compatible runtimes.
 
-mistralai-devstral-small-2505,Mistral: Devstral Small 2505,Devstral-Small-2505 is a 24B parameter agentic LLM fine-tuned from Mistral-Small-3.1, jointly developed by Mistral AI and All Hands AI for advanced software engineering tasks. It is optimized for codebase exploration, multi-file editing, and integration into coding agents, achieving state-of-the-art results on SWE-Bench Verified (46.8%).
-
-Devstral supports a 128k context window and uses a custom Tekken tokenizer. It is text-only, with the vision encoder removed, and is suitable for local deployment on high-end consumer hardware (e.g., RTX 4090, 32GB RAM Macs). Devstral is best used in agentic workflows via the OpenHands scaffold and is compatible with inference frameworks like vLLM, Transformers, and Ollama. It is released under the Apache 2.0 license.
 mistralai-ministral-14b-2512,Mistral: Ministral 3 14B 2512,The largest model in the Ministral 3 family, Ministral 3 14B offers frontier capabilities and performance comparable to its larger Mistral Small 3.2 24B counterpart. A powerful and efficient language model with vision capabilities.
 mistralai-ministral-3b,Mistral: Ministral 3B,Ministral 3B is a 3B parameter model optimized for on-device and edge computing. It excels in knowledge, commonsense reasoning, and function-calling, outperforming larger models like Mistral 7B on most benchmarks. Supporting up to 128k context length, it’s ideal for orchestrating agentic workflows and specialist tasks with efficient inference.
 mistralai-ministral-3b-2512,Mistral: Ministral 3 3B 2512,The smallest model in the Ministral 3 family, Ministral 3 3B is a powerful, efficient tiny language model with vision capabilities.
 mistralai-ministral-8b,Mistral: Ministral 8B,Ministral 8B is an 8B parameter model featuring a unique interleaved sliding-window attention pattern for faster, memory-efficient inference. Designed for edge use cases, it supports up to 128k context length and excels in knowledge and reasoning tasks. It outperforms peers in the sub-10B category, making it perfect for low-latency, privacy-first applications.
 mistralai-ministral-8b-2512,Mistral: Ministral 3 8B 2512,A balanced model in the Ministral 3 family, Ministral 3 8B is a powerful, efficient tiny language model with vision capabilities.
 mistralai-mistral-7b-instruct,Mistral: Mistral 7B Instruct,A high-performing, industry-standard 7.3B parameter model, with optimizations for speed and context length.
-
-*Mistral 7B Instruct has multiple version variants, and this is intended to be the latest version.*
-mistralai-mistral-7b-instruct-free,Mistral: Mistral 7B Instruct (free),A high-performing, industry-standard 7.3B parameter model, with optimizations for speed and context length.
 
 *Mistral 7B Instruct has multiple version variants, and this is intended to be the latest version.*
 mistralai-mistral-7b-instruct-v0-1,Mistral: Mistral 7B Instruct v0.1,A 7.3B parameter model that outperforms Llama 2 13B on all benchmarks, with optimizations for speed and context length.
@@ -316,13 +333,22 @@ newsdata-io-archive,NewsData.io: Archive News,Fetch historical news from the arc
 newsdata-io-latest,NewsData.io: Latest News,Fetch latest headlines from the last 48 hours with rich filtering options including keywords, countries, regions, categories, and more
 newsdata-io-sources,NewsData.io: Sources,Get list of source domains filtered by country, category, language, and priority
 nor-gate,NOR Gate,A logic gate that outputs true only if both inputs are false
+normalize-whitespace,Normalize Whitespace,Normalizes whitespace in text by collapsing multiple spaces, removing extra newlines, and trimming.
 not-equals,Not Equals,Checks if two values are not equal, with deep comparison for objects and arrays
+notion-append-blocks,Notion Append Blocks,Append block content to a Notion page or block
+notion-archive-page,Notion Archive Page,Archive or restore a Notion page
+notion-create-page,Notion Create Page,Create a new page in a Notion database or as a child of another page
+notion-get-blocks,Notion Get Blocks,Get children blocks of a Notion page or block
+notion-get-page,Notion Get Page,Retrieve a page by ID from Notion
+notion-query-database,Notion Query Database,Query and filter entries from a Notion database
+notion-search,Notion Search,Search pages and databases in a Notion workspace
+notion-update-page,Notion Update Page,Update properties of an existing Notion page
 null-bomb,Null Bomb,Randomly returns null/undefined based on probability, useful for testing null handling in flows.
 number,Number,A simple number node that outputs a constant numeric value
+object-merge,Object Merge,Deep merges multiple objects into one. Later objects override earlier ones. Nested objects are recursively merged.
 openai-chatgpt-4o-latest,OpenAI: ChatGPT-4o,OpenAI ChatGPT 4o is continually updated by OpenAI to point to the current version of GPT-4o used by ChatGPT. It therefore differs slightly from the API version of [GPT-4o](/models/openai/gpt-4o) in that it has additional RLHF. It is intended for research and evaluation.
 
 OpenAI notes that this model is not suited for production use-cases as it may be removed or redirected to another model in the future.
-openai-codex-mini,OpenAI: Codex Mini,codex-mini-latest is a fine-tuned version of o4-mini specifically for use in Codex CLI. For direct use in the API, we recommend starting with gpt-4.1.
 openai-gpt-3-5-turbo,OpenAI: GPT-3.5 Turbo,GPT-3.5 Turbo is OpenAI's fastest model. It can understand and generate natural language or code, and is optimized for chat and traditional completion tasks.
 
 Training data up to Sep 2021.
@@ -363,7 +389,7 @@ For benchmarking against other models, it was briefly called ["im-also-a-good-gp
 openai-gpt-4o-2024-11-20,OpenAI: GPT-4o (2024-11-20),The 2024-11-20 version of GPT-4o offers a leveled-up creative writing ability with more natural, engaging, and tailored writing to improve relevance & readability. It’s also better at working with uploaded files, providing deeper insights & more thorough responses.
 
 GPT-4o ("o" for "omni") is OpenAI's latest AI model, supporting both text and image inputs with text outputs. It maintains the intelligence level of [GPT-4 Turbo](/models/openai/gpt-4-turbo) while being twice as fast and 50% more cost-effective. GPT-4o also offers improved performance in processing non-English languages and enhanced visual capabilities.
-openai-gpt-4o-audio-preview,OpenAI: GPT-4o Audio,The gpt-4o-audio-preview model adds support for audio inputs as prompts. This enhancement allows the model to detect nuances within audio recordings and add depth to generated user experiences. Audio outputs are currently not supported. Audio tokens are priced at $40 per million input audio tokens.
+openai-gpt-4o-audio-preview,OpenAI: GPT-4o Audio,The gpt-4o-audio-preview model adds support for audio inputs as prompts. This enhancement allows the model to detect nuances within audio recordings and add depth to generated user experiences. Audio outputs are currently not supported. Audio tokens are priced at $40 per million input and $80 per million output audio tokens.
 openai-gpt-4o-extended,OpenAI: GPT-4o (extended),GPT-4o ("o" for "omni") is OpenAI's latest AI model, supporting both text and image inputs with text outputs. It maintains the intelligence level of [GPT-4 Turbo](/models/openai/gpt-4-turbo) while being twice as fast and 50% more cost-effective. GPT-4o also offers improved performance in processing non-English languages and enhanced visual capabilities.
 
 For benchmarking against other models, it was briefly called ["im-also-a-good-gpt2-chatbot"](https://twitter.com/LiamFedus/status/1790064963966370209)
@@ -418,6 +444,8 @@ openai-gpt-5-image-mini,OpenAI: GPT-5 Image Mini,GPT-5 Image Mini combines OpenA
 openai-gpt-5-mini,OpenAI: GPT-5 Mini,GPT-5 Mini is a compact version of GPT-5, designed to handle lighter-weight reasoning tasks. It provides the same instruction-following and safety-tuning benefits as GPT-5, but with reduced latency and cost. GPT-5 Mini is the successor to OpenAI's o4-mini model.
 openai-gpt-5-nano,OpenAI: GPT-5 Nano,GPT-5-Nano is the smallest and fastest variant in the GPT-5 system, optimized for developer tools, rapid interactions, and ultra-low latency environments. While limited in reasoning depth compared to its larger counterparts, it retains key instruction-following and safety features. It is the successor to GPT-4.1-nano and offers a lightweight option for cost-sensitive or real-time applications.
 openai-gpt-5-pro,OpenAI: GPT-5 Pro,GPT-5 Pro is OpenAI’s most advanced model, offering major improvements in reasoning, code quality, and user experience. It is optimized for complex tasks that require step-by-step reasoning, instruction following, and accuracy in high-stakes use cases. It supports test-time routing features and advanced prompt understanding, including user-specified intent like "think hard about this." Improvements include reductions in hallucination, sycophancy, and better performance in coding, writing, and health-related tasks.
+openai-gpt-audio,OpenAI: GPT Audio,The gpt-audio model is OpenAI's first generally available audio model. The new snapshot features an upgraded decoder for more natural sounding voices and maintains better voice consistency. Audio is priced at $32 per million input tokens and $64 per million output tokens.
+openai-gpt-audio-mini,OpenAI: GPT Audio Mini,A cost-efficient version of GPT Audio. The new snapshot features an upgraded decoder for more natural sounding voices and maintains better voice consistency. Input is priced at $0.60 per million tokens and output is priced at $2.40 per million tokens.
 openai-gpt-oss-120b,OpenAI: gpt-oss-120b,gpt-oss-120b is an open-weight, 117B-parameter Mixture-of-Experts (MoE) language model from OpenAI designed for high-reasoning, agentic, and general-purpose production use cases. It activates 5.1B parameters per forward pass and is optimized to run on a single H100 GPU with native MXFP4 quantization. The model supports configurable reasoning depth, full chain-of-thought access, and native tool use, including function calling, browsing, and structured output generation.
 openai-gpt-oss-120b-exacto,OpenAI: gpt-oss-120b (exacto),gpt-oss-120b is an open-weight, 117B-parameter Mixture-of-Experts (MoE) language model from OpenAI designed for high-reasoning, agentic, and general-purpose production use cases. It activates 5.1B parameters per forward pass and is optimized to run on a single H100 GPU with native MXFP4 quantization. The model supports configurable reasoning depth, full chain-of-thought access, and native tool use, including function calling, browsing, and structured output generation.
 openai-gpt-oss-120b-free,OpenAI: gpt-oss-120b (free),gpt-oss-120b is an open-weight, 117B-parameter Mixture-of-Experts (MoE) language model from OpenAI designed for high-reasoning, agentic, and general-purpose production use cases. It activates 5.1B parameters per forward pass and is optimized to run on a single H100 GPU with native MXFP4 quantization. The model supports configurable reasoning depth, full chain-of-thought access, and native tool use, including function calling, browsing, and structured output generation.
@@ -465,6 +493,7 @@ openai-omni-moderation-latest,OpenAI: Omni Moderation Latest,Identify potentiall
 or-gate,OR Gate,A logic gate that outputs true if either input is true
 output-chat,Chat Output,Outputs a chat message to the user
 output-data,Data Output,Outputs labeled data from the flow
+parse-url,Parse URL,Parses a URL into its components: protocol, host, pathname, query parameters, etc.
 perplexity-sonar,Perplexity: Sonar,Sonar is lightweight, affordable, fast, and simple to use — now featuring citations and the ability to customize sources. It is designed for companies seeking to integrate lightweight question-and-answer features optimized for speed.
 perplexity-sonar-deep-research,Perplexity: Sonar Deep Research,Sonar Deep Research is a research-focused model designed for multi-step retrieval, synthesis, and reasoning across complex topics. It autonomously searches, reads, and evaluates sources, refining its approach as it gathers information. This enables comprehensive report generation across domains like finance, technology, health, and current events.
 
@@ -525,19 +554,6 @@ qwen-qwen-2-5-vl-7b-instruct,Qwen: Qwen2.5-VL 7B Instruct,Qwen2.5 VL 7B is a mul
 For more details, see this [blog post](https://qwenlm.github.io/blog/qwen2-vl/) and [GitHub repo](https://github.com/QwenLM/Qwen2-VL).
 
 Usage of this model is subject to [Tongyi Qianwen LICENSE AGREEMENT](https://huggingface.co/Qwen/Qwen1.5-110B-Chat/blob/main/LICENSE).
-qwen-qwen-2-5-vl-7b-instruct-free,Qwen: Qwen2.5-VL 7B Instruct (free),Qwen2.5 VL 7B is a multimodal LLM from the Qwen Team with the following key enhancements:
-
-- SoTA understanding of images of various resolution & ratio: Qwen2.5-VL achieves state-of-the-art performance on visual understanding benchmarks, including MathVista, DocVQA, RealWorldQA, MTVQA, etc.
-
-- Understanding videos of 20min+: Qwen2.5-VL can understand videos over 20 minutes for high-quality video-based question answering, dialog, content creation, etc.
-
-- Agent that can operate your mobiles, robots, etc.: with the abilities of complex reasoning and decision making, Qwen2.5-VL can be integrated with devices like mobile phones, robots, etc., for automatic operation based on visual environment and text instructions.
-
-- Multilingual Support: to serve global users, besides English and Chinese, Qwen2.5-VL now supports the understanding of texts in different languages inside images, including most European languages, Japanese, Korean, Arabic, Vietnamese, etc.
-
-For more details, see this [blog post](https://qwenlm.github.io/blog/qwen2-vl/) and [GitHub repo](https://github.com/QwenLM/Qwen2-VL).
-
-Usage of this model is subject to [Tongyi Qianwen LICENSE AGREEMENT](https://huggingface.co/Qwen/Qwen1.5-110B-Chat/blob/main/LICENSE).
 qwen-qwen-max,Qwen: Qwen-Max ,Qwen-Max, based on Qwen2.5, provides the best inference performance among [Qwen models](/qwen), especially for complex multi-step tasks. It's a large-scale MoE model that has been pretrained on over 20 trillion tokens and further post-trained with curated Supervised Fine-Tuning (SFT) and Reinforcement Learning from Human Feedback (RLHF) methodologies. The parameter count is unknown.
 qwen-qwen-plus,Qwen: Qwen-Plus,Qwen-Plus, based on the Qwen2.5 foundation model, is a 131K context model with a balanced performance, speed, and cost combination.
 qwen-qwen-plus-2025-07-28,Qwen: Qwen Plus 0728,Qwen Plus 0728, based on the Qwen3 foundation model, is a 1 million context hybrid reasoning model with a balanced performance, speed, and cost combination.
@@ -583,9 +599,15 @@ qwen-qwen3-coder-flash,Qwen: Qwen3 Coder Flash,Qwen3 Coder Flash is Alibaba's fa
 qwen-qwen3-coder-free,Qwen: Qwen3 Coder 480B A35B (free),Qwen3-Coder-480B-A35B-Instruct is a Mixture-of-Experts (MoE) code generation model developed by the Qwen team. It is optimized for agentic coding tasks such as function calling, tool use, and long-context reasoning over repositories. The model features 480 billion total parameters, with 35 billion active per forward pass (8 out of 160 experts).
 
 Pricing for the Alibaba endpoints varies by context length. Once a request is greater than 128k input tokens, the higher pricing is used.
+qwen-qwen3-coder-next,Qwen: Qwen3 Coder Next,Qwen3-Coder-Next is an open-weight causal language model optimized for coding agents and local development workflows. It uses a sparse MoE design with 80B total parameters and only 3B activated per token, delivering performance comparable to models with 10 to 20x higher active compute, which makes it well suited for cost-sensitive, always-on agent deployment.
+
+The model is trained with a strong agentic focus and performs reliably on long-horizon coding tasks, complex tool usage, and recovery from execution failures. With a native 256k context window, it integrates cleanly into real-world CLI and IDE environments and adapts well to common agent scaffolds used by modern coding tools. The model operates exclusively in non-thinking mode and does not emit <think> blocks, simplifying integration for production coding agents.
 qwen-qwen3-coder-plus,Qwen: Qwen3 Coder Plus,Qwen3 Coder Plus is Alibaba's proprietary version of the Open Source Qwen3 Coder 480B A35B. It is a powerful coding agent model specializing in autonomous programming via tool calling and environment interaction, combining coding proficiency with versatile general-purpose abilities.
 qwen-qwen3-max,Qwen: Qwen3 Max,Qwen3-Max is an updated release built on the Qwen3 series, offering major improvements in reasoning, instruction following, multilingual support, and long-tail knowledge coverage compared to the January 2025 version. It delivers higher accuracy in math, coding, logic, and science tasks, follows complex instructions in Chinese and English more reliably, reduces hallucinations, and produces higher-quality responses for open-ended Q&A, writing, and conversation. The model supports over 100 languages with stronger translation and commonsense reasoning, and is optimized for retrieval-augmented generation (RAG) and tool calling, though it does not include a dedicated “thinking” mode.
 qwen-qwen3-next-80b-a3b-instruct,Qwen: Qwen3 Next 80B A3B Instruct,Qwen3-Next-80B-A3B-Instruct is an instruction-tuned chat model in the Qwen3-Next series optimized for fast, stable responses without “thinking” traces. It targets complex tasks across reasoning, code generation, knowledge QA, and multilingual use, while remaining robust on alignment and formatting. Compared with prior Qwen3 instruct variants, it focuses on higher throughput and stability on ultra-long inputs and multi-turn dialogues, making it well-suited for RAG, tool use, and agentic workflows that require consistent final answers rather than visible chain-of-thought.
+
+The model employs scaling-efficient training and decoding to improve parameter efficiency and inference speed, and has been validated on a broad set of public benchmarks where it reaches or approaches larger Qwen3 systems in several categories while outperforming earlier mid-sized baselines. It is best used as a general assistant, code helper, and long-context task solver in production settings where deterministic, instruction-following outputs are preferred.
+qwen-qwen3-next-80b-a3b-instruct-free,Qwen: Qwen3 Next 80B A3B Instruct (free),Qwen3-Next-80B-A3B-Instruct is an instruction-tuned chat model in the Qwen3-Next series optimized for fast, stable responses without “thinking” traces. It targets complex tasks across reasoning, code generation, knowledge QA, and multilingual use, while remaining robust on alignment and formatting. Compared with prior Qwen3 instruct variants, it focuses on higher throughput and stability on ultra-long inputs and multi-turn dialogues, making it well-suited for RAG, tool use, and agentic workflows that require consistent final answers rather than visible chain-of-thought.
 
 The model employs scaling-efficient training and decoding to improve parameter efficiency and inference speed, and has been validated on a broad set of public benchmarks where it reaches or approaches larger Qwen3 systems in several categories while outperforming earlier mid-sized baselines. It is best used as a general assistant, code helper, and long-context task solver in production settings where deterministic, instruction-following outputs are preferred.
 qwen-qwen3-next-80b-a3b-thinking,Qwen: Qwen3 Next 80B A3B Thinking,Qwen3-Next-80B-A3B-Thinking is a reasoning-first chat model in the Qwen3-Next line that outputs structured “thinking” traces by default. It’s designed for hard multi-step problems; math proofs, code synthesis/debugging, logic, and agentic planning, and reports strong results across knowledge, reasoning, coding, alignment, and multilingual evaluations. Compared with prior Qwen3 variants, it emphasizes stability under long chains of thought and efficient scaling during inference, and it is tuned to follow complex instructions while reducing repetitive or off-task behavior.
@@ -611,6 +633,7 @@ random-error,Random Error,Randomly throws an error based on probability, useful 
 random-number,Random Number,Generates random numbers with configurable range and distribution
 range,Range,Calculates range statistics of numbers
 read-website,Read Website (beta),Simple website reader - scrapes content and extracts main text
+remote-mcp-tool,Remote MCP Tool,Connect a remote MCP (Model Context Protocol) server as a tool provider for an LLM node.
 response-format,Response Format,Define a JSON Schema response format for structured outputs from LLMs.
 round,Round,Rounds a number to nearest integer
 route,Route,Routes a single value to one of two outputs based on a boolean condition
@@ -619,6 +642,7 @@ self-healing-error,Self Healing Error,Throws an error initially but succeeds on 
 semantic-search,Semantic Search,Search knowledge base using semantic similarity and vector embeddings
 set-object-property,Set Object Property,Set or add a key-value pair to an object, returning a new object with the property set. Can also create a new object from scratch if the input object is empty or null.
 simple-agent,Simple Agent (beta),A simple AI agent that accepts tools and processes messages. Perfect template for creating starter agents.
+split-into-chunks,Split Into Chunks,Splits text into smaller chunks by character count, word count, or sentence count. Useful for processing long content in batches.
 standard-deviation,Standard Deviation,Calculates standard deviation of numbers
 string,String,A simple string node that outputs a string
 string-case,String Case Convert,Converts text to different letter cases
@@ -631,21 +655,27 @@ string-split,String Split,Splits a string into an array using a delimiter
 string-substring,String Substring,Extracts a portion of text between start and end positions
 string-template,String Template,Fills a template string with variable values
 string-trim,String Trim,Removes whitespace or specified characters from the start and/or end of text
+strip-html,Strip HTML,Removes HTML tags from text, optionally preserving whitespace and decoding entities.
 subtract,Subtract,Subtracts second number from first
 switch,Switch,Routes data based on a value matching cases
 system-prompt,System Prompt,Draft a text-based system prompt for an LLM, with configurable variables.
 temperature,Temperature,A temperature slider useful for controlling randomness in model outputs. Lower values (0.0-0.3) produce very deterministic outputs ideal for factual content, code, or documentation. Medium values (0.4-0.7) balance creativity and coherence for general conversation and controlled creative writing. Higher values (0.8-1.0) introduce more randomness for brainstorming, poetry, and ideation. Values above 1.0 become very random and may be incoherent, suitable only for experimental purposes.
 text-scratch-pad,Text Scratch Pad,Accumulate text input over multiple executions. Each new input gets concatenated to the existing content with an optional delimiter.
+text-to-conversation,Text to Conversation,Parses a text transcript back into a conversation message array. Recognizes role labels like 'User:', 'Assistant:', 'System:'.
 throw-error,Throw Error,Throws an error with a custom message and optional context for testing error handling.
 time-adder,Time Adder,Add or subtract time from a timestamp. Supports various time units and operations.
 timestamp,Timestamp,Generate current timestamp in various formats. Runs as a constant to provide current time at flow start.
 token-count,Token Count,Count tokens in text, messages, or arrays of messages using the cl100k_base tokenizer (used by GPT-4, GPT-3.5-turbo, and other OpenAI models).
 tokenizer,Tokenizer,Convert text, messages, or arrays of messages into arrays of token numbers using cl200k_base or cl100k_base tokenizers.
 tool,Tool,Define a tool / function call for a LLM to use.
+tool-cleanup,Tool Cleanup,Ensures all tool calls in a conversation have corresponding tool responses. Inserts synthetic responses for any unanswered tool calls before user messages or at the end of the conversation.
 truncate-by-tokens,Truncate by Tokens,Keep only the most recent messages that fit within the specified token limit.
 truncate-by-tokens-from-start,Truncate by Tokens from Start,Keep only the first messages that fit within the specified token limit.
 truncate-by-tokens-preserve-system,Truncate by Tokens Preserve System,Always keep system messages, truncate other messages to fit within the specified token limit.
+truncate-old-tool-responses,Truncate Old Tool Responses,Replaces tool response content with a placeholder for messages outside the recent window. Keeps recent tool responses intact while compressing older ones to save context tokens.
+truncate-text,Truncate Text,Truncates text to a maximum length with options for where to cut and what suffix to add.
 untokenizer,Untokenizer,Convert arrays of token numbers back into text strings using cl200k_base or cl100k_base tokenizers.
+word-count,Word Count,Counts words, characters, sentences, and paragraphs in text.
 x-ai-grok-3,xAI: Grok 3,Grok 3 is the latest model from xAI. It's their flagship model that excels at enterprise use cases like data extraction, coding, and text summarization. Possesses deep domain knowledge in finance, healthcare, law, and science.
 
 
@@ -670,5 +700,7 @@ x-ai-grok-4-fast,xAI: Grok 4 Fast,Grok 4 Fast is xAI's latest multimodal model w
 
 Reasoning can be enabled/disabled using the `reasoning` `enabled` parameter in the API. [Learn more in our docs](https://openrouter.ai/docs/use-cases/reasoning-tokens#controlling-reasoning-tokens)
 x-ai-grok-code-fast-1,xAI: Grok Code Fast 1,Grok Code Fast 1 is a speedy and economical reasoning model that excels at agentic coding. With reasoning traces visible in the response, developers can steer Grok Code for high-quality work flows.
+xml-to-json,XML to JSON,Parses an XML string into a JSON object. Useful for parsing Claude's XML-structured responses.
 xnor-gate,XNOR Gate,A logic gate that outputs true if inputs are the same, false if they are different
 xor-gate,XOR Gate,A logic gate that outputs true if inputs are different, false if they are the same
+yaml-to-json,YAML to JSON,Parses a YAML string into a JSON object.

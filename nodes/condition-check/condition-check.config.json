@@ -1,5 +1,6 @@
 {
   "display_name": "Condition Check",
+  "tagline": "Check a condition",
   "description": "Conditional pass-through that routes data to passed or blocked based on a condition",
   "category": "logic",
   "is_plugin": false,

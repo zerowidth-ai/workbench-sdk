@@ -1,5 +1,6 @@
 {
   "display_name": "NewsData.io: Archive News",
+  "tagline": "Search news archives",
   "description": "Fetch historical news from the archive (7+ years) with date range filtering and rich search options",
   "category": "third-party",
   "provider": "newsdata_io",

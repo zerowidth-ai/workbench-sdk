@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { emitAPICallEvent } from '../utilities/sanitizeAPICall.js';
 
 export default class OpenAIIntegration {
     constructor(apiKey, options = {}) {
@@ -17,19 +18,25 @@ export default class OpenAIIntegration {
      * @returns {Promise<Object>} Embedding response
      */
     async createEmbedding(input, model = 'text-embedding-3-small') {
+        const requestUrl = `${this.options.baseURL}/embeddings`;
+        const requestHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` };
+        const requestBody = { model, input };
+        const startTime = Date.now();
+
         try {
             const response = await axios({
-                url: `${this.options.baseURL}/embeddings`,
+                url: requestUrl,
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.apiKey}`
-                },
-                data: {
-                    model: model,
-                    input: input
-                },
+                headers: requestHeaders,
+                data: requestBody,
                 timeout: this.options.timeout
+            });
+
+            await emitAPICallEvent(this._engineConfig, {
+                timestamp: startTime, integration: 'openai', nodeId: null, nodeType: null,
+                request: { method: 'POST', url: requestUrl, headers: requestHeaders, body: requestBody },
+                response: { status: response.status, statusText: response.statusText },
+                duration: Date.now() - startTime, error: null
             });
 
             if (response.status >= 400) {
@@ -43,6 +50,12 @@ export default class OpenAIIntegration {
             };
 
         } catch (error) {
+            await emitAPICallEvent(this._engineConfig, {
+                timestamp: startTime, integration: 'openai', nodeId: null, nodeType: null,
+                request: { method: 'POST', url: requestUrl, headers: requestHeaders, body: requestBody },
+                response: { status: error.response?.status || 0, statusText: error.response?.statusText || 'Error' },
+                duration: Date.now() - startTime, error: error.message
+            });
             if (error.response) {
                 const status = error.response.status;
                 const statusText = error.response.statusText;
@@ -88,19 +101,25 @@ export default class OpenAIIntegration {
                 moderationInput = [moderationInput];
             }
 
+            const modRequestUrl = `${this.options.baseURL}/moderations`;
+            const modRequestHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` };
+            const modRequestBody = { model: 'omni-moderation-latest', input: moderationInput };
+            const modStartTime = Date.now();
+
             const response = await axios({
-                url: `${this.options.baseURL}/moderations`,
+                url: modRequestUrl,
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.apiKey}`
-                },
-                data: {
-                    model: 'omni-moderation-latest',
-                    input: moderationInput
-                },
+                headers: modRequestHeaders,
+                data: modRequestBody,
                 timeout: this.options.timeout,
                 validateStatus: () => true // Always resolve, never throw for HTTP errors
+            });
+
+            await emitAPICallEvent(this._engineConfig, {
+                timestamp: modStartTime, integration: 'openai', nodeId: null, nodeType: null,
+                request: { method: 'POST', url: modRequestUrl, headers: modRequestHeaders, body: modRequestBody },
+                response: { status: response.status, statusText: response.statusText },
+                duration: Date.now() - modStartTime, error: null
             });
 
             if (response.status >= 400) {

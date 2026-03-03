@@ -1,0 +1,94 @@
+[
+  {
+    "description": "Strip simple HTML tags",
+    "inputs": {
+      "html": "<p>Hello <strong>World</strong></p>"
+    },
+    "expected": {
+      "text": "Hello World"
+    }
+  },
+  {
+    "description": "Preserve line breaks from block elements",
+    "inputs": {
+      "html": "<p>Paragraph 1</p><p>Paragraph 2</p>"
+    },
+    "expected": {
+      "text": "Paragraph 1\nParagraph 2"
+    }
+  },
+  {
+    "description": "Convert br tags to newlines",
+    "inputs": {
+      "html": "Line 1<br>Line 2<br/>Line 3"
+    },
+    "expected": {
+      "text": "Line 1\nLine 2\nLine 3"
+    }
+  },
+  {
+    "description": "Decode HTML entities",
+    "inputs": {
+      "html": "&lt;script&gt; &amp; &quot;quotes&quot;"
+    },
+    "expected": {
+      "text": "<script> & \"quotes\""
+    }
+  },
+  {
+    "description": "Decode numeric entities",
+    "inputs": {
+      "html": "&#65;&#66;&#67; &#x41;&#x42;&#x43;"
+    },
+    "expected": {
+      "text": "ABC ABC"
+    }
+  },
+  {
+    "description": "Handle nested tags",
+    "inputs": {
+      "html": "<div><p>Nested <span>content</span> here</p></div>"
+    },
+    "expected": {
+      "text": "Nested content here"
+    }
+  },
+  {
+    "description": "Disable line break preservation",
+    "inputs": {
+      "html": "<p>Para 1</p><p>Para 2</p>",
+      "preserve_line_breaks": false
+    },
+    "expected": {
+      "text": "Para 1Para 2"
+    }
+  },
+  {
+    "description": "Disable entity decoding",
+    "inputs": {
+      "html": "&amp; &lt;",
+      "decode_entities": false
+    },
+    "expected": {
+      "text": "&amp; &lt;"
+    }
+  },
+  {
+    "description": "Handle empty string",
+    "inputs": {
+      "html": ""
+    },
+    "expected": {
+      "text": ""
+    }
+  },
+  {
+    "description": "Complex HTML document",
+    "inputs": {
+      "html": "<html><head><title>Test</title></head><body><h1>Title</h1><p>First paragraph.</p><ul><li>Item 1</li><li>Item 2</li></ul></body></html>"
+    },
+    "expected": {
+      "text": "TestTitle\nFirst paragraph.\nItem 1\nItem 2"
+    }
+  }
+]

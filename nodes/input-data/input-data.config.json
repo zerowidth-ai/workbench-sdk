@@ -1,5 +1,6 @@
 {
   "display_name": "Input Data",
+  "tagline": "Receive input data",
   "description": "Defines a single data input that can be requested from the user during flow execution",
   "icon": "input-cursor",
   "category": "i/o",

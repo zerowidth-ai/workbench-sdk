@@ -1,0 +1,44 @@
+{
+  "display_name": "Keep Bookends",
+  "tagline": "Keep first and last messages",
+  "description": "Keeps the first N and last M messages from a conversation, removing the middle. System messages are always preserved regardless of counts. Useful for managing context length while retaining initial context and recent messages.",
+  "icon": "bookmark",
+  "category": "messages",
+  "inputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "Array of message objects to trim",
+      "required": true
+    },
+    {
+      "name": "keep_first",
+      "display_name": "Keep First",
+      "type": "number",
+      "description": "Number of non-system messages to keep from the start",
+      "required": true
+    },
+    {
+      "name": "keep_last",
+      "display_name": "Keep Last",
+      "type": "number",
+      "description": "Number of messages to keep from the end",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "Array of messages with middle removed, system messages preserved"
+    },
+    {
+      "name": "removed_count",
+      "display_name": "Removed Count",
+      "type": "number",
+      "description": "Number of messages that were removed"
+    }
+  ]
+}

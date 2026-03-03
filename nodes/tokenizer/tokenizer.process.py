@@ -10,19 +10,24 @@ async def process(
 ) -> dict[str, Any]:
     try:
         input_data = inputs.get('input')
-        if not input_data:
+        if input_data is None:
             raise Exception("Input is required for tokenization")
 
-        # Get the tokenizer setting, default to cl200k_base
-        tokenizer = settings.get('tokenizer', 'cl200k_base')
+        # Get the tokenizer setting, default to o200k_base (GPT-4o tokenizer)
+        tokenizer = settings.get('tokenizer', 'o200k_base')
 
-        # Validate tokenizer option
-        if tokenizer not in ['cl200k_base', 'cl100k_base']:
-            raise Exception(f"Unsupported tokenizer: {tokenizer}. Only cl200k_base and cl100k_base are supported.")
+        # Map tokenizer names (cl200k_base was a mistake, should be o200k_base)
+        encoding_map = {
+            'cl200k_base': 'o200k_base',  # Backwards compatibility
+            'o200k_base': 'o200k_base',
+            'cl100k_base': 'cl100k_base',
+        }
 
-        # Get the encoding for the specified tokenizer
-        # Python tiktoken uses different names
-        encoding_name = 'cl200k_base' if tokenizer == 'cl200k_base' else 'cl100k_base'
+        # Validate and map tokenizer option
+        if tokenizer not in encoding_map:
+            raise Exception(f"Unsupported tokenizer: {tokenizer}. Supported: o200k_base, cl100k_base")
+
+        encoding_name = encoding_map[tokenizer]
         encoding = tiktoken.get_encoding(encoding_name)
 
         # Helper function to extract text from content (handles multi-modal)

@@ -1,5 +1,6 @@
 {
   "display_name": "Standard Deviation",
+  "tagline": "Measure data spread",
   "description": "Calculates standard deviation of numbers",
   "category": "math",
   "inputs": [

@@ -8,11 +8,12 @@ import crypto from "crypto";
 import ErrorManager from "./classes/ErrorManager.js";
 import CacheManager from "./utilities/cache.js";
 
-import { callMCPTool, fetchMCPToolSchema } from "./utilities/mcp.js";
+import { callMCPTool, fetchMCPTools } from "./utilities/mcp.js";
 import { loadNodes, loadIntegrations, detectAndLoadFlow } from "./utilities/loaders.js";
 import { validateKeys, validateFlow, validateInputs } from "./utilities/validators.js";
 import { loadCustomTypes, typeCheck, convertType } from "./utilities/typers.js";
 import { createSafeToolName, isRemoteMCPTool, isManualToolNode, mapTypeToJSONSchema, getDirname } from "./utilities/helpers.js";
+import { sanitizeAPICallEvent } from "./utilities/sanitizeAPICall.js";
 
 
 /**
@@ -70,7 +71,7 @@ export default class zv1 {
     
     this.typeCheck = typeCheck.bind(this);
     this.convertType = convertType.bind(this);
-    this.fetchMCPToolSchema = fetchMCPToolSchema.bind(this);
+    // MCP tools are fetched via fetchMCPTools utility (no binding needed)
     this.validateKeys = validateKeys.bind(this);
     this.validateFlow = validateFlow.bind(this);
     this.validateInputs = validateInputs.bind(this);  
@@ -82,6 +83,18 @@ export default class zv1 {
     if(!this.config.integrations) {
       this.config.integrations = await this.loadIntegrations(this.config, this.flow);
     }
+
+    // Bind API call emit helper for node process functions (e.g. http-request)
+    this.config._emitAPICall = async (rawEvent) => {
+      if (!this.config.onAPICall) return;
+      const event = sanitizeAPICallEvent(rawEvent);
+      try {
+        const result = this.config.onAPICall(event);
+        if (result && typeof result.then === 'function') await result;
+      } catch (e) {
+        // Don't let callback errors break node execution
+      }
+    };
 
     this.nodes = nodes;
     this.compiledCustomTypes = compiledCustomTypes;
@@ -433,18 +446,33 @@ export default class zv1 {
       } else if (inputDef.allow_multiple && !inputDef.refires) {
         // Non-refiring multiple input: Collect all current values
         const cachedValue = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
-        
+
         if (this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name })) {
           if(!inputs[inputName]) {
             inputs[inputName] = [];
           }
-          
+
           // Get the value and validate its type
           const value = cachedValue;
           const itemType = inputDef.type || "any";
-          
-          // Validate individual item type
-          if (this.typeCheck(value, itemType)) {
+
+          // If the value is an array and doesn't pass type check as-is,
+          // check if it's an array of the expected type and spread it in
+          if (Array.isArray(value) && !this.typeCheck(value, itemType)) {
+            let allValid = value.length > 0;
+            for (const item of value) {
+              if (!this.typeCheck(item, itemType)) {
+                allValid = false;
+                break;
+              }
+            }
+            if (allValid) {
+              inputs[inputName].push(...value);
+              this.logDebug(`Spread array of ${value.length} items into multiple-input [${inputName}]`);
+            } else {
+              this.logDebug(`Type mismatch for item in multiple-input [${inputName}]: Expected ${itemType}`);
+            }
+          } else if (this.typeCheck(value, itemType)) {
               inputs[inputName].push(value);
           } else {
               this.logDebug(`Type mismatch for item in multiple-input [${inputName}]: Expected ${itemType}`);
@@ -453,7 +481,7 @@ export default class zv1 {
       } else {
         // Single value input: Always use latest value
         const cachedValue = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
-        
+
         if (this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name })) {
           this.logDebug(`Setting value for input [${inputName}]`);
           inputs[inputName] = cachedValue;
@@ -840,23 +868,36 @@ export default class zv1 {
       } else if (inputDef.allow_multiple && !inputDef.refires) {
         // Non-refiring multiple input: Collect all current values
         const cachedValue = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
-        
+
         if (this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name })) {
           if(!inputs[inputName]) {
             inputs[inputName] = [];
           }
-          
+
           const value = cachedValue;
           const itemType = inputDef.type || "any";
-          
-          if (this.typeCheck(value, itemType)) {
+
+          // If the value is an array and doesn't pass type check as-is,
+          // check if it's an array of the expected type and spread it in
+          if (Array.isArray(value) && !this.typeCheck(value, itemType)) {
+            let allValid = value.length > 0;
+            for (const item of value) {
+              if (!this.typeCheck(item, itemType)) {
+                allValid = false;
+                break;
+              }
+            }
+            if (allValid) {
+              inputs[inputName].push(...value);
+            }
+          } else if (this.typeCheck(value, itemType)) {
               inputs[inputName].push(value);
           }
         }
       } else {
         // Single value input: Always use latest value
         const cachedValue = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
-        
+
         if (this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name })) {
           inputs[inputName] = cachedValue;
         } else if (!inputDef.required && inputDef.default !== undefined) {
@@ -1108,8 +1149,12 @@ export default class zv1 {
             let variable_value = inputData[inputNode.settings?.key || 'chat'];
 
             if(variable_value !== undefined) {
-              // await this.processNode({ ...inputNode, settings: { ...inputNode.settings, ...{messages: variable_value} } });
-              // await this.propagate(inputNode.id);
+              // Normalize string/object to message array
+              if (typeof variable_value === 'string') {
+                variable_value = [{ role: 'user', content: variable_value }];
+              } else if (variable_value && typeof variable_value === 'object' && !Array.isArray(variable_value)) {
+                variable_value = [variable_value];
+              }
               this.addToExecutionQueue({ ...inputNode, settings: { ...inputNode.settings, ...{messages: variable_value} } });
             } else {
               inputsMissingValues.push({
@@ -1695,18 +1740,33 @@ export default class zv1 {
       } else if (inputDef.allow_multiple && !inputDef.refires) {
         // Non-refiring multiple input: Collect all current values
         const cachedValue = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
-        
+
         if (this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name })) {
           if(!inputs[inputName]) {
             inputs[inputName] = [];
           }
-          
+
           // Get the value and validate its type
           const value = cachedValue;
           const itemType = inputDef.type || "any";
-          
-          // Validate individual item type
-          if (this.typeCheck(value, itemType)) {
+
+          // If the value is an array and doesn't pass type check as-is,
+          // check if it's an array of the expected type and spread it in
+          if (Array.isArray(value) && !this.typeCheck(value, itemType)) {
+            let allValid = value.length > 0;
+            for (const item of value) {
+              if (!this.typeCheck(item, itemType)) {
+                allValid = false;
+                break;
+              }
+            }
+            if (allValid) {
+              inputs[inputName].push(...value);
+              this.logDebug(`Spread array of ${value.length} items into multiple-input [${inputName}]`);
+            } else {
+              this.logDebug(`Type mismatch for item in multiple-input [${inputName}]: Expected ${itemType}`);
+            }
+          } else if (this.typeCheck(value, itemType)) {
               inputs[inputName].push(value);
           } else {
               this.logDebug(`Type mismatch for item in multiple-input [${inputName}]: Expected ${itemType}`);
@@ -1715,7 +1775,7 @@ export default class zv1 {
       } else {
         // Single value input: Always use latest value
         const cachedValue = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
-        
+
         if (this.cache.has({ node_id: link.from.node_id, port_name: link.from.port_name })) {
           this.logDebug(`Setting value for LLM input [${inputName}]`);
           inputs[inputName] = cachedValue;
@@ -1898,34 +1958,30 @@ export default class zv1 {
           };
         }
       } else if (isRemoteMCPTool(pluginNode)) {
-        // Fetch all tools from the MCP endpoint
-        const url = pluginNode.settings?.url;
-        if (!url) continue;
-        const id = uuidv4();
+        // Resolve named MCP integration from config.keys.mcp
+        const integrationName = pluginNode.settings?.mcp_integration;
+        if (!integrationName) {
+          this.logDebug(`MCP plugin node [${pluginNode.id}] has no mcp_integration setting`);
+          continue;
+        }
+        const mcpConfig = this.config.keys?.mcp?.[integrationName];
+        if (!mcpConfig?.url) {
+          this.logDebug(`MCP integration "${integrationName}" not found in config.keys.mcp`);
+          continue;
+        }
+        const { url, token } = mcpConfig;
         try {
-
-          const response = await axios.post(url, {
-            id,
-            method: "tools/list",
-            params: {}
-          });
-          const tools = response.data?.result?.tools || [];
+          const tools = await fetchMCPTools(url, token);
           for (const tool of tools) {
-            // Add each tool as a separate schema
-            toolSchemas.push({
-              name: tool.name,
-              description: tool.description,
-              parameters: tool.inputSchema
-            });
-            // Track MCP tools for error handling
+            toolSchemas.push(tool);
             toolNodeMap[tool.name] = { node: pluginNode, type: 'mcp', mcpToolName: tool.name };
-            // Map tool name to a runner that calls this MCP node/tool
             toolRunners[tool.name] = async (args) => {
-              return await callMCPTool(pluginNode, { ...args, name: tool.name });
+              return await callMCPTool({ ...args, name: tool.name }, { url, token });
             };
           }
+          this.logDebug(`Loaded ${tools.length} MCP tools from "${integrationName}"`);
         } catch (err) {
-          this.logDebug(`Failed to fetch MCP tools from ${url}: ${err.message}`);
+          this.logDebug(`Failed to fetch MCP tools from "${integrationName}" (${url}): ${err.message}`);
         }
       } else if (isManualToolNode(pluginNode)) {
         const schema = this.generateToolSchema(pluginNode);
@@ -1936,20 +1992,23 @@ export default class zv1 {
       }
     }
 
-    // --- Also gather manual tool nodes connected to the LLM's 'tools' input port ---
+    // --- Also gather tool schemas connected to the LLM's 'tools' input port ---
     const toolInputLinks = this.flow.links.filter(
       link => link.to.node_id === node.id && link.to.port_name === "tools"
     );
     for (const link of toolInputLinks) {
-      // the schema should be grabbable from the node's output cache on its "tool" output
-      const toolSchema = this.cache.get({ node_id: link.from.node_id, port_name: 'tool' });
-      if(toolSchema) {
+      const cachedValue = this.cache.get({ node_id: link.from.node_id, port_name: link.from.port_name });
+      if (!cachedValue) continue;
+
+      // Normalize to an array — could be a single tool or an array of tools
+      const schemas = Array.isArray(cachedValue) ? cachedValue : [cachedValue];
+      for (const toolSchema of schemas) {
+        if (!toolSchema || typeof toolSchema !== 'object' || !toolSchema.name) continue;
         // Only add schema if developer hasn't already provided one via config
-        // If config.tools has this tool name but no schema, developer wants to use flow schema with their process
         const configTool = this.config.tools?.[toolSchema.name];
         if (!configTool || !configTool.schema) {
           toolSchemas.push(toolSchema);
-          this.logDebug(`Loaded manual tool schema from flow: ${toolSchema.name}`);
+          this.logDebug(`Loaded tool schema from flow: ${toolSchema.name}`);
           // If there's no runner for this tool, track it as a manual tool
           if (!configTool?.process && !toolRunners[toolSchema.name]) {
             manualToolNames.add(toolSchema.name);
@@ -1961,13 +2020,28 @@ export default class zv1 {
         }
       }
     }
-    
+
+    // Extract internal tool names (tools handled by engine plugins, not manual/external tools)
+    // This is used by LLM nodes to filter the conversation output to only include
+    // messages related to internally-handled tools
+    const internalToolNames = Object.entries(toolNodeMap)
+      .filter(([_, info]) => info.type === 'plugin' || info.type === 'mcp')
+      .map(([name, _]) => name);
+    this.config.internal_tool_names = internalToolNames;
+    this.logDebug(`Internal tool names for LLM node [${node.id}]:`, internalToolNames);
 
     // 2. Inject toolSchemas into LLM call
     let llmResult;
     let tool_results = [];
     let toolCallMessage = null;
     let toolCallCount = 0;
+
+    // Normalize string/object messages to array format before accumulation
+    if (typeof inputs.messages === 'string') {
+      inputs.messages = [{ role: 'user', content: inputs.messages }];
+    } else if (inputs.messages && typeof inputs.messages === 'object' && !Array.isArray(inputs.messages)) {
+      inputs.messages = [inputs.messages];
+    }
 
     // Track accumulated messages across tool call rounds
     // Start with the original messages, then append tool calls/results each round
@@ -2001,7 +2075,7 @@ export default class zv1 {
 
         for (const tool_call of llmResult.tool_calls) {
 
-          if (tool_call.type === 'function') {
+          if (tool_call.type === 'function' && tool_call.function) {
             const toolName = tool_call.function.name;
 
             // Check if this is a manual tool (no runner, pass through)
@@ -2164,7 +2238,10 @@ export default class zv1 {
     
     // Track this execution state
     this.executedNodeStates.add(executionHash);
-    
+
+    // Clean up internal_tool_names from config
+    delete this.config.internal_tool_names;
+
     this.logDebug(`LLM Node [${node.id}] processing completed successfully`);
     return llmResult;
   }
@@ -2580,9 +2657,19 @@ export default class zv1 {
 
     // Use the inputs passed from processLLMNode instead of re-collecting them
     const llmInputs = { ...inputs };
-    
-    // Inject the tools array
-    llmInputs.tools = toolSchemas;
+
+    // Merge plugin/manual toolSchemas with any tools already in inputs (e.g. from filter-tools)
+    // Deduplicate by tool name since tools from the "tools" input port are collected
+    // both during normal input collection and during tool schema gathering
+    const inputTools = Array.isArray(llmInputs.tools) ? llmInputs.tools : [];
+    const seenToolNames = new Set();
+    llmInputs.tools = [];
+    for (const tool of [...toolSchemas, ...inputTools]) {
+      if (tool?.name && !seenToolNames.has(tool.name)) {
+        seenToolNames.add(tool.name);
+        llmInputs.tools.push(tool);
+      }
+    }
 
     // If this is a tool call response, append it to the messages array (OpenAI style)
     if (toolCallMessage && toolResults && Array.isArray(llmInputs.messages)) {

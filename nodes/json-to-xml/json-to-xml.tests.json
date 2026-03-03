@@ -1,0 +1,103 @@
+[
+  {
+    "description": "Simple object to XML",
+    "inputs": {
+      "json": {"name": "Alice", "age": 30}
+    },
+    "expected": {
+      "xml": "<root>\n  <name>Alice</name>\n  <age>30</age>\n</root>"
+    }
+  },
+  {
+    "description": "Custom root element",
+    "inputs": {
+      "json": {"name": "Bob"},
+      "root_element": "user"
+    },
+    "expected": {
+      "xml": "<user>\n  <name>Bob</name>\n</user>"
+    }
+  },
+  {
+    "description": "Nested object",
+    "inputs": {
+      "json": {"user": {"name": "Charlie", "active": true}}
+    },
+    "expected": {
+      "xml": "<root>\n  <user>\n    <name>Charlie</name>\n    <active>true</active>\n  </user>\n</root>"
+    }
+  },
+  {
+    "description": "Array of primitives",
+    "inputs": {
+      "json": {"tags": ["a", "b", "c"]}
+    },
+    "expected": {
+      "xml": "<root>\n  <tags>\n    <tag>a</tag>\n    <tag>b</tag>\n    <tag>c</tag>\n  </tags>\n</root>"
+    }
+  },
+  {
+    "description": "Array of objects",
+    "inputs": {
+      "json": {"users": [{"name": "A"}, {"name": "B"}]}
+    },
+    "expected": {
+      "xml": "<root>\n  <users>\n    <user>\n      <name>A</name>\n    </user>\n    <user>\n      <name>B</name>\n    </user>\n  </users>\n</root>"
+    }
+  },
+  {
+    "description": "Escape special characters",
+    "inputs": {
+      "json": {"text": "<script>alert('xss')</script>"}
+    },
+    "expected": {
+      "xml": "<root>\n  <text>&lt;script&gt;alert(&apos;xss&apos;)&lt;/script&gt;</text>\n</root>"
+    }
+  },
+  {
+    "description": "Boolean values",
+    "inputs": {
+      "json": {"enabled": true, "debug": false}
+    },
+    "expected": {
+      "xml": "<root>\n  <enabled>true</enabled>\n  <debug>false</debug>\n</root>"
+    }
+  },
+  {
+    "description": "Null value",
+    "inputs": {
+      "json": {"value": null}
+    },
+    "expected": {
+      "xml": "<root>\n  <value></value>\n</root>"
+    }
+  },
+  {
+    "description": "Without pretty printing",
+    "inputs": {
+      "json": {"name": "Alice"},
+      "pretty": false
+    },
+    "expected": {
+      "xml": "<root><name>Alice</name></root>"
+    }
+  },
+  {
+    "description": "Empty object",
+    "inputs": {
+      "json": {}
+    },
+    "expected": {
+      "xml": "<root></root>"
+    }
+  },
+  {
+    "description": "Top-level null",
+    "inputs": {
+      "json": null
+    },
+    "expected": {
+      "xml": "<root></root>"
+    }
+  }
+]

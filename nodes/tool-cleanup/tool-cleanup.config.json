@@ -1,0 +1,30 @@
+{
+  "display_name": "Tool Cleanup",
+  "tagline": "Fix tool responses",
+  "description": "Ensures all tool calls in a conversation have corresponding tool responses. Inserts synthetic responses for any unanswered tool calls before user messages or at the end of the conversation.",
+  "icon": "wrench",
+  "category": "messages",
+  "inputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "Array of message objects to clean up",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "messages",
+      "display_name": "Messages",
+      "type": "conversation",
+      "description": "Array of messages with synthetic tool responses inserted for any unanswered tool calls"
+    },
+    {
+      "name": "inserted_count",
+      "display_name": "Inserted Count",
+      "type": "number",
+      "description": "Number of synthetic tool responses that were inserted"
+    }
+  ]
+}

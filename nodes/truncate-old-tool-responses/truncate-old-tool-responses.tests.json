@@ -1,0 +1,207 @@
+[
+  {
+    "description": "Truncate old tool responses outside recent window",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Old question"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_data"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "This is a very long response that should be truncated"},
+        {"role": "assistant", "content": "Here's the old data"},
+        {"role": "user", "content": "New question"},
+        {"role": "assistant", "content": "New response"}
+      ],
+      "keep_recent": 3
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Old question"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_data"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "[Truncated]"},
+        {"role": "assistant", "content": "Here's the old data"},
+        {"role": "user", "content": "New question"},
+        {"role": "assistant", "content": "New response"}
+      ],
+      "truncated_count": 1
+    }
+  },
+  {
+    "description": "Keep recent tool responses intact",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Question"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_weather"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Sunny, 72F"},
+        {"role": "assistant", "content": "The weather is sunny!"}
+      ],
+      "keep_recent": 10
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Question"},
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "get_weather"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Sunny, 72F"},
+        {"role": "assistant", "content": "The weather is sunny!"}
+      ],
+      "truncated_count": 0
+    }
+  },
+  {
+    "description": "Custom placeholder",
+    "inputs": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "Long response here"},
+        {"role": "user", "content": "Recent message"}
+      ],
+      "keep_recent": 1,
+      "placeholder": "[Response removed for context compression]"
+    },
+    "expected": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "[Response removed for context compression]"},
+        {"role": "user", "content": "Recent message"}
+      ],
+      "truncated_count": 1
+    }
+  },
+  {
+    "description": "Passthrough when no tool messages",
+    "inputs": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi there!"},
+        {"role": "user", "content": "How are you?"}
+      ],
+      "keep_recent": 2
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi there!"},
+        {"role": "user", "content": "How are you?"}
+      ],
+      "truncated_count": 0
+    }
+  },
+  {
+    "description": "Multiple old tool responses truncated",
+    "inputs": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "Response 1"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "Response 2"},
+        {"role": "tool", "tool_call_id": "call_3", "content": "Response 3"},
+        {"role": "user", "content": "Recent"}
+      ],
+      "keep_recent": 2
+    },
+    "expected": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "[Truncated]"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "[Truncated]"},
+        {"role": "tool", "tool_call_id": "call_3", "content": "Response 3"},
+        {"role": "user", "content": "Recent"}
+      ],
+      "truncated_count": 2
+    }
+  },
+  {
+    "description": "Handle empty messages array",
+    "inputs": {
+      "messages": [],
+      "keep_recent": 20
+    },
+    "expected": {
+      "messages": [],
+      "truncated_count": 0
+    }
+  },
+  {
+    "description": "Default keep_recent of 20",
+    "inputs": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "Old response"},
+        {"role": "user", "content": "1"},
+        {"role": "assistant", "content": "2"},
+        {"role": "user", "content": "3"},
+        {"role": "assistant", "content": "4"},
+        {"role": "user", "content": "5"},
+        {"role": "assistant", "content": "6"},
+        {"role": "user", "content": "7"},
+        {"role": "assistant", "content": "8"},
+        {"role": "user", "content": "9"},
+        {"role": "assistant", "content": "10"},
+        {"role": "user", "content": "11"},
+        {"role": "assistant", "content": "12"},
+        {"role": "user", "content": "13"},
+        {"role": "assistant", "content": "14"},
+        {"role": "user", "content": "15"},
+        {"role": "assistant", "content": "16"},
+        {"role": "user", "content": "17"},
+        {"role": "assistant", "content": "18"},
+        {"role": "user", "content": "19"},
+        {"role": "assistant", "content": "20"}
+      ]
+    },
+    "expected": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "[Truncated]"},
+        {"role": "user", "content": "1"},
+        {"role": "assistant", "content": "2"},
+        {"role": "user", "content": "3"},
+        {"role": "assistant", "content": "4"},
+        {"role": "user", "content": "5"},
+        {"role": "assistant", "content": "6"},
+        {"role": "user", "content": "7"},
+        {"role": "assistant", "content": "8"},
+        {"role": "user", "content": "9"},
+        {"role": "assistant", "content": "10"},
+        {"role": "user", "content": "11"},
+        {"role": "assistant", "content": "12"},
+        {"role": "user", "content": "13"},
+        {"role": "assistant", "content": "14"},
+        {"role": "user", "content": "15"},
+        {"role": "assistant", "content": "16"},
+        {"role": "user", "content": "17"},
+        {"role": "assistant", "content": "18"},
+        {"role": "user", "content": "19"},
+        {"role": "assistant", "content": "20"}
+      ],
+      "truncated_count": 1
+    }
+  },
+  {
+    "description": "Preserve tool_calls on assistant messages",
+    "inputs": {
+      "messages": [
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "complex_function", "arguments": "{\"key\": \"value\"}"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "Big response"},
+        {"role": "user", "content": "Recent"}
+      ],
+      "keep_recent": 1
+    },
+    "expected": {
+      "messages": [
+        {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "function": {"name": "complex_function", "arguments": "{\"key\": \"value\"}"}}]},
+        {"role": "tool", "tool_call_id": "call_1", "content": "[Truncated]"},
+        {"role": "user", "content": "Recent"}
+      ],
+      "truncated_count": 1
+    }
+  },
+  {
+    "description": "keep_recent of 0 truncates all tool responses",
+    "inputs": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "Response 1"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "Response 2"}
+      ],
+      "keep_recent": 0
+    },
+    "expected": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "[Truncated]"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "[Truncated]"}
+      ],
+      "truncated_count": 2
+    }
+  }
+]

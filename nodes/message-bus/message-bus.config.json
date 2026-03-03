@@ -1,5 +1,6 @@
 {
   "display_name": "Message Bus",
+  "tagline": "Combine message sources",
   "description": "Combine messages from multiple sources into a single message array. Supports daisy-chaining and flexible input handling.",
   "icon": "bus",
   "category": "messages",

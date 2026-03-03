@@ -1,5 +1,6 @@
 {
   "display_name": "Time Adder",
+  "tagline": "Add or subtract time",
   "description": "Add or subtract time from a timestamp. Supports various time units and operations.",
   "icon": "plus-circle",
   "category": "date",

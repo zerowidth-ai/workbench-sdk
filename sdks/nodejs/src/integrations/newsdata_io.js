@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { emitAPICallEvent } from '../utilities/sanitizeAPICall.js';
 
 export default class NewsDataIntegration {
     constructor(apiKey, options = {}) {
@@ -46,14 +47,22 @@ export default class NewsDataIntegration {
             });
 
 
+            const queryParams = { apikey: this.apiKey, ...params };
+            const startTime = Date.now();
+            const fullUrl = `${url}?${new URLSearchParams(queryParams).toString()}`;
+
             const response = await axios({
                 url: url,
                 method: 'GET',
-                params: {
-                    apikey: this.apiKey,
-                    ...params
-                },
+                params: queryParams,
                 timeout: this.options.timeout
+            });
+
+            await emitAPICallEvent(this._engineConfig, {
+                timestamp: startTime, integration: 'newsdata_io', nodeId: null, nodeType: null,
+                request: { method: 'GET', url: fullUrl, headers: {}, body: null },
+                response: { status: response.status, statusText: response.statusText },
+                duration: Date.now() - startTime, error: null
             });
 
             if (response.status >= 400) {

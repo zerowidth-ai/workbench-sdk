@@ -1,5 +1,6 @@
 {
   "display_name": "String Trim",
+  "tagline": "Trim whitespace",
   "description": "Removes whitespace or specified characters from the start and/or end of text",
   "category": "text",
   "inputs": [

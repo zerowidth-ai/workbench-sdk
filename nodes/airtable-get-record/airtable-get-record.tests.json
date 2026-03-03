@@ -1,0 +1,25 @@
+[
+  {
+    "description": "Get record by ID",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "record_id": "${AIRTABLE_TEST_RECORD_ID}"
+    },
+    "expected": {
+      "record": "object",
+      "id": "string",
+      "fields": "object",
+      "created_time": "string"
+    }
+  },
+  {
+    "description": "Error on invalid record ID",
+    "inputs": {
+      "base_id": "${AIRTABLE_TEST_BASE_ID}",
+      "table_name": "${AIRTABLE_TEST_TABLE_NAME}",
+      "record_id": "recINVALIDXXXXXX"
+    },
+    "expectedError": "Airtable API error"
+  }
+]

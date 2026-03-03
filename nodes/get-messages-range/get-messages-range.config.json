@@ -1,5 +1,6 @@
 {
   "display_name": "Get Messages Range",
+  "tagline": "Get message range",
   "description": "Extract messages from a specific range (start index to end index).",
   "icon": "arrows-horizontal",
   "category": "messages",

@@ -1,5 +1,6 @@
 {
   "display_name": "Merge Messages",
+  "tagline": "Merge messages together",
   "description": "Combine consecutive messages from the same role into single messages.",
   "icon": "merge",
   "category": "messages",

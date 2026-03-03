@@ -1,5 +1,6 @@
 {
   "display_name": "Message",
+  "tagline": "Create a message",
   "description": "Manually create a single message.",
   "icon": "fa-comment",
   "category": "messages",

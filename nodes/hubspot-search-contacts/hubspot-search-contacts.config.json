@@ -1,5 +1,6 @@
 {
   "display_name": "Search Hubspot Contacts",
+  "tagline": "Search HubSpot contacts",
   "description": "Search for contacts by filtering on properties, searching through associations, and sorting results",
   "category": "third-party",
   "provider": ["hubspot"],

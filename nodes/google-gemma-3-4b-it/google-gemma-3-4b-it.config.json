@@ -1,5 +1,6 @@
 {
   "display_name": "Google: Gemma 3 4B",
+  "tagline": "Large Language Model",
   "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities, including structured outputs and function calling.",
   "category": "llm",
   "provider": "google",

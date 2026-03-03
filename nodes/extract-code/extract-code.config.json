@@ -1,0 +1,57 @@
+{
+  "display_name": "Extract Code",
+  "tagline": "Extract code blocks",
+  "description": "Extracts code blocks from LLM responses that use markdown formatting. Returns the code content and detected language.",
+  "icon": "code",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "The text containing code blocks to extract",
+      "required": true
+    },
+    {
+      "name": "return_all",
+      "display_name": "Return All",
+      "type": "boolean",
+      "description": "Return all code blocks instead of just the first",
+      "required": false,
+      "default": false
+    },
+    {
+      "name": "language_filter",
+      "display_name": "Language Filter",
+      "type": "string",
+      "description": "Only return code blocks matching this language (e.g., 'python', 'javascript')",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "code",
+      "display_name": "Code",
+      "type": "string",
+      "description": "The extracted code. If return_all is true, returns array of code strings."
+    },
+    {
+      "name": "language",
+      "display_name": "Language",
+      "type": "string",
+      "description": "The language tag from the code block (e.g., 'python', 'javascript'), or null if not specified"
+    },
+    {
+      "name": "found",
+      "display_name": "Found",
+      "type": "boolean",
+      "description": "Whether any code blocks were found"
+    },
+    {
+      "name": "blocks",
+      "display_name": "Blocks",
+      "type": "array",
+      "description": "All extracted blocks with code and language (only populated when return_all is true)"
+    }
+  ]
+}

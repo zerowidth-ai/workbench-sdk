@@ -1,0 +1,44 @@
+{
+  "display_name": "XML to JSON",
+  "tagline": "Convert XML to JSON",
+  "description": "Parses an XML string into a JSON object. Useful for parsing Claude's XML-structured responses.",
+  "icon": "code-slash",
+  "category": "data",
+  "inputs": [
+    {
+      "name": "xml",
+      "display_name": "XML",
+      "type": "string",
+      "description": "The XML string to parse",
+      "required": true
+    },
+    {
+      "name": "remove_root",
+      "display_name": "Remove Root",
+      "type": "boolean",
+      "description": "Whether to unwrap and remove the root element",
+      "required": false,
+      "default": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "json",
+      "display_name": "JSON",
+      "type": "any",
+      "description": "The parsed JSON object"
+    },
+    {
+      "name": "success",
+      "display_name": "Success",
+      "type": "boolean",
+      "description": "Whether parsing succeeded"
+    },
+    {
+      "name": "error",
+      "display_name": "Error",
+      "type": "string",
+      "description": "Error message if parsing failed"
+    }
+  ]
+}

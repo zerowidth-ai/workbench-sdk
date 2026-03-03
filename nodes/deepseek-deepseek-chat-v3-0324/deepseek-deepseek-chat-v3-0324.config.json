@@ -1,5 +1,6 @@
 {
   "display_name": "DeepSeek: DeepSeek V3 0324",
+  "tagline": "Large Language Model",
   "description": "DeepSeek V3, a 685B-parameter, mixture-of-experts model, is the latest iteration of the flagship chat model family from the DeepSeek team.\n\nIt succeeds the [DeepSeek V3](/deepseek/deepseek-chat-v3) model and performs really well on a variety of tasks.",
   "category": "llm",
   "provider": "deepseek",
@@ -44,7 +45,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

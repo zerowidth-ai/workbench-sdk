@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export default async ({inputs, settings, config}) => {
+export default async ({inputs, settings, config, nodeConfig}) => {
 
   const url = inputs.url;
   const method = (inputs.method || 'GET').toUpperCase();
@@ -17,6 +17,8 @@ export default async ({inputs, settings, config}) => {
     fullUrl += (url.includes('?') ? '&' : '?') + params;
   }
 
+  const startTime = Date.now();
+
   try {
     const response = await axios({
       url: fullUrl,
@@ -27,6 +29,19 @@ export default async ({inputs, settings, config}) => {
       maxRedirects: followRedirects ? 5 : 0,
       validateStatus: () => true // Always resolve, never throw for HTTP errors
     });
+
+    if (config._emitAPICall) {
+      await config._emitAPICall({
+        timestamp: startTime,
+        integration: 'http-request',
+        nodeId: nodeConfig?.id || null,
+        nodeType: nodeConfig?.type || 'http-request',
+        request: { method, url: fullUrl, headers, body: body || null },
+        response: { status: response.status, statusText: response.statusText },
+        duration: Date.now() - startTime,
+        error: null
+      });
+    }
 
     let parsedBody = response.data;
     const contentType = response.headers['content-type'] || '';
@@ -51,6 +66,19 @@ export default async ({inputs, settings, config}) => {
       ...(error ? { error } : {})
     };
   } catch (err) {
+    if (config._emitAPICall) {
+      await config._emitAPICall({
+        timestamp: startTime,
+        integration: 'http-request',
+        nodeId: nodeConfig?.id || null,
+        nodeType: nodeConfig?.type || 'http-request',
+        request: { method, url: fullUrl, headers, body: body || null },
+        response: { status: err.response ? err.response.status : 0, statusText: err.response ? err.response.statusText : 'Error' },
+        duration: Date.now() - startTime,
+        error: err.message
+      });
+    }
+
     return {
       status: err.response ? err.response.status : null,
       headers: err.response ? err.response.headers : {},
@@ -58,4 +86,4 @@ export default async ({inputs, settings, config}) => {
       error: err.message
     };
   }
-}; 
+};

@@ -1,5 +1,6 @@
 {
   "display_name": "String Case Convert",
+  "tagline": "Convert text case",
   "description": "Converts text to different letter cases",
   "category": "text",
   "inputs": [

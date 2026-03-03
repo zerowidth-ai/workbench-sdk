@@ -1,0 +1,121 @@
+[
+  {
+    "description": "Parse full URL",
+    "inputs": {
+      "url": "https://example.com:8080/path/to/page?foo=bar&baz=qux#section"
+    },
+    "expected": {
+      "protocol": "https:",
+      "host": "example.com:8080",
+      "hostname": "example.com",
+      "port": "8080",
+      "pathname": "/path/to/page",
+      "search": "?foo=bar&baz=qux",
+      "query": { "foo": "bar", "baz": "qux" },
+      "hash": "#section",
+      "origin": "https://example.com:8080"
+    }
+  },
+  {
+    "description": "Parse simple URL",
+    "inputs": {
+      "url": "https://example.com"
+    },
+    "expected": {
+      "protocol": "https:",
+      "host": "example.com",
+      "hostname": "example.com",
+      "port": "",
+      "pathname": "/",
+      "search": "",
+      "query": {},
+      "hash": "",
+      "origin": "https://example.com"
+    }
+  },
+  {
+    "description": "Parse URL with path only",
+    "inputs": {
+      "url": "https://example.com/api/users"
+    },
+    "expected": {
+      "protocol": "https:",
+      "host": "example.com",
+      "hostname": "example.com",
+      "port": "",
+      "pathname": "/api/users",
+      "search": "",
+      "query": {},
+      "hash": "",
+      "origin": "https://example.com"
+    }
+  },
+  {
+    "description": "Parse URL with query only",
+    "inputs": {
+      "url": "https://example.com?search=test"
+    },
+    "expected": {
+      "protocol": "https:",
+      "host": "example.com",
+      "hostname": "example.com",
+      "port": "",
+      "pathname": "/",
+      "search": "?search=test",
+      "query": { "search": "test" },
+      "hash": "",
+      "origin": "https://example.com"
+    }
+  },
+  {
+    "description": "Parse URL with multiple query values",
+    "inputs": {
+      "url": "https://example.com?tag=a&tag=b&tag=c"
+    },
+    "expected": {
+      "protocol": "https:",
+      "host": "example.com",
+      "hostname": "example.com",
+      "port": "",
+      "pathname": "/",
+      "search": "?tag=a&tag=b&tag=c",
+      "query": { "tag": ["a", "b", "c"] },
+      "hash": "",
+      "origin": "https://example.com"
+    }
+  },
+  {
+    "description": "Parse HTTP URL",
+    "inputs": {
+      "url": "http://localhost:3000/test"
+    },
+    "expected": {
+      "protocol": "http:",
+      "host": "localhost:3000",
+      "hostname": "localhost",
+      "port": "3000",
+      "pathname": "/test",
+      "search": "",
+      "query": {},
+      "hash": "",
+      "origin": "http://localhost:3000"
+    }
+  },
+  {
+    "description": "Handle empty string",
+    "inputs": {
+      "url": ""
+    },
+    "expected": {
+      "protocol": "",
+      "host": "",
+      "hostname": "",
+      "port": "",
+      "pathname": "",
+      "search": "",
+      "query": {},
+      "hash": "",
+      "origin": ""
+    }
+  }
+]

@@ -1,5 +1,6 @@
 {
   "display_name": "OpenAI: GPT-3.5 Turbo",
+  "tagline": "Large Language Model",
   "description": "GPT-3.5 Turbo is OpenAI's fastest model. It can understand and generate natural language or code, and is optimized for chat and traditional completion tasks.\n\nTraining data up to Sep 2021.",
   "category": "llm",
   "provider": "openai",
@@ -40,7 +41,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

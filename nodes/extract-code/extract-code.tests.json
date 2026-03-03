@@ -1,0 +1,162 @@
+[
+  {
+    "description": "Extract Python code block",
+    "inputs": {
+      "text": "Here's the code:\n```python\nprint('hello world')\n```"
+    },
+    "expected": {
+      "code": "print('hello world')\n",
+      "language": "python",
+      "found": true
+    }
+  },
+  {
+    "description": "Extract JavaScript code block",
+    "inputs": {
+      "text": "```javascript\nconsole.log('test');\n```"
+    },
+    "expected": {
+      "code": "console.log('test');\n",
+      "language": "javascript",
+      "found": true
+    }
+  },
+  {
+    "description": "Extract code block without language tag",
+    "inputs": {
+      "text": "```\nsome code here\n```"
+    },
+    "expected": {
+      "code": "some code here\n",
+      "language": null,
+      "found": true
+    }
+  },
+  {
+    "description": "Extract first code block when multiple present",
+    "inputs": {
+      "text": "First:\n```python\ncode1\n```\nSecond:\n```javascript\ncode2\n```",
+      "return_all": false
+    },
+    "expected": {
+      "code": "code1\n",
+      "language": "python",
+      "found": true
+    }
+  },
+  {
+    "description": "Return all code blocks when return_all is true",
+    "inputs": {
+      "text": "```python\ncode1\n```\n```javascript\ncode2\n```",
+      "return_all": true
+    },
+    "expected": {
+      "code": ["code1\n", "code2\n"],
+      "language": "python",
+      "found": true,
+      "blocks": [
+        {"code": "code1\n", "language": "python"},
+        {"code": "code2\n", "language": "javascript"}
+      ]
+    }
+  },
+  {
+    "description": "Filter by language",
+    "inputs": {
+      "text": "```python\npython_code\n```\n```javascript\njs_code\n```\n```python\nmore_python\n```",
+      "language_filter": "python",
+      "return_all": true
+    },
+    "expected": {
+      "code": ["python_code\n", "more_python\n"],
+      "language": "python",
+      "found": true,
+      "blocks": [
+        {"code": "python_code\n", "language": "python"},
+        {"code": "more_python\n", "language": "python"}
+      ]
+    }
+  },
+  {
+    "description": "Language filter with no matches returns not found",
+    "inputs": {
+      "text": "```python\ncode\n```",
+      "language_filter": "rust"
+    },
+    "expected": {
+      "code": null,
+      "language": null,
+      "found": false,
+      "blocks": []
+    }
+  },
+  {
+    "description": "No code blocks returns not found",
+    "inputs": {
+      "text": "This is just plain text with no code blocks."
+    },
+    "expected": {
+      "code": null,
+      "language": null,
+      "found": false,
+      "blocks": []
+    }
+  },
+  {
+    "description": "Handle empty string",
+    "inputs": {
+      "text": ""
+    },
+    "expected": {
+      "code": null,
+      "language": null,
+      "found": false,
+      "blocks": []
+    }
+  },
+  {
+    "description": "Extract multi-line code block",
+    "inputs": {
+      "text": "```python\ndef hello():\n    print('Hello')\n    return True\n```"
+    },
+    "expected": {
+      "code": "def hello():\n    print('Hello')\n    return True\n",
+      "language": "python",
+      "found": true
+    }
+  },
+  {
+    "description": "Extract from verbose LLM response",
+    "inputs": {
+      "text": "Sure! Here's a function that calculates factorial:\n\n```python\ndef factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n```\n\nYou can call it with `factorial(5)` to get 120."
+    },
+    "expected": {
+      "code": "def factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n",
+      "language": "python",
+      "found": true
+    }
+  },
+  {
+    "description": "Handle sql language tag",
+    "inputs": {
+      "text": "```sql\nSELECT * FROM users WHERE active = true;\n```"
+    },
+    "expected": {
+      "code": "SELECT * FROM users WHERE active = true;\n",
+      "language": "sql",
+      "found": true
+    }
+  },
+  {
+    "description": "Language filter is case-insensitive",
+    "inputs": {
+      "text": "```Python\ncode\n```",
+      "language_filter": "PYTHON"
+    },
+    "expected": {
+      "code": "code\n",
+      "language": "python",
+      "found": true
+    }
+  }
+]

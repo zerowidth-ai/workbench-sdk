@@ -1,5 +1,6 @@
 {
   "display_name": "Tool",
+  "tagline": "Define a tool",
   "description": "Define a tool / function call for a LLM to use.",
   "icon": "fa-comment",
   "category": "messages",

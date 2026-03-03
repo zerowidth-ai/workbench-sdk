@@ -1,0 +1,38 @@
+[
+  {
+    "description": "Encode simple string",
+    "inputs": {
+      "text": "Hello World"
+    },
+    "expected": {
+      "encoded": "SGVsbG8gV29ybGQ="
+    }
+  },
+  {
+    "description": "Encode empty string",
+    "inputs": {
+      "text": ""
+    },
+    "expected": {
+      "encoded": ""
+    }
+  },
+  {
+    "description": "Encode with special characters",
+    "inputs": {
+      "text": "Hello! @#$%"
+    },
+    "expected": {
+      "encoded": "SGVsbG8hIEAjJCU="
+    }
+  },
+  {
+    "description": "Encode unicode",
+    "inputs": {
+      "text": "Héllo Wörld"
+    },
+    "expected": {
+      "encoded": "SMOpbGxvIFfDtnJsZA=="
+    }
+  }
+]

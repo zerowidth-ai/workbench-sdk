@@ -1,5 +1,6 @@
 {
   "display_name": "Anthropic: Claude 3 Haiku",
+  "tagline": "Large Language Model",
   "description": "Claude 3 Haiku is Anthropic's fastest and most compact model for\nnear-instant responsiveness. Quick and accurate targeted performance.\n\nSee the launch announcement and benchmark results [here](https://www.anthropic.com/news/claude-3-haiku)\n\n#multimodal",
   "category": "llm",
   "provider": "anthropic",
@@ -33,7 +34,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

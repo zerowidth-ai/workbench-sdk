@@ -1,5 +1,6 @@
 {
   "display_name": "xAI: Grok 3",
+  "tagline": "Large Language Model",
   "description": "Grok 3 is the latest model from xAI. It's their flagship model that excels at enterprise use cases like data extraction, coding, and text summarization. Possesses deep domain knowledge in finance, healthcare, law, and science.\n\n",
   "category": "llm",
   "provider": "x-ai",
@@ -39,7 +40,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

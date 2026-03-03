@@ -168,7 +168,7 @@ export async function loadIntegrations(config, flow = null) {
   }
 
   // map of basic keys that share a integrationformat and implementation
-  const basicKeyIntegrations = ['firecrawl', 'newsdata_io', 'openai', 'google_custom_search'];
+  const basicKeyIntegrations = ['firecrawl', 'newsdata_io', 'openai', 'google_custom_search', 'airtable', 'notion'];
 
   // Load basic integrations in parallel
   await Promise.all(basicKeyIntegrations.map(async integration => {
@@ -209,8 +209,14 @@ export async function loadIntegrations(config, flow = null) {
     integrations._oauthRefreshManager = oauthRefreshManager;
   }
 
+  // Set engine config reference on all integration instances
+  // This allows integrations to emit onAPICall events without signature changes
+  for (const [name, instance] of Object.entries(integrations)) {
+    if (instance && typeof instance === 'object' && !name.startsWith('_')) {
+      instance._engineConfig = config;
+    }
+  }
 
-  
   return integrations;
 }
 

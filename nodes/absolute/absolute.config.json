@@ -1,5 +1,6 @@
 {
   "display_name": "Absolute",
+  "tagline": "Get absolute value",
   "description": "Returns absolute value of a number",
   "category": "math",
   "is_plugin": true,

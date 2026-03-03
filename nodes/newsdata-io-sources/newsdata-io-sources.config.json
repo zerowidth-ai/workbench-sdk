@@ -1,5 +1,6 @@
 {
   "display_name": "NewsData.io: Sources",
+  "tagline": "List news sources",
   "description": "Get list of source domains filtered by country, category, language, and priority",
   "category": "third-party",
   "provider": "newsdata_io",

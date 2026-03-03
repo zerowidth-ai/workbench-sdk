@@ -1,5 +1,6 @@
 {
   "display_name": "Array Split",
+  "tagline": "Split a list",
   "description": "Splits an array into multiple chunks based on different criteria",
   "category": "lists",
   "inputs": [

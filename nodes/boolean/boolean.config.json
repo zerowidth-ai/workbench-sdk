@@ -1,5 +1,6 @@
 {
   "display_name": "Boolean Switch",
+  "tagline": "Set a boolean value",
   "description": "A simple switch node that outputs true or false",
   "icon": "toggle-on",
   "category": "logic",

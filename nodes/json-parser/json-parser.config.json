@@ -1,5 +1,6 @@
 {
   "display_name": "JSON Parser",
+  "tagline": "Parse JSON data",
   "description": "Parses a JSON string into an object or array",
   "icon": "code",
   "category": "data",

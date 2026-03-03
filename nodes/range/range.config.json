@@ -1,5 +1,6 @@
 {
   "display_name": "Range",
+  "tagline": "Calculate number range",
   "description": "Calculates range statistics of numbers",
   "category": "math",
   "inputs": [

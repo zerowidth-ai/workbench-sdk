@@ -55,7 +55,17 @@ async def process(
             continue
         value = inputs.get(input_def["name"])
         if value is not None:
-            params[input_def["name"]] = value
+            # Flatten tools array to handle both individual tools and arrays of tools
+            if input_def["name"] == "tools" and isinstance(value, list):
+                flat_tools = []
+                for item in value:
+                    if isinstance(item, list):
+                        flat_tools.extend(item)
+                    else:
+                        flat_tools.append(item)
+                params["tools"] = flat_tools
+            else:
+                params[input_def["name"]] = value
 
     response = await openrouter.chat_completion(
         model="google/gemma-2-27b-it",
@@ -65,8 +75,15 @@ async def process(
         engine_config=config,
     )
 
-    # Build conversation output: collect tool-related messages from end of input
+    # Get the set of internal tool names (tools handled by engine plugins)
+    # If internal_tool_names is not in config, we're in backward-compatible mode (include all)
+    # If it's an empty list, there are no internal tools (include none from history)
+    has_internal_tool_tracking = "internal_tool_names" in config
+    internal_tool_names: set[str] = set(config.get("internal_tool_names", []))
+
+    # Build conversation output: only include messages related to internal tools
     conversation_messages: list[dict[str, Any]] = []
+
     if isinstance(messages, list) and len(messages) > 0:
         # Work backwards from the end
         for i in range(len(messages) - 1, -1, -1):
@@ -82,20 +99,45 @@ async def process(
                 and len(tool_calls) > 0
             )
 
-            # Include this message if it's a tool message or has tool_calls
-            if is_tool or has_tool_calls:
-                conversation_messages.insert(0, msg)
+            if is_tool:
+                # Only include tool result if it's for an internal tool
+                tool_name = msg.get("name")
+                if not has_internal_tool_tracking or tool_name in internal_tool_names:
+                    conversation_messages.insert(0, msg)
+                # Skip external tool results
+            elif has_tool_calls:
+                # Filter to only internal tool calls
+                if not has_internal_tool_tracking:
+                    internal_calls = tool_calls
+                else:
+                    internal_calls = [
+                        tc for tc in tool_calls
+                        if tc.get("function", {}).get("name") in internal_tool_names
+                    ]
+
+                if len(internal_calls) > 0:
+                    filtered_msg = {**msg, "tool_calls": internal_calls}
+                    conversation_messages.insert(0, filtered_msg)
+                # External tool calls from history are dropped
             else:
                 # Stop when we hit a message that is not tool and has no tool_calls
                 break
 
-    # Append the final output message
+    # Append the final output message — always include all tool_calls on the response
+    # The internal/external split only applies to historical messages above, not the fresh response
     final_message: dict[str, Any] = {
         "content": response.get("content"),
         "role": response.get("role"),
     }
-    if response.get("tool_calls"):
-        final_message["tool_calls"] = response.get("tool_calls")
+
+    response_tool_calls = response.get("tool_calls")
+    if (
+        response_tool_calls is not None
+        and isinstance(response_tool_calls, list)
+        and len(response_tool_calls) > 0
+    ):
+        final_message["tool_calls"] = response_tool_calls
+
     if response.get("images"):
         final_message["images"] = response.get("images")
     conversation_messages.append(final_message)

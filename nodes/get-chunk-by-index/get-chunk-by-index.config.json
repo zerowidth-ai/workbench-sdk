@@ -1,5 +1,6 @@
 {
   "display_name": "Get Chunk by Index",
+  "tagline": "Get document chunk",
   "description": "Retrieve a specific chunk from a knowledge base by document ID and chunk index",
   "category": "knowledge",
   "is_plugin": true,

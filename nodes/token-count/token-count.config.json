@@ -1,5 +1,6 @@
 {
   "display_name": "Token Count",
+  "tagline": "Count tokens",
   "description": "Count tokens in text, messages, or arrays of messages using the cl100k_base tokenizer (used by GPT-4, GPT-3.5-turbo, and other OpenAI models).",
   "icon": "hash",
   "category": "text",

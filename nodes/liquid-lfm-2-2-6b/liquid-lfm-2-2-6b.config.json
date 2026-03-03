@@ -1,5 +1,6 @@
 {
-  "display_name": "LiquidAI/LFM2-2.6B",
+  "display_name": "LiquidAI: LFM2-2.6B",
+  "tagline": "Large Language Model",
   "description": "LFM2 is a new generation of hybrid models developed by Liquid AI, specifically designed for edge AI and on-device deployment. It sets a new standard in terms of quality, speed, and memory efficiency.",
   "category": "llm",
   "provider": "liquid",

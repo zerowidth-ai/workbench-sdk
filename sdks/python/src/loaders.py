@@ -184,23 +184,29 @@ async def load_integrations(
             logger.warning(f"Failed to load OpenRouter integration: {e}")
 
     # Load other basic integrations
-    basic_integrations = ["firecrawl", "newsdata_io", "openai", "google_custom_search"]
+    basic_integrations = ["firecrawl", "newsdata_io", "openai", "google_custom_search", "airtable", "notion"]
 
     for integration_name in basic_integrations:
-        if keys.get(integration_name):
-            try:
-                # Dynamic import of integration module
-                module = importlib.import_module(
-                    f"src.integrations.{integration_name}"
-                )
-                integration_class = getattr(
-                    module, f"{_to_class_name(integration_name)}Integration"
-                )
-                integrations[integration_name] = integration_class(keys[integration_name])
-                if debug:
-                    logger.debug(f"Loaded {integration_name} integration")
-            except (ImportError, AttributeError) as e:
-                logger.warning(f"Failed to load {integration_name} integration: {e}")
+        key_value = keys.get(integration_name)
+        # Skip if no key, or if it's a dict with empty/None values
+        if not key_value:
+            continue
+        if isinstance(key_value, dict) and not any(key_value.values()):
+            continue
+
+        try:
+            # Dynamic import of integration module
+            module = importlib.import_module(
+                f"src.integrations.{integration_name}"
+            )
+            integration_class = getattr(
+                module, f"{_to_class_name(integration_name)}Integration"
+            )
+            integrations[integration_name] = integration_class(key_value)
+            if debug:
+                logger.debug(f"Loaded {integration_name} integration")
+        except (ImportError, AttributeError, ValueError) as e:
+            logger.warning(f"Failed to load {integration_name} integration: {e}")
 
     # Load HubSpot integration (OAuth-based)
     if keys.get("hubspot"):
@@ -233,6 +239,12 @@ async def load_integrations(
                         logger.debug("Loaded SQLite knowledge base integration")
         except ImportError as e:
             logger.warning(f"Failed to load knowledge base integration: {e}")
+
+    # Set engine config reference on all integration instances
+    # This allows integrations to emit on_api_call events without signature changes
+    for name, instance in integrations.items():
+        if not name.startswith("_") and hasattr(instance, "__dict__"):
+            instance._engine_config = config
 
     return integrations
 

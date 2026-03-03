@@ -1,5 +1,6 @@
 {
   "display_name": "Response Format",
+  "tagline": "Define response format",
   "description": "Define a JSON Schema response format for structured outputs from LLMs.",
   "icon": "fa-code",
   "category": "messages",

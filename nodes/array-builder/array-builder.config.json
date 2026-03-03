@@ -1,5 +1,6 @@
 {
   "display_name": "Array Builder",
+  "tagline": "Build a list",
   "description": "Connect an array of items to build an list of unspecified order.",
   "icon": "list-ol",
   "category": "lists",

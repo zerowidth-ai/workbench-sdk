@@ -1,0 +1,22 @@
+[
+  {
+    "description": "Get blocks from a page",
+    "inputs": {
+      "block_id": "${NOTION_TEST_PAGE_ID}"
+    },
+    "expected": {
+      "results": "array",
+      "has_more": "boolean"
+    }
+  },
+  {
+    "description": "Get blocks with page size limit",
+    "inputs": {
+      "block_id": "${NOTION_TEST_PAGE_ID}",
+      "page_size": 10
+    },
+    "expected": {
+      "results": "array"
+    }
+  }
+]

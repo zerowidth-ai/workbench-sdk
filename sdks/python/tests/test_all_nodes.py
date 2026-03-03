@@ -78,6 +78,29 @@ CUSTOM_TESTS = {
 }
 
 
+def substitute_env_vars(obj: Any) -> Any:
+    """
+    Recursively substitute ${VAR} patterns with environment variable values.
+
+    Args:
+        obj: The object to process (can be string, list, dict, or other).
+
+    Returns:
+        The object with environment variables substituted.
+    """
+    if isinstance(obj, str):
+        return re.sub(
+            r"\$\{([^}]+)\}",
+            lambda m: os.environ.get(m.group(1), m.group(0)),
+            obj,
+        )
+    if isinstance(obj, list):
+        return [substitute_env_vars(item) for item in obj]
+    if isinstance(obj, dict):
+        return {key: substitute_env_vars(value) for key, value in obj.items()}
+    return obj
+
+
 def get_nodes_dir() -> Path:
     """Get the nodes directory path."""
     sdk_root = Path(__file__).parent.parent
@@ -157,8 +180,11 @@ async def run_node_test(
         )
         return False
 
+    # Substitute environment variables in inputs (e.g., ${AIRTABLE_TEST_BASE_ID})
+    substituted_inputs = substitute_env_vars(test_case.get("inputs", {}))
+
     # Merge default values from node_config into inputs
-    inputs_with_defaults = dict(test_case.get("inputs", {}))
+    inputs_with_defaults = dict(substituted_inputs)
     for input_def in node_config.get("inputs", []):
         name = input_def.get("name")
         if (
@@ -168,8 +194,11 @@ async def run_node_test(
         ):
             inputs_with_defaults[name] = input_def["default"]
 
+    # Substitute environment variables in settings as well
+    substituted_settings = substitute_env_vars(test_case.get("settings", {}))
+
     # Apply default settings from node configuration
-    settings_with_defaults = dict(test_case.get("settings", {}))
+    settings_with_defaults = dict(substituted_settings)
     for setting_def in node_config.get("settings", []):
         name = setting_def.get("name")
         if (
@@ -407,6 +436,8 @@ async def run_tests(node_filter: str | None = None, start_from: str | None = Non
             "keys": {
                 "openrouter": os.environ.get("OPENROUTER_API_KEY"),
                 "newsdata_io": os.environ.get("NEWSDATA_IO_API_KEY"),
+                "airtable": os.environ.get("AIRTABLE_API_KEY"),
+                "notion": os.environ.get("NOTION_API_KEY"),
             }
         }
     )

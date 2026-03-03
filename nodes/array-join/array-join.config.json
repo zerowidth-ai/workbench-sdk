@@ -1,5 +1,6 @@
 {
   "display_name": "Array Join",
+  "tagline": "Join list to text",
   "description": "Combines array elements into a single string with a separator",
   "category": "lists",
   "inputs": [

@@ -1,5 +1,6 @@
 {
   "display_name": "xAI: Grok 3 Mini",
+  "tagline": "Large Language Model",
   "description": "A lightweight model that thinks before responding. Fast, smart, and great for logic-based tasks that do not require deep domain knowledge. The raw thinking traces are accessible.",
   "category": "llm",
   "provider": "x-ai",
@@ -39,7 +40,7 @@
     {
       "name": "tools",
       "display_name": "Tools",
-      "type": "tool",
+      "type": "tool or array of tools",
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true

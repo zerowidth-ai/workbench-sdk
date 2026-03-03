@@ -3,6 +3,7 @@ HTTP Request Node - Make HTTP requests.
 """
 
 import json
+import time
 from typing import Any
 from urllib.parse import urlencode
 
@@ -40,6 +41,9 @@ async def process(
         params = urlencode(query)
         full_url += ("&" if "?" in url else "?") + params
 
+    start_time = int(time.time() * 1000)
+    emit_api_call = config.get("_emit_api_call")
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.request(
@@ -53,6 +57,18 @@ async def process(
             ) as response:
                 status = response.status
                 response_headers = dict(response.headers)
+
+                if emit_api_call:
+                    await emit_api_call({
+                        "timestamp": start_time,
+                        "integration": "http-request",
+                        "nodeId": node_config.get("id") if node_config else None,
+                        "nodeType": node_config.get("type", "http-request") if node_config else "http-request",
+                        "request": {"method": method, "url": full_url, "headers": headers, "body": body},
+                        "response": {"status": status, "statusText": response.reason or ""},
+                        "duration": int(time.time() * 1000) - start_time,
+                        "error": None,
+                    })
 
                 # Try to parse response body
                 content_type = response_headers.get("Content-Type", "")
@@ -76,6 +92,18 @@ async def process(
                 return result
 
     except Exception as err:
+        if emit_api_call:
+            await emit_api_call({
+                "timestamp": start_time,
+                "integration": "http-request",
+                "nodeId": node_config.get("id") if node_config else None,
+                "nodeType": node_config.get("type", "http-request") if node_config else "http-request",
+                "request": {"method": method, "url": full_url, "headers": headers, "body": body},
+                "response": {"status": 0, "statusText": "Error"},
+                "duration": int(time.time() * 1000) - start_time,
+                "error": str(err),
+            })
+
         return {
             "status": None,
             "headers": {},

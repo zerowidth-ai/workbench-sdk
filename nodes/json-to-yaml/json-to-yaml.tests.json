@@ -1,0 +1,101 @@
+[
+  {
+    "description": "Simple object to YAML",
+    "inputs": {
+      "json": {"name": "Alice", "age": 30}
+    },
+    "expected": {
+      "yaml": "name: Alice\nage: 30"
+    }
+  },
+  {
+    "description": "Nested object",
+    "inputs": {
+      "json": {"user": {"name": "Bob", "active": true}}
+    },
+    "expected": {
+      "yaml": "user:\n  name: Bob\n  active: true"
+    }
+  },
+  {
+    "description": "Array of primitives",
+    "inputs": {
+      "json": {"tags": ["a", "b", "c"]}
+    },
+    "expected": {
+      "yaml": "tags:\n  - a\n  - b\n  - c"
+    }
+  },
+  {
+    "description": "Array of objects",
+    "inputs": {
+      "json": {"users": [{"name": "Alice"}, {"name": "Bob"}]}
+    },
+    "expected": {
+      "yaml": "users:\n  - name: Alice\n  - name: Bob"
+    }
+  },
+  {
+    "description": "Boolean values",
+    "inputs": {
+      "json": {"enabled": true, "debug": false}
+    },
+    "expected": {
+      "yaml": "enabled: true\ndebug: false"
+    }
+  },
+  {
+    "description": "Null value",
+    "inputs": {
+      "json": {"value": null}
+    },
+    "expected": {
+      "yaml": "value: null"
+    }
+  },
+  {
+    "description": "Numeric values",
+    "inputs": {
+      "json": {"count": 42, "price": 19.99}
+    },
+    "expected": {
+      "yaml": "count: 42\nprice: 19.99"
+    }
+  },
+  {
+    "description": "String that needs quoting (contains colon)",
+    "inputs": {
+      "json": {"url": "http://example.com"}
+    },
+    "expected": {
+      "yaml": "url: \"http://example.com\""
+    }
+  },
+  {
+    "description": "Empty object",
+    "inputs": {
+      "json": {}
+    },
+    "expected": {
+      "yaml": "{}"
+    }
+  },
+  {
+    "description": "Empty array",
+    "inputs": {
+      "json": {"items": []}
+    },
+    "expected": {
+      "yaml": "items: []"
+    }
+  },
+  {
+    "description": "Top-level null",
+    "inputs": {
+      "json": null
+    },
+    "expected": {
+      "yaml": "null"
+    }
+  }
+]

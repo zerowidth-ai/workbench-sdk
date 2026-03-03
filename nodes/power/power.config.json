@@ -1,5 +1,6 @@
 {
   "display_name": "Power",
+  "tagline": "Raise to a power",
   "description": "Raises first number to power of second",
   "category": "math",
   "inputs": [

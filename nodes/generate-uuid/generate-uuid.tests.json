@@ -1,0 +1,7 @@
+[
+  {
+    "description": "Generate single UUID has correct format",
+    "inputs": {},
+    "expected": {}
+  }
+]

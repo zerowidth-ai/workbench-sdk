@@ -7,7 +7,11 @@ Provides access to news data through the NewsData.io API.
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any
+from urllib.parse import urlencode
+
+from src.utilities.sanitize_api_call import emit_api_call_event
 
 try:
     import httpx
@@ -76,9 +80,18 @@ class NewsDataIntegration:
         clean_params["apikey"] = self.api_key
 
         url = f"{self.base_url}/{endpoint}"
+        start_time = int(time.time() * 1000)
+        full_url = f"{url}?{urlencode(clean_params)}"
 
         try:
             response = await self.client.get(url, params=clean_params)
+
+            await emit_api_call_event(getattr(self, "_engine_config", None), {
+                "timestamp": start_time, "integration": "newsdata_io", "nodeId": None, "nodeType": None,
+                "request": {"method": "GET", "url": full_url, "headers": {}, "body": None},
+                "response": {"status": response.status_code, "statusText": response.reason_phrase or ""},
+                "duration": int(time.time() * 1000) - start_time, "error": None,
+            })
 
             if response.status_code >= 400:
                 try:

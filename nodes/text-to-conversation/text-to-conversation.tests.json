@@ -1,0 +1,132 @@
+[
+  {
+    "description": "Parse basic conversation",
+    "inputs": {
+      "text": "User: Hello\n\nAssistant: Hi there!"
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi there!"}
+      ],
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Parse with system message",
+    "inputs": {
+      "text": "System: You are helpful\n\nUser: Hi\n\nAssistant: Hello!"
+    },
+    "expected": {
+      "messages": [
+        {"role": "system", "content": "You are helpful"},
+        {"role": "user", "content": "Hi"},
+        {"role": "assistant", "content": "Hello!"}
+      ],
+      "message_count": 3
+    }
+  },
+  {
+    "description": "Handle uppercase role labels",
+    "inputs": {
+      "text": "USER: Hello\n\nASSISTANT: Hi!"
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"}
+      ],
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Normalize 'Human' to 'user'",
+    "inputs": {
+      "text": "Human: Hello\n\nAssistant: Hi!"
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"}
+      ],
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Normalize 'AI' to 'assistant'",
+    "inputs": {
+      "text": "User: Hello\n\nAI: Hi there!"
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi there!"}
+      ],
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Use default role when no label",
+    "inputs": {
+      "text": "Hello\n\nHow are you?",
+      "default_role": "user"
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "user", "content": "How are you?"}
+      ],
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Custom separator",
+    "inputs": {
+      "text": "User: Hello---Assistant: Hi!",
+      "separator": "---"
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"}
+      ],
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Handle empty string",
+    "inputs": {
+      "text": ""
+    },
+    "expected": {
+      "messages": [],
+      "message_count": 0
+    }
+  },
+  {
+    "description": "Handle multi-line content",
+    "inputs": {
+      "text": "User: Hello\nHow are you today?\n\nAssistant: I'm doing well!\nThanks for asking."
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello\nHow are you today?"},
+        {"role": "assistant", "content": "I'm doing well!\nThanks for asking."}
+      ],
+      "message_count": 2
+    }
+  },
+  {
+    "description": "Skip empty chunks",
+    "inputs": {
+      "text": "User: Hello\n\n\n\nAssistant: Hi!"
+    },
+    "expected": {
+      "messages": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": "Hi!"}
+      ],
+      "message_count": 2
+    }
+  }
+]

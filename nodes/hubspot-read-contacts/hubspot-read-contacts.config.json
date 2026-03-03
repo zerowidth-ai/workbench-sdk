@@ -1,5 +1,6 @@
 {
   "display_name": "Read Hubspot Contacts",
+  "tagline": "Read HubSpot contacts",
   "description": "Retrieve all contacts from HubSpot CRM using query parameters to specify the information that gets returned",
   "category": "third-party",
   "provider": ["hubspot"],

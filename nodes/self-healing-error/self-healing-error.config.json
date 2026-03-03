@@ -1,5 +1,6 @@
 {
   "display_name": "Self Healing Error",
+  "tagline": "Test retry logic",
   "description": "Throws an error initially but succeeds on retry, useful for testing retry logic and error recovery.",
   "icon": "refresh-cw",
   "category": "testing",

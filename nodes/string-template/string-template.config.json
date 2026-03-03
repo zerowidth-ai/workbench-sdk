@@ -1,5 +1,6 @@
 {
   "display_name": "String Template",
+  "tagline": "Fill template variables",
   "description": "Fills a template string with variable values",
   "category": "text",
   "inputs": [
