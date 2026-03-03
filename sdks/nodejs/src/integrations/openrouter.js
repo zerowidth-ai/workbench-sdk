@@ -278,7 +278,24 @@ export default class OpenRouterIntegration {
 
             return result;
         } catch (error) {
-            // Emit API call event for error case
+            // Parse error details from OpenAI SDK error shape
+            const status = error.status || error.response?.status || 0;
+            const statusText = error.response?.statusText || (status ? `HTTP ${status}` : 'Error');
+            const errorBody = error.error || error.response?.data || null;
+            const errorCode = error.code || errorBody?.error?.code || null;
+            const errorType = error.type || errorBody?.error?.type || null;
+
+            let errorMessage = `OpenRouter API Error`;
+            if (status) errorMessage += ` (${status})`;
+
+            // Extract the most specific error message available
+            const specificMessage = errorBody?.error?.message
+                || errorBody?.message
+                || (typeof errorBody === 'string' ? errorBody : null)
+                || error.message;
+            if (specificMessage) errorMessage += `: ${specificMessage}`;
+
+            // Emit API call event with full error detail
             await emitAPICallEvent(engineConfig || this._engineConfig, {
                 timestamp: apiCallStartTime,
                 integration: 'openrouter',
@@ -289,69 +306,28 @@ export default class OpenRouterIntegration {
                     url: `${this.client.baseURL}/chat/completions`,
                     headers: {
                         'Content-Type': 'application/json',
+                        'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
+                        'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
                         'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
                     },
                     body: payload
                 },
                 response: {
-                    status: error.response?.status || 0,
-                    statusText: error.response?.statusText || 'Error'
-                },
-                duration: Date.now() - apiCallStartTime,
-                error: error.message
-            });
-
-            // Enhanced error handling with detailed information
-            let errorMessage = 'OpenRouter API Error';
-            let errorDetails = {};
-
-            if (error.response) {
-                // Server responded with error status
-                const status = error.response.status;
-                const statusText = error.response.statusText;
-                const responseData = error.response.data;
-                
-                errorMessage = `OpenRouter API Error (${status} ${statusText})`;
-                errorDetails = {
                     status,
                     statusText,
-                    responseData,
-                    url: error.config?.url,
-                    method: error.config?.method
-                };
-
-                // Try to extract more specific error information
-                if (responseData?.error) {
-                    errorMessage += `: ${responseData.error.message || responseData.error}`;
-                } else if (responseData?.message) {
-                    errorMessage += `: ${responseData.message}`;
-                } else if (typeof responseData === 'string') {
-                    errorMessage += `: ${responseData}`;
+                    body: errorBody
+                },
+                duration: Date.now() - apiCallStartTime,
+                error: {
+                    message: errorMessage,
+                    code: errorCode,
+                    type: errorType,
+                    status,
+                    raw: error.message
                 }
-            } else if (error.request) {
-                // Request was made but no response received
-                errorMessage = 'OpenRouter API Error: No response received';
-                errorDetails = {
-                    request: error.request,
-                    url: error.config?.url,
-                    method: error.config?.method
-                };
-            } else {
-                // Something else happened
-                errorMessage = `OpenRouter API Error: ${error.message}`;
-                errorDetails = {
-                    message: error.message,
-                    stack: error.stack
-                };
-            }
-
-            // Log detailed error information for debugging
-            console.error('OpenRouter Integration Error Details:', {
-                errorMessage,
-                errorDetails,
-                payload: payload,
-                model: payload.model
             });
+
+            console.error('OpenRouter Integration Error:', errorMessage);
 
             throw new Error(errorMessage);
         }

@@ -180,10 +180,70 @@ class OpenRouterIntegration:
         # Enable streaming
         payload["stream"] = True
 
+        api_call_start_time = int(time.time() * 1000)
         try:
-            return await self._stream_completion(payload, node_config, engine_config)
+            return await self._stream_completion(payload, node_config, engine_config, api_call_start_time)
         except Exception as e:
-            error_message = f"OpenRouter API Error: {e}"
+            # Parse error details from OpenAI SDK error shape
+            status = getattr(e, "status_code", None) or getattr(e, "status", 0) or 0
+            status_text = f"HTTP {status}" if status else "Error"
+            error_body = getattr(e, "body", None) or getattr(e, "response", None)
+            error_code = getattr(e, "code", None)
+            error_type = getattr(e, "type", None)
+
+            # Try to extract nested error info
+            if isinstance(error_body, dict):
+                nested = error_body.get("error", {})
+                if isinstance(nested, dict):
+                    error_code = error_code or nested.get("code")
+                    error_type = error_type or nested.get("type")
+                    specific_msg = nested.get("message") or error_body.get("message")
+                else:
+                    specific_msg = error_body.get("message") or str(nested)
+            elif isinstance(error_body, str):
+                specific_msg = error_body
+            else:
+                specific_msg = str(e)
+
+            error_message = "OpenRouter API Error"
+            if status:
+                error_message += f" ({status})"
+            if specific_msg:
+                error_message += f": {specific_msg}"
+
+            # Emit API call event with full error detail
+            _cfg = engine_config or getattr(self, "_engine_config", None)
+            await emit_api_call_event(_cfg, {
+                "timestamp": api_call_start_time,
+                "integration": "openrouter",
+                "nodeId": node_config.get("id") if node_config else None,
+                "nodeType": node_config.get("type") if node_config else None,
+                "request": {
+                    "method": "POST",
+                    "url": f"{self.base_url}/chat/completions",
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": self.referer,
+                        "X-Title": self.title,
+                        "Authorization": f"Bearer {self.api_key}",
+                    },
+                    "body": payload,
+                },
+                "response": {
+                    "status": status,
+                    "statusText": status_text,
+                    "body": error_body,
+                },
+                "duration": int(time.time() * 1000) - api_call_start_time,
+                "error": {
+                    "message": error_message,
+                    "code": error_code,
+                    "type": error_type,
+                    "status": status,
+                    "raw": str(e),
+                },
+            })
+
             logger.error(f"OpenRouter Integration Error: {error_message}")
             raise Exception(error_message) from e
 
@@ -205,11 +265,13 @@ class OpenRouterIntegration:
         payload: dict[str, Any],
         node_config: dict[str, Any] | None,
         engine_config: dict[str, Any] | None,
+        api_call_start_time: int | None = None,
     ) -> dict[str, Any]:
         """Handle streaming completion response."""
         import json as json_module
 
-        api_call_start_time = int(time.time() * 1000)
+        if api_call_start_time is None:
+            api_call_start_time = int(time.time() * 1000)
 
         # Extract OpenRouter-specific params for extra_body (not supported by OpenAI SDK directly)
         extra_body: dict[str, Any] = {}
