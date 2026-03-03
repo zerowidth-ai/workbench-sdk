@@ -163,11 +163,11 @@ export default class OpenRouterIntegration {
                     }
                   }
 
-                  if(event.data.content !== null){
+                  if(event.data.content != null){
                     content += event.data.content;
                   }
 
-                  if(event.data.reasoning !== null){
+                  if(event.data.reasoning != null){
                     reasoning += event.data.reasoning;
                   }
 
