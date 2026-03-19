@@ -1,13 +1,12 @@
-export default async ({inputs, settings, config}) => {
+export default async ({inputs, settings, config, nodeConfig}) => {
 
   const items = inputs.items;
 
-  let array = [];
-  if (Array.isArray(items)) {
-    array = items;
-  } else {
-    array = [items];
+  if (items === undefined || items === null) {
+    return { array: [] };
   }
+
+  const array = Array.isArray(items) ? items : [items];
 
   return { array };
 };

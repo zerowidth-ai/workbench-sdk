@@ -1,8 +1,8 @@
-export default async ({ inputs, settings, config }) => {
+export default async ({ inputs, settings, config, nodeConfig }) => {
   const text = inputs.text;
 
   if (typeof text !== "string") {
-    return { encoded: "" };
+    throw new Error("base64-encode: input 'text' must be a string");
   }
 
   const encoded = Buffer.from(text, "utf-8").toString("base64");

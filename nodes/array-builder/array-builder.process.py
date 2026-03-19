@@ -12,9 +12,9 @@ async def process(
     """
     items = inputs.get("items")
 
-    if isinstance(items, list):
-        array = items
-    else:
-        array = [items]
+    if items is None:
+        return {"array": []}
+
+    array = items if isinstance(items, list) else [items]
 
     return {"array": array}

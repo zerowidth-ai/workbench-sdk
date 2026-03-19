@@ -25,17 +25,16 @@ async def process(
   else:
     condition = bool(inputs.get("condition"))
   
-  # Initialize the output dictionary
-  output = {}
-  
-  # Add result to output only if the corresponding input exists
+  # Return result based on condition, matching JS behavior
+  result = inputs.get("if_true") if condition else inputs.get("if_false")
+
   if condition:
-    if "if_true" in inputs:
-      output["result"] = inputs.get("if_true")
-    output["true_path"] = True
+    return {
+      "result": result,
+      "true_path": True,
+    }
   else:
-    if "if_false" in inputs:
-      output["result"] = inputs.get("if_false")
-    output["false_path"] = True
-  
-  return output 
+    return {
+      "result": result,
+      "false_path": True,
+    } 

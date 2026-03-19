@@ -1,6 +1,9 @@
-export default async ({inputs, settings, config}) => {
+export default async ({inputs, settings, config, nodeConfig}) => {
+
+  const a = inputs.string_a != null ? String(inputs.string_a) : '';
+  const b = inputs.string_b != null ? String(inputs.string_b) : '';
 
   return {
-    text: `${inputs.string_a}${inputs.string_b}`
+    text: `${a}${b}`
   };
 }; 

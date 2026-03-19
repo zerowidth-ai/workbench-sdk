@@ -12,7 +12,7 @@ async def process(
     text = inputs.get("text")
 
     if not isinstance(text, str):
-        return {"encoded": ""}
+        raise ValueError("base64-encode: input 'text' must be a string")
 
     encoded = base64.b64encode(text.encode("utf-8")).decode("utf-8")
 

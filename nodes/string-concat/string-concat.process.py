@@ -7,6 +7,9 @@ async def process(
     config: dict[str, Any],
     node_config: dict[str, Any],
 ) -> dict[str, Any]:
+  a = str(inputs.get("string_a", "")) if inputs.get("string_a") is not None else ""
+  b = str(inputs.get("string_b", "")) if inputs.get("string_b") is not None else ""
+
   return {
-    "text": f"{inputs['string_a']}{inputs['string_b']}"
+    "text": f"{a}{b}"
   }

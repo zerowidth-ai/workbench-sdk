@@ -1,97 +1,114 @@
-export default async ({inputs, settings, config}) => {
+export default async ({inputs, settings, config, nodeConfig}) => {
 
   const csvString = inputs.csv || '';
   const delimiter = settings.delimiter || ',';
   const hasHeaders = settings.has_headers !== false;
   const trimValues = settings.trim_values !== false;
   const skipEmptyLines = settings.skip_empty_lines !== false;
-  
+
   let data = [];
   let headers = [];
   let error = '';
   let success = false;
-  
+
   try {
-    // Split into lines
-    let lines = csvString.split(/\r?\n/);
-    
+    // Parse all records handling multi-line quoted values
+    let records = parseCSV(csvString, delimiter);
+
     // Skip empty lines if configured
     if (skipEmptyLines) {
-      lines = lines.filter(line => line.trim() !== '');
+      records = records.filter(row => row.some(cell => cell.trim() !== ''));
     }
-    
-    if (lines.length === 0) {
+
+    if (records.length === 0) {
       return { data: [], headers: [], error: '', success: true };
     }
-    
+
     // Parse headers if configured
-    if (hasHeaders && lines.length > 0) {
-      headers = parseCSVLine(lines[0], delimiter, trimValues);
-      lines = lines.slice(1);
+    if (hasHeaders && records.length > 0) {
+      headers = trimValues ? records[0].map(h => h.trim()) : records[0];
+      records = records.slice(1);
     }
-    
+
     // Parse data rows
     if (hasHeaders) {
-      // Parse as objects with header keys
-      data = lines.map(line => {
-        const values = parseCSVLine(line, delimiter, trimValues);
-        const row = {};
-        
-        // Map values to header keys
+      data = records.map(row => {
+        const obj = {};
         headers.forEach((header, index) => {
-          if (index < values.length) {
-            row[header] = values[index];
+          if (index < row.length) {
+            obj[header] = trimValues ? row[index].trim() : row[index];
           }
         });
-        
-        return row;
+        return obj;
       });
     } else {
-      // Parse as arrays of values
-      data = lines.map(line => parseCSVLine(line, delimiter, trimValues));
+      data = records.map(row =>
+        trimValues ? row.map(cell => cell.trim()) : row
+      );
     }
-    
+
     success = true;
   } catch (e) {
     error = e.message || 'Failed to parse CSV';
     data = [];
     headers = [];
   }
-  
+
   return { data, headers, error, success };
 };
 
-// Helper function to parse a CSV line respecting quotes
-function parseCSVLine(line, delimiter, trim) {
-  const values = [];
+// Parse full CSV string into array of rows, handling multi-line quoted values
+function parseCSV(text, delimiter) {
+  const records = [];
+  let row = [];
   let currentValue = '';
   let inQuotes = false;
-  
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    const nextChar = i < line.length - 1 ? line[i + 1] : '';
-    
-    if (char === '"') {
-      if (inQuotes && nextChar === '"') {
-        // Escaped quote inside quotes
-        currentValue += '"';
-        i++; // Skip the next quote
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = i < text.length - 1 ? text[i + 1] : '';
+
+    if (inQuotes) {
+      if (char === '"') {
+        if (nextChar === '"') {
+          // Escaped quote
+          currentValue += '"';
+          i++;
+        } else {
+          // End of quoted field
+          inQuotes = false;
+        }
       } else {
-        // Toggle quote mode
-        inQuotes = !inQuotes;
+        currentValue += char;
       }
-    } else if (char === delimiter && !inQuotes) {
-      // End of value
-      values.push(trim ? currentValue.trim() : currentValue);
-      currentValue = '';
     } else {
-      // Add character to current value
-      currentValue += char;
+      if (char === '"') {
+        inQuotes = true;
+      } else if (char === delimiter) {
+        row.push(currentValue);
+        currentValue = '';
+      } else if (char === '\r' && nextChar === '\n') {
+        row.push(currentValue);
+        currentValue = '';
+        records.push(row);
+        row = [];
+        i++; // skip \n
+      } else if (char === '\n') {
+        row.push(currentValue);
+        currentValue = '';
+        records.push(row);
+        row = [];
+      } else {
+        currentValue += char;
+      }
     }
   }
-  
-  // Add the last value
-  values.push(trim ? currentValue.trim() : currentValue);
-  
-  return values;
+
+  // Push last value/row
+  row.push(currentValue);
+  if (row.length > 0) {
+    records.push(row);
+  }
+
+  return records;
 } 

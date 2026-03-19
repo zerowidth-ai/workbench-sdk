@@ -29,16 +29,15 @@ async def process(
         }
     except Exception as e:
         error = str(e)
-        
+
         # Try to parse the default value
         try:
             value = json.loads(settings.get("default_value", "{}"))
-        except:
+        except Exception:
             value = {}
-        
-        # For failed parsing, only include value and success fields
-        # This matches the expected output format in the tests
+
         return {
             "value": value,
-            "success": success
+            "error": error,
+            "success": success,
         } 

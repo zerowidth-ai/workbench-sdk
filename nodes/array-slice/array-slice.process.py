@@ -10,9 +10,16 @@ async def process(
   array = inputs.get("array", [])
   if not isinstance(array, list):
     array = [array]
-    
-  start = int(inputs.get("start", 0))
-  end = int(inputs.get("end")) if inputs.get("end") is not None else None
+
+  try:
+    start = int(inputs.get("start", 0))
+  except (ValueError, TypeError):
+    raise ValueError("array-slice: 'start' must be a valid number")
+
+  try:
+    end = int(inputs.get("end")) if inputs.get("end") is not None else None
+  except (ValueError, TypeError):
+    raise ValueError("array-slice: 'end' must be a valid number")
   
   return {
     "array": array[start:end]
