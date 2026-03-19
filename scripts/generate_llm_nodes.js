@@ -77,7 +77,7 @@ const PARAMETER_MAPPINGS = {
     default: null
   },
   'response_format': {
-    type: 'string or object',
+    type: 'object',
     description: 'Output format specification',
     default: null
   },
@@ -118,12 +118,7 @@ const PARAMETER_MAPPINGS = {
   },
   'reasoning': {
     type: 'boolean',
-    description: 'Internal reasoning mode',
-    default: null
-  },
-  'include_reasoning': {
-    type: 'boolean',
-    description: 'Include reasoning in response',
+    description: 'Enable reasoning mode',
     default: null
   },
   'modalities': {
@@ -375,28 +370,36 @@ class LLMNodeGenerator {
   }
 
   /**
-   * Sort inputs with priority order: primary inputs first, then alphabetical, then by type
+   * Sort inputs with explicit ordering.
+   * Primary inputs first, then tools together, then booleans, then numbers, then everything else.
    */
   sortInputs(inputs) {
-    const priorityInputs = ['system_prompt', 'messages', 'prompt', 'modalities', 'image_config', 'tools'];
-    
+    const orderedNames = [
+      // Primary inputs
+      'messages', 'prompt', 'system_prompt',
+      // Image
+      'modalities', 'image_config',
+      // Tools (kept together)
+      'tools', 'tool_choice',
+      // Booleans
+      'reasoning',
+      // Format/structure
+      'response_format', 'stop',
+      // Numbers
+      'temperature', 'top_p', 'max_tokens', 'frequency_penalty', 'presence_penalty', 'seed',
+    ];
+
     return inputs.sort((a, b) => {
-      // First, sort by priority
-      const aPriority = priorityInputs.indexOf(a.name);
-      const bPriority = priorityInputs.indexOf(b.name);
-      
-      if (aPriority !== -1 && bPriority !== -1) {
-        return aPriority - bPriority;
-      }
-      if (aPriority !== -1) return -1;
-      if (bPriority !== -1) return 1;
-      
-      // Then alphabetical by name
-      const nameCompare = a.name.localeCompare(b.name);
-      if (nameCompare !== 0) return nameCompare;
-      
-      // Finally by type
-      return a.type.localeCompare(b.type);
+      const aIdx = orderedNames.indexOf(a.name);
+      const bIdx = orderedNames.indexOf(b.name);
+
+      // Both in the list: use explicit order
+      if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+      // Only one in the list: it goes first
+      if (aIdx !== -1) return -1;
+      if (bIdx !== -1) return 1;
+      // Neither in the list: alphabetical
+      return a.name.localeCompare(b.name);
     });
   }
 
@@ -446,8 +449,8 @@ class LLMNodeGenerator {
       });
       inputs.push({
         name: "system_prompt",
-        display_name: "System Prompt",
-        type: "string or message",
+        display_name: "System Message",
+        type: "message or string",
         description: "System prompt to instruct the model",
         default: null
       });
@@ -714,8 +717,13 @@ class LLMNodeGenerator {
     const provider = model.id.split('/')[0].toLowerCase();
     const needs_key_from = ['openrouter'];
 
+    // Determine tagline based on model capabilities
+    const hasImageOutput = this.hasImageGenerationCapability(model);
+    const tagline = hasImageOutput ? 'Generate images and text' : 'Generate text';
+
     return {
       display_name: model.name,
+      tagline,
       description: model.description || `Chat completion using ${model.name}`,
       category: this.config.generation.category,
       provider: provider,

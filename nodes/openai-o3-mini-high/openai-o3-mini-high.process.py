@@ -48,7 +48,7 @@ async def process(
 
     # Build parameters dict from config inputs
     params = {}
-    config_inputs = [{"name":"system_prompt","display_name":"System Prompt","type":"string or message","description":"System prompt to instruct the model","default":None},{"name":"messages","display_name":"Conversation","type":"conversation or message or string","description":"Array of chat messages that make up the conversation","required":True},{"name":"tools","display_name":"Tools","type":"tool or array of tools","description":"Array of tools to use","default":None,"allow_multiple":True},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":None},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":None},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":None},{"name":"tool_choice","display_name":"Tool Choice","type":"string","description":"Tool selection control","default":None}]
+    config_inputs = [{"name":"messages","display_name":"Conversation","type":"conversation or message or string","description":"Array of chat messages that make up the conversation","required":True},{"name":"system_prompt","display_name":"System Message","type":"message or string","description":"System prompt to instruct the model","default":None},{"name":"tools","display_name":"Tools","type":"tool or array of tools","description":"Array of tools to use","default":None,"allow_multiple":True},{"name":"tool_choice","display_name":"Tool Choice","type":"string","description":"Tool selection control","default":None},{"name":"reasoning","display_name":"Reasoning","type":"boolean","description":"Enable reasoning mode","default":None},{"name":"response_format","display_name":"Response Format","type":"object","description":"Output format specification","default":None},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":None},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":None}]
 
     for input_def in config_inputs:
         if input_def["name"] == "messages":
@@ -153,6 +153,8 @@ async def process(
         "content": response.get("content"),
         "role": response.get("role"),
         "tool_calls": response.get("tool_calls"),
+        "reasoning": response.get("reasoning"),
+        "refusal": response.get("refusal"),
         "finish_reason": response.get("finish_reason"),
         "usage": response.get("usage"),
         "cost_total": response.get("cost_total"),

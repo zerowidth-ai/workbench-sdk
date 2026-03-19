@@ -1,0 +1,72 @@
+{
+  "display_name": "GitHub Create Issue",
+  "tagline": "Create GitHub issue",
+  "description": "Create a new issue in a GitHub repository.",
+  "icon": "github",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "owner",
+      "display_name": "Owner",
+      "type": "string",
+      "description": "Repository owner (user or organization)",
+      "required": true
+    },
+    {
+      "name": "repo",
+      "display_name": "Repository",
+      "type": "string",
+      "description": "Repository name",
+      "required": true
+    },
+    {
+      "name": "title",
+      "display_name": "Title",
+      "type": "string",
+      "description": "Issue title",
+      "required": true
+    },
+    {
+      "name": "body",
+      "display_name": "Body",
+      "type": "string",
+      "description": "Issue body (supports GitHub markdown)",
+      "required": false
+    },
+    {
+      "name": "labels",
+      "display_name": "Labels",
+      "type": "array",
+      "description": "Array of label names to apply",
+      "required": false
+    },
+    {
+      "name": "assignees",
+      "display_name": "Assignees",
+      "type": "array",
+      "description": "Array of GitHub usernames to assign",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "issue",
+      "display_name": "Issue",
+      "type": "object",
+      "description": "The created issue object"
+    },
+    {
+      "name": "number",
+      "display_name": "Number",
+      "type": "number",
+      "description": "Issue number"
+    },
+    {
+      "name": "url",
+      "display_name": "URL",
+      "type": "string",
+      "description": "Issue URL on GitHub"
+    }
+  ]
+}

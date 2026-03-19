@@ -184,7 +184,7 @@ async def load_integrations(
             logger.warning(f"Failed to load OpenRouter integration: {e}")
 
     # Load other basic integrations
-    basic_integrations = ["firecrawl", "newsdata_io", "openai", "google_custom_search", "airtable", "notion"]
+    basic_integrations = ["firecrawl", "newsdata_io", "openai", "google_custom_search", "airtable", "notion", "sendgrid", "slack", "supabase", "pinecone", "twilio", "github", "linear", "stripe", "resend", "jira", "confluence"]
 
     for integration_name in basic_integrations:
         key_value = keys.get(integration_name)
@@ -249,8 +249,16 @@ async def load_integrations(
     return integrations
 
 
+_CLASS_NAME_OVERRIDES = {
+    "newsdata_io": "NewsData",
+    "openai": "OpenAI",
+}
+
+
 def _to_class_name(snake_case: str) -> str:
     """Convert snake_case to PascalCase for class names."""
+    if snake_case in _CLASS_NAME_OVERRIDES:
+        return _CLASS_NAME_OVERRIDES[snake_case]
     return "".join(word.capitalize() for word in snake_case.split("_"))
 
 

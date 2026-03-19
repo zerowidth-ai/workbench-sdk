@@ -1,0 +1,67 @@
+{
+  "display_name": "Supabase Query",
+  "tagline": "Query rows from Supabase table",
+  "description": "Query rows from a Supabase table using the PostgREST API with filtering, ordering, and pagination.",
+  "icon": "database",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "table",
+      "display_name": "Table",
+      "type": "string",
+      "description": "Table name to query",
+      "required": true
+    },
+    {
+      "name": "select",
+      "display_name": "Select",
+      "type": "string",
+      "description": "Columns to select (e.g. 'id,name,email' or '*')",
+      "required": false,
+      "default": "*"
+    },
+    {
+      "name": "filters",
+      "display_name": "Filters",
+      "type": "array",
+      "description": "Array of filter objects: [{column, operator, value}]. Operators: eq, neq, gt, gte, lt, lte, like, ilike, is",
+      "required": false
+    },
+    {
+      "name": "order",
+      "display_name": "Order",
+      "type": "string",
+      "description": "Order clause (e.g. 'created_at.desc')",
+      "required": false
+    },
+    {
+      "name": "limit",
+      "display_name": "Limit",
+      "type": "number",
+      "description": "Maximum number of rows to return",
+      "required": false
+    },
+    {
+      "name": "offset",
+      "display_name": "Offset",
+      "type": "number",
+      "description": "Number of rows to skip",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "rows",
+      "display_name": "Rows",
+      "type": "array",
+      "description": "Array of matching rows"
+    },
+    {
+      "name": "count",
+      "display_name": "Count",
+      "type": "number",
+      "description": "Number of rows returned"
+    }
+  ]
+}

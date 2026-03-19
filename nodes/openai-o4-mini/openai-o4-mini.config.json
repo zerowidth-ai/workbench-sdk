@@ -1,6 +1,6 @@
 {
   "display_name": "OpenAI: o4 Mini",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "OpenAI o4-mini is a compact reasoning model in the o-series, optimized for fast, cost-efficient performance while retaining strong multimodal and agentic capabilities. It supports tool use and demonstrates competitive reasoning and coding performance across benchmarks like AIME (99.5% with Python) and SWE-bench, outperforming its predecessor o3-mini and even approaching o3 in some domains.\n\nDespite its smaller size, o4-mini exhibits high accuracy in STEM tasks, visual problem solving (e.g., MathVista, MMMU), and code editing. It is especially well-suited for high-throughput scenarios where latency or cost is critical. Thanks to its efficient architecture and refined reinforcement learning training, o4-mini can chain tools, generate structured outputs, and solve multi-step tasks with minimal delay—often in under a minute.",
   "category": "llm",
   "provider": "openai",
@@ -19,18 +19,18 @@
   ],
   "inputs": [
     {
-      "name": "system_prompt",
-      "display_name": "System Prompt",
-      "type": "string or message",
-      "description": "System prompt to instruct the model",
-      "default": null
-    },
-    {
       "name": "messages",
       "display_name": "Conversation",
       "type": "conversation or message or string",
       "description": "Array of chat messages that make up the conversation",
       "required": true
+    },
+    {
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt to instruct the model",
+      "default": null
     },
     {
       "name": "tools",
@@ -41,10 +41,24 @@
       "allow_multiple": true
     },
     {
-      "name": "include_reasoning",
-      "display_name": "Include Reasoning",
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
+      "default": null
+    },
+    {
+      "name": "reasoning",
+      "display_name": "Reasoning",
       "type": "boolean",
-      "description": "Include reasoning in response",
+      "description": "Enable reasoning mode",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "object",
+      "description": "Output format specification",
       "default": null
     },
     {
@@ -55,31 +69,10 @@
       "default": null
     },
     {
-      "name": "reasoning",
-      "display_name": "Reasoning",
-      "type": "boolean",
-      "description": "Internal reasoning mode",
-      "default": null
-    },
-    {
-      "name": "response_format",
-      "display_name": "Response Format",
-      "type": "string or object",
-      "description": "Output format specification",
-      "default": null
-    },
-    {
       "name": "seed",
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
-      "default": null
-    },
-    {
-      "name": "tool_choice",
-      "display_name": "Tool Choice",
-      "type": "string",
-      "description": "Tool selection control",
       "default": null
     }
   ],

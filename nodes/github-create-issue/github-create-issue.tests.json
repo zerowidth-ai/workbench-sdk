@@ -1,0 +1,15 @@
+[
+  {
+    "description": "Create issue with title and body",
+    "inputs": {
+      "owner": "${GITHUB_TEST_OWNER}",
+      "repo": "${GITHUB_TEST_REPO}",
+      "title": "Test Issue from zv1",
+      "body": "This is a test issue created by the zv1 engine."
+    },
+    "expected": {
+      "number": "number",
+      "url": "string"
+    }
+  }
+]

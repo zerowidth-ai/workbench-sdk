@@ -162,11 +162,10 @@ class OpenRouterIntegration:
                 payload["reasoning"] = reasoning
 
         if "include_reasoning" in kwargs:
+            # Legacy support: treat as reasoning toggle
             include_reasoning = kwargs.pop("include_reasoning")
-            if isinstance(include_reasoning, bool):
-                if "reasoning" not in payload:
-                    payload["reasoning"] = {"enabled": True}
-                payload["reasoning"]["exclude"] = not include_reasoning
+            if isinstance(include_reasoning, bool) and "reasoning" not in payload:
+                payload["reasoning"] = {"enabled": include_reasoning}
 
         # Add other parameters (excluding system_prompt which is handled in messages)
         for key, value in kwargs.items():
@@ -177,11 +176,16 @@ class OpenRouterIntegration:
         if "tools" in payload and not payload["tools"]:
             del payload["tools"]
 
-        # Enable streaming
-        payload["stream"] = True
+        is_image_request = isinstance(payload.get("modalities"), list) and "image" in payload["modalities"]
 
         api_call_start_time = int(time.time() * 1000)
         try:
+            # Image models: use non-streaming to preserve images field (OpenAI SDK strips it from stream deltas)
+            if is_image_request:
+                return await self._non_streaming_completion(payload, node_config, engine_config, api_call_start_time)
+
+            # Enable streaming
+            payload["stream"] = True
             return await self._stream_completion(payload, node_config, engine_config, api_call_start_time)
         except Exception as e:
             # Parse error details from OpenAI SDK error shape
@@ -260,6 +264,91 @@ class OpenRouterIntegration:
             cleaned.append(clean_msg)
         return cleaned
 
+    async def _non_streaming_completion(
+        self,
+        payload: dict[str, Any],
+        node_config: dict[str, Any] | None,
+        engine_config: dict[str, Any] | None,
+        api_call_start_time: int | None = None,
+    ) -> dict[str, Any]:
+        """Non-streaming completion for image models.
+
+        Bypasses the OpenAI SDK entirely because it strips OpenRouter-specific
+        fields like `images` from both streaming deltas and non-streaming messages.
+        Uses raw httpx to preserve the full response.
+        """
+        import httpx
+
+        if api_call_start_time is None:
+            api_call_start_time = int(time.time() * 1000)
+
+        url = f"{self.base_url}/chat/completions"
+        headers = {
+            "Content-Type": "application/json",
+            "HTTP-Referer": self.referer,
+            "X-Title": self.title,
+            "Authorization": f"Bearer {self.api_key}",
+        }
+
+        async with httpx.AsyncClient(timeout=300) as client:
+            res = await client.post(url, headers=headers, json=payload)
+
+        if res.status_code >= 400:
+            error_body = res.json() if res.headers.get("content-type", "").startswith("application/json") else None
+            error_msg = (error_body or {}).get("error", {}).get("message", f"HTTP {res.status_code}")
+            raise Exception(f"OpenRouter API Error ({res.status_code}): {error_msg}")
+
+        data = res.json()
+        choice = data.get("choices", [{}])[0] if data.get("choices") else {}
+        message = choice.get("message", {})
+        usage_raw = data.get("usage", {})
+
+        usage = UsageStats(
+            prompt_tokens=usage_raw.get("prompt_tokens", 0) or 0,
+            completion_tokens=usage_raw.get("completion_tokens", 0) or 0,
+            total_tokens=usage_raw.get("total_tokens", 0) or 0,
+        )
+
+        cost_data = None
+        if node_config and node_config.get("pricing"):
+            cost_data = self.calculate_costs(usage, node_config["pricing"])
+
+        # Image models return data on choice directly (text, images, reasoning)
+        # rather than nested under choice.message
+        result: dict[str, Any] = {
+            "content": message.get("content") or choice.get("text", "") or "",
+            "role": message.get("role", "assistant") or "assistant",
+            "finish_reason": choice.get("finish_reason", "") or "",
+            "tool_calls": message.get("tool_calls"),
+            "model": payload["model"],
+            "usage": usage.to_dict(),
+            "reasoning": message.get("reasoning") or choice.get("reasoning") or None,
+            "images": message.get("images") or choice.get("images") or None,
+        }
+
+        if cost_data:
+            result["cost_total"] = cost_data.total_cost
+            result["cost_itemized"] = cost_data.itemized_costs
+
+        _cfg = engine_config or getattr(self, "_engine_config", None)
+        await emit_api_call_event(_cfg, {
+            "timestamp": api_call_start_time,
+            "integration": "openrouter",
+            "nodeId": node_config.get("id") if node_config else None,
+            "nodeType": node_config.get("type") if node_config else None,
+            "request": {
+                "method": "POST",
+                "url": url,
+                "headers": headers,
+                "body": payload,
+            },
+            "response": {"status": res.status_code, "statusText": res.reason_phrase, "body": result},
+            "duration": int(time.time() * 1000) - api_call_start_time,
+            "error": None,
+        })
+
+        return result
+
     async def _stream_completion(
         self,
         payload: dict[str, Any],
@@ -290,6 +379,7 @@ class OpenRouterIntegration:
         role = "assistant"
         finish_reason = ""
         reasoning = ""
+        images: list[dict[str, Any]] = []
         tool_calls: list[dict[str, Any]] = []
         usage = UsageStats()
 
@@ -308,11 +398,16 @@ class OpenRouterIntegration:
                     choice = chunk.choices[0]
                     if hasattr(choice, "delta") and choice.delta:
                         delta = choice.delta
+                        # Access images from delta (OpenRouter custom field, may not be a typed attr)
+                        delta_images = getattr(delta, "images", None)
+                        if delta_images is None and hasattr(delta, "model_extra"):
+                            delta_images = delta.model_extra.get("images")
                         event["data"] = {
                             "content": getattr(delta, "content", None),
                             "reasoning": getattr(delta, "reasoning", None),
                             "role": getattr(delta, "role", None),
                             "tool_calls": getattr(delta, "tool_calls", None),
+                            "images": delta_images,
                             "finish_reason": getattr(choice, "finish_reason", None),
                         }
                     elif hasattr(choice, "text") and choice.text:
@@ -350,6 +445,11 @@ class OpenRouterIntegration:
                             # Append to most recent tool call's arguments
                             if tc.function and tc.function.arguments:
                                 tool_calls[-1]["function"]["arguments"] += tc.function.arguments
+
+                # Accumulate images from delta (OpenRouter returns images in delta.images)
+                delta_imgs = event["data"].get("images")
+                if delta_imgs and isinstance(delta_imgs, list):
+                    images.extend(delta_imgs)
 
                 # Handle finish reason
                 if event["data"].get("finish_reason"):
@@ -396,6 +496,7 @@ class OpenRouterIntegration:
             "model": payload["model"],
             "usage": usage.to_dict(),
             "reasoning": reasoning if reasoning else None,
+            "images": images if images else None,
         }
 
         if cost_data:
@@ -420,7 +521,7 @@ class OpenRouterIntegration:
                 },
                 "body": payload,
             },
-            "response": {"status": 200, "statusText": "OK"},
+            "response": {"status": 200, "statusText": "OK", "body": result},
             "duration": int(time.time() * 1000) - api_call_start_time,
             "error": None,
         })

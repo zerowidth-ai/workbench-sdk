@@ -1,0 +1,14 @@
+[
+  {
+    "description": "Create issue with title and description",
+    "inputs": {
+      "team_id": "${LINEAR_TEST_TEAM_ID}",
+      "title": "Test Issue from zv1",
+      "description": "This is a test issue created by the zv1 engine."
+    },
+    "expected": {
+      "identifier": "string",
+      "url": "string"
+    }
+  }
+]

@@ -1,6 +1,6 @@
 {
   "display_name": "Perplexity: Sonar Pro",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Note: Sonar Pro pricing includes Perplexity search pricing. See [details here](https://docs.perplexity.ai/guides/pricing#detailed-pricing-breakdown-for-sonar-reasoning-pro-and-sonar-pro)\n\nFor enterprises seeking more advanced capabilities, the Sonar Pro API can handle in-depth, multi-step queries with added extensibility, like double the number of citations per search as Sonar on average. Plus, with a larger context window, it can handle longer and more nuanced searches and follow-up questions. ",
   "category": "llm",
   "provider": "perplexity",
@@ -25,27 +25,6 @@
       "required": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "temperature",
       "display_name": "Temperature",
       "type": "number",
@@ -57,6 +36,27 @@
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
       "default": null
     }
   ],

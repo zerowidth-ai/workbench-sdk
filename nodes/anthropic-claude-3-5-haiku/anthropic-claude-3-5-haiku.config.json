@@ -1,6 +1,6 @@
 {
   "display_name": "Anthropic: Claude 3.5 Haiku",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Claude 3.5 Haiku features offers enhanced capabilities in speed, coding accuracy, and tool use. Engineered to excel in real-time applications, it delivers quick response times that are essential for dynamic tasks such as chat interactions and immediate coding suggestions.\n\nThis makes it highly suitable for environments that demand both speed and precision, such as software development, customer service bots, and data management systems.\n\nThis model is currently pointing to [Claude 3.5 Haiku (2024-10-22)](/anthropic/claude-3-5-haiku-20241022).",
   "category": "llm",
   "provider": "anthropic",
@@ -18,18 +18,18 @@
   ],
   "inputs": [
     {
-      "name": "system_prompt",
-      "display_name": "System Prompt",
-      "type": "string or message",
-      "description": "System prompt to instruct the model",
-      "default": null
-    },
-    {
       "name": "messages",
       "display_name": "Conversation",
       "type": "conversation or message or string",
       "description": "Array of chat messages that make up the conversation",
       "required": true
+    },
+    {
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt to instruct the model",
+      "default": null
     },
     {
       "name": "tools",
@@ -40,10 +40,10 @@
       "allow_multiple": true
     },
     {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
       "default": null
     },
     {
@@ -61,17 +61,17 @@
       "default": null
     },
     {
-      "name": "tool_choice",
-      "display_name": "Tool Choice",
-      "type": "string",
-      "description": "Tool selection control",
-      "default": null
-    },
-    {
       "name": "top_p",
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
       "default": null
     }
   ],

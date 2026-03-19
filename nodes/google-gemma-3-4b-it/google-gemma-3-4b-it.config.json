@@ -1,12 +1,12 @@
 {
   "display_name": "Google: Gemma 3 4B",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities, including structured outputs and function calling.",
   "category": "llm",
   "provider": "google",
   "accepts_plugins": false,
   "model_id": "google/gemma-3-4b-it",
-  "context_length": 96000,
+  "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
     "max_tokens",
@@ -22,13 +22,6 @@
   ],
   "inputs": [
     {
-      "name": "system_prompt",
-      "display_name": "System Prompt",
-      "type": "string or message",
-      "description": "System prompt to instruct the model",
-      "default": null
-    },
-    {
       "name": "messages",
       "display_name": "Conversation",
       "type": "conversation or message or string",
@@ -36,38 +29,17 @@
       "required": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt to instruct the model",
       "default": null
     },
     {
       "name": "response_format",
       "display_name": "Response Format",
-      "type": "string or object",
+      "type": "object",
       "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "seed",
-      "display_name": "Seed",
-      "type": "number",
-      "description": "Deterministic outputs",
       "default": null
     },
     {
@@ -89,6 +61,34 @@
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
       "default": null
     }
   ],
@@ -152,13 +152,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.01703012,
+        "cost": 0.04,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.0681536,
+        "cost": 0.08,
         "currency": "USD"
       }
     ]

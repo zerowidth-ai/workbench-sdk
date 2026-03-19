@@ -1,0 +1,24 @@
+[
+  {
+    "description": "List customers with limit",
+    "inputs": {
+      "limit": 5
+    },
+    "expected": {
+      "customers": "array",
+      "has_more": "boolean",
+      "count": "number"
+    }
+  },
+  {
+    "description": "List customers filtered by email",
+    "inputs": {
+      "email": "${STRIPE_TEST_EMAIL}",
+      "limit": 1
+    },
+    "expected": {
+      "customers": "array",
+      "count": "number"
+    }
+  }
+]

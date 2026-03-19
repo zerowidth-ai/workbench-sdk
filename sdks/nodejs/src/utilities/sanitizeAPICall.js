@@ -12,7 +12,7 @@ export function sanitizeAPICallEvent(event) {
 
         // Sanitize headers - redact auth-related values
         if (sanitized.request.headers) {
-            const authPattern = /^(authorization|x-api-key|api-key|cookie)$/i;
+            const authPattern = /^(authorization|x-api-key|api-key|apikey|cookie)$/i;
             const cleanHeaders = {};
             for (const [key, value] of Object.entries(sanitized.request.headers)) {
                 cleanHeaders[key] = authPattern.test(key) ? '[REDACTED]' : value;

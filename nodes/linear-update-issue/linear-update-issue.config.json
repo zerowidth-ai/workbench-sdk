@@ -1,0 +1,72 @@
+{
+  "display_name": "Linear Update Issue",
+  "tagline": "Update existing Linear issue",
+  "description": "Update an existing issue in Linear by ID.",
+  "icon": "edit",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "issue_id",
+      "display_name": "Issue ID",
+      "type": "string",
+      "description": "Linear issue ID to update",
+      "required": true
+    },
+    {
+      "name": "title",
+      "display_name": "Title",
+      "type": "string",
+      "description": "New issue title",
+      "required": false
+    },
+    {
+      "name": "description",
+      "display_name": "Description",
+      "type": "string",
+      "description": "New issue description (supports markdown)",
+      "required": false
+    },
+    {
+      "name": "state_id",
+      "display_name": "State ID",
+      "type": "string",
+      "description": "Linear workflow state ID to move the issue to",
+      "required": false
+    },
+    {
+      "name": "priority",
+      "display_name": "Priority",
+      "type": "number",
+      "description": "Priority level: 0 (none), 1 (urgent), 2 (high), 3 (medium), 4 (low)",
+      "required": false
+    },
+    {
+      "name": "assignee_id",
+      "display_name": "Assignee ID",
+      "type": "string",
+      "description": "Linear user ID to assign the issue to",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "issue",
+      "display_name": "Issue",
+      "type": "object",
+      "description": "The updated issue object"
+    },
+    {
+      "name": "identifier",
+      "display_name": "Identifier",
+      "type": "string",
+      "description": "Issue identifier (e.g. ENG-123)"
+    },
+    {
+      "name": "url",
+      "display_name": "URL",
+      "type": "string",
+      "description": "Issue URL in Linear"
+    }
+  ]
+}

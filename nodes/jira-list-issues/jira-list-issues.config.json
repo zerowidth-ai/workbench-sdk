@@ -1,0 +1,53 @@
+{
+  "display_name": "Jira List Issues",
+  "tagline": "Search Jira issues with JQL",
+  "description": "Search for issues in Jira using JQL (Jira Query Language).",
+  "icon": "list",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "jql",
+      "display_name": "JQL Query",
+      "type": "string",
+      "description": "JQL query string (e.g. 'project = ENG AND status = \"In Progress\"')",
+      "required": true
+    },
+    {
+      "name": "max_results",
+      "display_name": "Max Results",
+      "type": "number",
+      "description": "Maximum number of issues to return",
+      "required": false,
+      "default": 25
+    },
+    {
+      "name": "start_at",
+      "display_name": "Start At",
+      "type": "number",
+      "description": "Index to start at for pagination",
+      "required": false,
+      "default": 0
+    }
+  ],
+  "outputs": [
+    {
+      "name": "issues",
+      "display_name": "Issues",
+      "type": "array",
+      "description": "Array of issue objects"
+    },
+    {
+      "name": "total",
+      "display_name": "Total",
+      "type": "number",
+      "description": "Total number of matching issues"
+    },
+    {
+      "name": "count",
+      "display_name": "Count",
+      "type": "number",
+      "description": "Number of issues returned in this page"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "display_name": "OpenAI: GPT-5.2-Codex",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "GPT-5.2-Codex is an upgraded version of GPT-5.1-Codex optimized for software engineering and coding workflows. It is designed for both interactive development sessions and long, independent execution of complex engineering tasks. The model supports building projects from scratch, feature development, debugging, large-scale refactoring, and code review. Compared to GPT-5.1-Codex, 5.2-Codex is more steerable, adheres closely to developer instructions, and produces cleaner, higher-quality code outputs. Reasoning effort can be adjusted with the `reasoning.effort` parameter. Read the [docs here](https://openrouter.ai/docs/use-cases/reasoning-tokens#reasoning-effort-level)\n\nCodex integrates into developer environments including the CLI, IDE extensions, GitHub, and cloud tasks. It adapts reasoning effort dynamically—providing fast responses for small tasks while sustaining extended multi-hour runs for large projects. The model is trained to perform structured code reviews, catching critical flaws by reasoning over dependencies and validating behavior against tests. It also supports multimodal inputs such as images or screenshots for UI development and integrates tool use for search, dependency installation, and environment setup. Codex is intended specifically for agentic coding applications.",
   "category": "llm",
   "provider": "openai",
@@ -8,35 +8,29 @@
   "model_id": "openai/gpt-5.2-codex",
   "context_length": 400000,
   "supported_parameters": [
-    "frequency_penalty",
     "include_reasoning",
-    "logit_bias",
-    "logprobs",
     "max_tokens",
-    "presence_penalty",
     "reasoning",
     "response_format",
     "seed",
-    "stop",
     "structured_outputs",
     "tool_choice",
-    "tools",
-    "top_logprobs"
+    "tools"
   ],
   "inputs": [
-    {
-      "name": "system_prompt",
-      "display_name": "System Prompt",
-      "type": "string or message",
-      "description": "System prompt to instruct the model",
-      "default": null
-    },
     {
       "name": "messages",
       "display_name": "Conversation",
       "type": "conversation or message or string",
       "description": "Array of chat messages that make up the conversation",
       "required": true
+    },
+    {
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt to instruct the model",
+      "default": null
     },
     {
       "name": "tools",
@@ -47,17 +41,24 @@
       "allow_multiple": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
       "default": null
     },
     {
-      "name": "include_reasoning",
-      "display_name": "Include Reasoning",
+      "name": "reasoning",
+      "display_name": "Reasoning",
       "type": "boolean",
-      "description": "Include reasoning in response",
+      "description": "Enable reasoning mode",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "object",
+      "description": "Output format specification",
       "default": null
     },
     {
@@ -68,45 +69,10 @@
       "default": null
     },
     {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "reasoning",
-      "display_name": "Reasoning",
-      "type": "boolean",
-      "description": "Internal reasoning mode",
-      "default": null
-    },
-    {
-      "name": "response_format",
-      "display_name": "Response Format",
-      "type": "string or object",
-      "description": "Output format specification",
-      "default": null
-    },
-    {
       "name": "seed",
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
-      "default": null
-    },
-    {
-      "name": "stop",
-      "display_name": "Stop",
-      "type": "string or array",
-      "description": "Custom stop sequences",
-      "default": null
-    },
-    {
-      "name": "tool_choice",
-      "display_name": "Tool Choice",
-      "type": "string",
-      "description": "Tool selection control",
       "default": null
     }
   ],
@@ -168,12 +134,6 @@
       "display_name": "Finish Reason",
       "type": "string",
       "description": "Why the completion finished"
-    },
-    {
-      "name": "logprobs",
-      "display_name": "Log Probabilities",
-      "type": "object",
-      "description": "Token probabilities and logprobs from the model"
     },
     {
       "name": "reasoning",

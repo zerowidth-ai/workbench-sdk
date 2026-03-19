@@ -1,0 +1,12 @@
+[
+  {
+    "description": "Update issue summary",
+    "inputs": {
+      "issue_key": "${JIRA_TEST_ISSUE_KEY}",
+      "summary": "Updated Summary from zv1"
+    },
+    "expected": {
+      "issue_key": "string"
+    }
+  }
+]

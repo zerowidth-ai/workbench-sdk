@@ -1,6 +1,6 @@
 {
   "display_name": "Qwen: Qwen2.5 Coder 7B Instruct",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Qwen2.5-Coder-7B-Instruct is a 7B parameter instruction-tuned language model optimized for code-related tasks such as code generation, reasoning, and bug fixing. Based on the Qwen2.5 architecture, it incorporates enhancements like RoPE, SwiGLU, RMSNorm, and GQA attention with support for up to 128K tokens using YaRN-based extrapolation. It is trained on a large corpus of source code, synthetic data, and text-code grounding, providing robust performance across programming languages and agentic coding workflows.\n\nThis model is part of the Qwen2.5-Coder family and offers strong compatibility with tools like vLLM for efficient deployment. Released under the Apache 2.0 license.",
   "category": "llm",
   "provider": "qwen",
@@ -27,30 +27,9 @@
       "required": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "response_format",
       "display_name": "Response Format",
-      "type": "string or object",
+      "type": "object",
       "description": "Output format specification",
       "default": null
     },
@@ -66,6 +45,27 @@
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
       "default": null
     }
   ],

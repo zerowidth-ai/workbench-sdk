@@ -1,0 +1,53 @@
+{
+  "display_name": "Confluence Search",
+  "tagline": "Search Confluence pages with CQL",
+  "description": "Search for pages and content in Confluence using CQL (Confluence Query Language).",
+  "icon": "search",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "cql",
+      "display_name": "CQL Query",
+      "type": "string",
+      "description": "CQL query string (e.g. 'type = page AND space = DEV AND text ~ \"search term\"')",
+      "required": true
+    },
+    {
+      "name": "limit",
+      "display_name": "Limit",
+      "type": "number",
+      "description": "Maximum number of results to return",
+      "required": false,
+      "default": 25
+    },
+    {
+      "name": "start",
+      "display_name": "Start",
+      "type": "number",
+      "description": "Offset for pagination",
+      "required": false,
+      "default": 0
+    }
+  ],
+  "outputs": [
+    {
+      "name": "results",
+      "display_name": "Results",
+      "type": "array",
+      "description": "Array of matching content objects"
+    },
+    {
+      "name": "total_size",
+      "display_name": "Total Size",
+      "type": "number",
+      "description": "Total number of matching results"
+    },
+    {
+      "name": "count",
+      "display_name": "Count",
+      "type": "number",
+      "description": "Number of results returned in this page"
+    }
+  ]
+}

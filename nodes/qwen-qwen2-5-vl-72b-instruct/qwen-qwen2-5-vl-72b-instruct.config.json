@@ -1,6 +1,6 @@
 {
   "display_name": "Qwen: Qwen2.5 VL 72B Instruct",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Qwen2.5-VL is proficient in recognizing common objects such as flowers, birds, fish, and insects. It is also highly capable of analyzing texts, charts, icons, graphics, and layouts within images.",
   "category": "llm",
   "provider": "qwen",
@@ -11,7 +11,6 @@
     "frequency_penalty",
     "logit_bias",
     "max_tokens",
-    "min_p",
     "presence_penalty",
     "repetition_penalty",
     "response_format",
@@ -31,38 +30,10 @@
       "required": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "response_format",
       "display_name": "Response Format",
-      "type": "string or object",
+      "type": "object",
       "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "seed",
-      "display_name": "Seed",
-      "type": "number",
-      "description": "Deterministic outputs",
       "default": null
     },
     {
@@ -84,6 +55,34 @@
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
       "default": null
     }
   ],
@@ -126,13 +125,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.15,
+        "cost": 0.7999999999999999,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.6,
+        "cost": 0.7999999999999999,
         "currency": "USD"
       }
     ]

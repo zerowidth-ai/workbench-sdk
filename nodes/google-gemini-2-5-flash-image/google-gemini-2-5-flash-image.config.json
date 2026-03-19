@@ -1,6 +1,6 @@
 {
-  "display_name": "Google: Gemini 2.5 Flash Image (Nano Banana)",
-  "tagline": "Large Language Model",
+  "display_name": "Google: Nano Banana (Gemini 2.5 Flash Image)",
+  "tagline": "Generate images and text",
   "description": "Gemini 2.5 Flash Image, a.k.a. \"Nano Banana,\" is now generally available. It is a state of the art image generation model with contextual understanding. It is capable of image generation, edits, and multi-turn conversations. Aspect ratios can be controlled with the [image_config API Parameter](https://openrouter.ai/docs/features/multimodal/image-generation#image-aspect-ratio-configuration)",
   "category": "llm",
   "provider": "google",
@@ -11,6 +11,7 @@
     "max_tokens",
     "response_format",
     "seed",
+    "stop",
     "structured_outputs",
     "temperature",
     "top_p"
@@ -43,15 +44,8 @@
     {
       "name": "response_format",
       "display_name": "Response Format",
-      "type": "string or object",
+      "type": "object",
       "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "seed",
-      "display_name": "Seed",
-      "type": "number",
-      "description": "Deterministic outputs",
       "default": null
     },
     {
@@ -66,6 +60,13 @@
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
       "default": null
     }
   ],

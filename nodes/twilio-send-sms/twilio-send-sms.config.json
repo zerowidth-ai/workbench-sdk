@@ -1,0 +1,45 @@
+{
+  "display_name": "Twilio Send SMS",
+  "tagline": "Send SMS via Twilio",
+  "description": "Send an SMS message using the Twilio Programmable Messaging API.",
+  "icon": "smartphone",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "to",
+      "display_name": "To",
+      "type": "string",
+      "description": "Recipient phone number in E.164 format (e.g. +15551234567)",
+      "required": true
+    },
+    {
+      "name": "from",
+      "display_name": "From",
+      "type": "string",
+      "description": "Twilio phone number to send from in E.164 format",
+      "required": true
+    },
+    {
+      "name": "body",
+      "display_name": "Body",
+      "type": "string",
+      "description": "SMS message body (max 1600 characters)",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "sid",
+      "display_name": "Message SID",
+      "type": "string",
+      "description": "Twilio message SID"
+    },
+    {
+      "name": "status",
+      "display_name": "Status",
+      "type": "string",
+      "description": "Message status (queued, sent, delivered, etc.)"
+    }
+  ]
+}

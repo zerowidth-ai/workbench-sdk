@@ -1,6 +1,6 @@
 {
   "display_name": "DeepSeek: DeepSeek V3.2 Speciale",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "DeepSeek-V3.2-Speciale is a high-compute variant of DeepSeek-V3.2 optimized for maximum reasoning and agentic performance. It builds on DeepSeek Sparse Attention (DSA) for efficient long-context processing, then scales post-training reinforcement learning to push capability beyond the base model. Reported evaluations place Speciale ahead of GPT-5 on difficult reasoning workloads, with proficiency comparable to Gemini-3.0-Pro, while retaining strong coding and tool-use reliability. Like V3.2, it benefits from a large-scale agentic task synthesis pipeline that improves compliance and generalization in interactive environments.",
   "category": "llm",
   "provider": "deepseek",
@@ -12,6 +12,7 @@
     "include_reasoning",
     "logit_bias",
     "max_tokens",
+    "min_p",
     "presence_penalty",
     "reasoning",
     "repetition_penalty",
@@ -32,52 +33,17 @@
       "required": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "include_reasoning",
-      "display_name": "Include Reasoning",
-      "type": "boolean",
-      "description": "Include reasoning in response",
-      "default": null
-    },
-    {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "reasoning",
       "display_name": "Reasoning",
       "type": "boolean",
-      "description": "Internal reasoning mode",
+      "description": "Enable reasoning mode",
       "default": null
     },
     {
       "name": "response_format",
       "display_name": "Response Format",
-      "type": "string or object",
+      "type": "object",
       "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "seed",
-      "display_name": "Seed",
-      "type": "number",
-      "description": "Deterministic outputs",
       "default": null
     },
     {
@@ -99,6 +65,34 @@
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
       "default": null
     }
   ],
@@ -154,13 +148,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.27,
+        "cost": 0.39999999999999997,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.41,
+        "cost": 1.2,
         "currency": "USD"
       }
     ]

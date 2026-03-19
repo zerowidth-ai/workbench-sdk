@@ -1,12 +1,12 @@
 {
   "display_name": "Qwen: Qwen3 Next 80B A3B Instruct",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Qwen3-Next-80B-A3B-Instruct is an instruction-tuned chat model in the Qwen3-Next series optimized for fast, stable responses without “thinking” traces. It targets complex tasks across reasoning, code generation, knowledge QA, and multilingual use, while remaining robust on alignment and formatting. Compared with prior Qwen3 instruct variants, it focuses on higher throughput and stability on ultra-long inputs and multi-turn dialogues, making it well-suited for RAG, tool use, and agentic workflows that require consistent final answers rather than visible chain-of-thought.\n\nThe model employs scaling-efficient training and decoding to improve parameter efficiency and inference speed, and has been validated on a broad set of public benchmarks where it reaches or approaches larger Qwen3 systems in several categories while outperforming earlier mid-sized baselines. It is best used as a general assistant, code helper, and long-context task solver in production settings where deterministic, instruction-following outputs are preferred.",
   "category": "llm",
   "provider": "qwen",
   "accepts_plugins": true,
   "model_id": "qwen/qwen3-next-80b-a3b-instruct",
-  "context_length": 262144,
+  "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",
@@ -26,18 +26,18 @@
   ],
   "inputs": [
     {
-      "name": "system_prompt",
-      "display_name": "System Prompt",
-      "type": "string or message",
-      "description": "System prompt to instruct the model",
-      "default": null
-    },
-    {
       "name": "messages",
       "display_name": "Conversation",
       "type": "conversation or message or string",
       "description": "Array of chat messages that make up the conversation",
       "required": true
+    },
+    {
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt to instruct the model",
+      "default": null
     },
     {
       "name": "tools",
@@ -48,38 +48,17 @@
       "allow_multiple": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
       "default": null
     },
     {
       "name": "response_format",
       "display_name": "Response Format",
-      "type": "string or object",
+      "type": "object",
       "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "seed",
-      "display_name": "Seed",
-      "type": "number",
-      "description": "Deterministic outputs",
       "default": null
     },
     {
@@ -97,17 +76,38 @@
       "default": null
     },
     {
-      "name": "tool_choice",
-      "display_name": "Tool Choice",
-      "type": "string",
-      "description": "Tool selection control",
-      "default": null
-    },
-    {
       "name": "top_p",
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
       "default": null
     }
   ],

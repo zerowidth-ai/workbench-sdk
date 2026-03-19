@@ -1,0 +1,72 @@
+{
+  "display_name": "Linear Create Issue",
+  "tagline": "Create Linear issue",
+  "description": "Create a new issue in Linear using the GraphQL API.",
+  "icon": "check-square",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "team_id",
+      "display_name": "Team ID",
+      "type": "string",
+      "description": "Linear team ID to create the issue in",
+      "required": true
+    },
+    {
+      "name": "title",
+      "display_name": "Title",
+      "type": "string",
+      "description": "Issue title",
+      "required": true
+    },
+    {
+      "name": "description",
+      "display_name": "Description",
+      "type": "string",
+      "description": "Issue description (supports markdown)",
+      "required": false
+    },
+    {
+      "name": "priority",
+      "display_name": "Priority",
+      "type": "number",
+      "description": "Priority level: 0 (none), 1 (urgent), 2 (high), 3 (medium), 4 (low)",
+      "required": false
+    },
+    {
+      "name": "assignee_id",
+      "display_name": "Assignee ID",
+      "type": "string",
+      "description": "Linear user ID to assign the issue to",
+      "required": false
+    },
+    {
+      "name": "label_ids",
+      "display_name": "Label IDs",
+      "type": "array",
+      "description": "Array of Linear label IDs to apply",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "issue",
+      "display_name": "Issue",
+      "type": "object",
+      "description": "The created issue object"
+    },
+    {
+      "name": "identifier",
+      "display_name": "Identifier",
+      "type": "string",
+      "description": "Issue identifier (e.g. ENG-123)"
+    },
+    {
+      "name": "url",
+      "display_name": "URL",
+      "type": "string",
+      "description": "Issue URL in Linear"
+    }
+  ]
+}

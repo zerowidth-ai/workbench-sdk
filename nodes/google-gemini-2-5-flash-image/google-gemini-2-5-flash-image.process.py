@@ -1,5 +1,5 @@
 """
-Google: Gemini 2.5 Flash Image (Nano Banana) - LLM node for the zv1 engine.
+Google: Nano Banana (Gemini 2.5 Flash Image) - LLM node for the zv1 engine.
 """
 
 from typing import Any
@@ -13,7 +13,7 @@ async def process(
     node_config: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Process function for the Google: Gemini 2.5 Flash Image (Nano Banana) node.
+    Process function for the Google: Nano Banana (Gemini 2.5 Flash Image) node.
 
     Args:
         inputs: Node inputs containing messages/prompt and parameters.
@@ -34,7 +34,7 @@ async def process(
 
     # Build parameters dict from config inputs
     params = {}
-    config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":True},{"name":"modalities","display_name":"Modalities","type":"array","description":"Output modalities to request (e.g., [\"image\", \"text\"])","default":["image","text"]},{"name":"image_config","display_name":"Image Config","type":"object","description":"Image generation configuration (aspect_ratio: \"1:1\", \"16:9\", etc.)","default":None},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":None},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":None},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":None},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":None}]
+    config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":True},{"name":"modalities","display_name":"Modalities","type":"array","description":"Output modalities to request (e.g., [\"image\", \"text\"])","default":["image","text"]},{"name":"image_config","display_name":"Image Config","type":"object","description":"Image generation configuration (aspect_ratio: \"1:1\", \"16:9\", etc.)","default":None},{"name":"response_format","display_name":"Response Format","type":"object","description":"Output format specification","default":None},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":None},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":None},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":None}]
 
     for input_def in config_inputs:
         if input_def["name"] == "messages":

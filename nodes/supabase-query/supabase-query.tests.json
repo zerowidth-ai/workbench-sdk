@@ -1,0 +1,14 @@
+[
+  {
+    "description": "Query all rows from table",
+    "inputs": {
+      "table": "${SUPABASE_TEST_TABLE}",
+      "select": "*",
+      "limit": 10
+    },
+    "expected": {
+      "rows": "array",
+      "count": "number"
+    }
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "description": "Get page by ID",
+    "inputs": {
+      "page_id": "${CONFLUENCE_TEST_PAGE_ID}"
+    },
+    "expected": {
+      "title": "string",
+      "body": "string"
+    }
+  }
+]

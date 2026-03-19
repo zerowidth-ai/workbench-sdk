@@ -1,0 +1,13 @@
+[
+  {
+    "description": "Send message to channel",
+    "inputs": {
+      "channel": "${SLACK_TEST_CHANNEL}",
+      "text": "Test message from zv1"
+    },
+    "expected": {
+      "ts": "string",
+      "channel": "string"
+    }
+  }
+]

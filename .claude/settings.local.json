@@ -15,7 +15,8 @@
       "Bash(python -m pytest tests/test_all_nodes.py -v --tb=short)",
       "Bash(python:*)",
       "Bash(xargs cat:*)",
-      "Bash(node tests/test.all-nodes.js:*)"
+      "Bash(node tests/test.all-nodes.js:*)",
+      "WebFetch(domain:openrouter.ai)"
     ]
   }
 }

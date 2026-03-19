@@ -1,0 +1,14 @@
+[
+  {
+    "description": "Send SMS",
+    "inputs": {
+      "to": "${TWILIO_TEST_TO}",
+      "from": "${TWILIO_TEST_FROM}",
+      "body": "Test SMS from zv1"
+    },
+    "expected": {
+      "sid": "string",
+      "status": "string"
+    }
+  }
+]

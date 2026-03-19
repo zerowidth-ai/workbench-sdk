@@ -1,0 +1,69 @@
+{
+  "display_name": "Pinecone Query",
+  "tagline": "Query vectors from Pinecone index",
+  "description": "Query a Pinecone vector index to find similar vectors by cosine similarity.",
+  "icon": "search",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "vector",
+      "display_name": "Vector",
+      "type": "array",
+      "description": "Query vector (array of floats)",
+      "required": true
+    },
+    {
+      "name": "top_k",
+      "display_name": "Top K",
+      "type": "number",
+      "description": "Number of results to return",
+      "required": false,
+      "default": 10
+    },
+    {
+      "name": "namespace",
+      "display_name": "Namespace",
+      "type": "string",
+      "description": "Pinecone namespace to query",
+      "required": false
+    },
+    {
+      "name": "filter",
+      "display_name": "Filter",
+      "type": "object",
+      "description": "Metadata filter object (Pinecone filter syntax)",
+      "required": false
+    },
+    {
+      "name": "include_metadata",
+      "display_name": "Include Metadata",
+      "type": "boolean",
+      "description": "Include metadata in results",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "include_values",
+      "display_name": "Include Values",
+      "type": "boolean",
+      "description": "Include vector values in results",
+      "required": false,
+      "default": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "matches",
+      "display_name": "Matches",
+      "type": "array",
+      "description": "Array of matching vectors with scores and metadata"
+    },
+    {
+      "name": "namespace",
+      "display_name": "Namespace",
+      "type": "string",
+      "description": "The namespace that was queried"
+    }
+  ]
+}

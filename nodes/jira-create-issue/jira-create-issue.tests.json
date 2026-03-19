@@ -1,0 +1,14 @@
+[
+  {
+    "description": "Create task issue",
+    "inputs": {
+      "project_key": "${JIRA_TEST_PROJECT_KEY}",
+      "summary": "Test Issue from zv1",
+      "description": "This is a test issue created by the zv1 engine."
+    },
+    "expected": {
+      "key": "string",
+      "id": "string"
+    }
+  }
+]

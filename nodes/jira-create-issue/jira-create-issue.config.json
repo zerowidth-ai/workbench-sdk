@@ -1,0 +1,87 @@
+{
+  "display_name": "Jira Create Issue",
+  "tagline": "Create Jira issue",
+  "description": "Create a new issue in a Jira project.",
+  "icon": "plus-square",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "project_key",
+      "display_name": "Project Key",
+      "type": "string",
+      "description": "Jira project key (e.g. ENG, PROJ)",
+      "required": true
+    },
+    {
+      "name": "summary",
+      "display_name": "Summary",
+      "type": "string",
+      "description": "Issue summary/title",
+      "required": true
+    },
+    {
+      "name": "issue_type",
+      "display_name": "Issue Type",
+      "type": "string",
+      "description": "Issue type name (e.g. Task, Bug, Story, Epic)",
+      "required": false,
+      "default": "Task"
+    },
+    {
+      "name": "description",
+      "display_name": "Description",
+      "type": "string",
+      "description": "Issue description (plain text, converted to Atlassian Document Format)",
+      "required": false
+    },
+    {
+      "name": "priority",
+      "display_name": "Priority",
+      "type": "string",
+      "description": "Priority name (e.g. Highest, High, Medium, Low, Lowest)",
+      "required": false
+    },
+    {
+      "name": "labels",
+      "display_name": "Labels",
+      "type": "array",
+      "description": "Array of label strings to apply",
+      "required": false
+    },
+    {
+      "name": "assignee_id",
+      "display_name": "Assignee ID",
+      "type": "string",
+      "description": "Atlassian account ID to assign the issue to",
+      "required": false
+    },
+    {
+      "name": "parent_key",
+      "display_name": "Parent Key",
+      "type": "string",
+      "description": "Parent issue key for sub-tasks (e.g. ENG-123)",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "issue",
+      "display_name": "Issue",
+      "type": "object",
+      "description": "The created issue object"
+    },
+    {
+      "name": "key",
+      "display_name": "Key",
+      "type": "string",
+      "description": "Issue key (e.g. ENG-456)"
+    },
+    {
+      "name": "id",
+      "display_name": "ID",
+      "type": "string",
+      "description": "Issue ID"
+    }
+  ]
+}

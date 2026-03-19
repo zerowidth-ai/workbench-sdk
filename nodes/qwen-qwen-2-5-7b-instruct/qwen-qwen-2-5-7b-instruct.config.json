@@ -1,6 +1,6 @@
 {
   "display_name": "Qwen: Qwen2.5 7B Instruct",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Qwen2.5 7B is the latest series of Qwen large language models. Qwen2.5 brings the following improvements upon Qwen2:\n\n- Significantly more knowledge and has greatly improved capabilities in coding and mathematics, thanks to our specialized expert models in these domains.\n\n- Significant improvements in instruction following, generating long texts (over 8K tokens), understanding structured data (e.g, tables), and generating structured outputs especially JSON. More resilient to the diversity of system prompts, enhancing role-play implementation and condition-setting for chatbots.\n\n- Long-context Support up to 128K tokens and can generate up to 8K tokens.\n\n- Multilingual support for over 29 languages, including Chinese, English, French, Spanish, Portuguese, German, Italian, Russian, Japanese, Korean, Vietnamese, Thai, Arabic, and more.\n\nUsage of this model is subject to [Tongyi Qianwen LICENSE AGREEMENT](https://huggingface.co/Qwen/Qwen1.5-110B-Chat/blob/main/LICENSE).",
   "category": "llm",
   "provider": "qwen",
@@ -14,6 +14,7 @@
     "min_p",
     "presence_penalty",
     "repetition_penalty",
+    "response_format",
     "seed",
     "stop",
     "temperature",
@@ -24,18 +25,18 @@
   ],
   "inputs": [
     {
-      "name": "system_prompt",
-      "display_name": "System Prompt",
-      "type": "string or message",
-      "description": "System prompt to instruct the model",
-      "default": null
-    },
-    {
       "name": "messages",
       "display_name": "Conversation",
       "type": "conversation or message or string",
       "description": "Array of chat messages that make up the conversation",
       "required": true
+    },
+    {
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt to instruct the model",
+      "default": null
     },
     {
       "name": "tools",
@@ -46,31 +47,17 @@
       "allow_multiple": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
       "default": null
     },
     {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "seed",
-      "display_name": "Seed",
-      "type": "number",
-      "description": "Deterministic outputs",
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "object",
+      "description": "Output format specification",
       "default": null
     },
     {
@@ -88,17 +75,38 @@
       "default": null
     },
     {
-      "name": "tool_choice",
-      "display_name": "Tool Choice",
-      "type": "string",
-      "description": "Tool selection control",
-      "default": null
-    },
-    {
       "name": "top_p",
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
       "default": null
     }
   ],

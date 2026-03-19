@@ -1,0 +1,14 @@
+[
+  {
+    "description": "Search for pages",
+    "inputs": {
+      "cql": "type = page ORDER BY lastModified DESC",
+      "limit": 5
+    },
+    "expected": {
+      "results": "array",
+      "total_size": "number",
+      "count": "number"
+    }
+  }
+]

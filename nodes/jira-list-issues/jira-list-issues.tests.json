@@ -1,0 +1,14 @@
+[
+  {
+    "description": "List issues by project",
+    "inputs": {
+      "jql": "project = ${JIRA_TEST_PROJECT_KEY} ORDER BY created DESC",
+      "max_results": 5
+    },
+    "expected": {
+      "issues": "array",
+      "total": "number",
+      "count": "number"
+    }
+  }
+]

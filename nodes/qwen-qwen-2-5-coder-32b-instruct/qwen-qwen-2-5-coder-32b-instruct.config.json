@@ -1,6 +1,6 @@
 {
   "display_name": "Qwen2.5 Coder 32B Instruct",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Qwen2.5-Coder is the latest series of Code-Specific Qwen large language models (formerly known as CodeQwen). Qwen2.5-Coder brings the following improvements upon CodeQwen1.5:\n\n- Significantly improvements in **code generation**, **code reasoning** and **code fixing**. \n- A more comprehensive foundation for real-world applications such as **Code Agents**. Not only enhancing coding capabilities but also maintaining its strengths in mathematics and general competencies.\n\nTo read more about its evaluation results, check out [Qwen 2.5 Coder's blog](https://qwenlm.github.io/blog/qwen2.5-coder-family/).",
   "category": "llm",
   "provider": "qwen",
@@ -9,27 +9,15 @@
   "context_length": 32768,
   "supported_parameters": [
     "frequency_penalty",
-    "logit_bias",
     "max_tokens",
-    "min_p",
     "presence_penalty",
     "repetition_penalty",
-    "response_format",
     "seed",
-    "stop",
-    "structured_outputs",
     "temperature",
     "top_k",
     "top_p"
   ],
   "inputs": [
-    {
-      "name": "system_prompt",
-      "display_name": "System Prompt",
-      "type": "string or message",
-      "description": "System prompt to instruct the model",
-      "default": null
-    },
     {
       "name": "messages",
       "display_name": "Conversation",
@@ -38,45 +26,10 @@
       "required": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "response_format",
-      "display_name": "Response Format",
-      "type": "string or object",
-      "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "seed",
-      "display_name": "Seed",
-      "type": "number",
-      "description": "Deterministic outputs",
-      "default": null
-    },
-    {
-      "name": "stop",
-      "display_name": "Stop",
-      "type": "string or array",
-      "description": "Custom stop sequences",
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt to instruct the model",
       "default": null
     },
     {
@@ -91,6 +44,34 @@
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
       "default": null
     }
   ],
@@ -154,13 +135,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.03,
+        "cost": 0.66,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.11,
+        "cost": 1,
         "currency": "USD"
       }
     ]

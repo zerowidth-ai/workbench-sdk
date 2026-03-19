@@ -1,12 +1,12 @@
 {
   "display_name": "Qwen: Qwen3 Coder Plus",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Qwen3 Coder Plus is Alibaba's proprietary version of the Open Source Qwen3 Coder 480B A35B. It is a powerful coding agent model specializing in autonomous programming via tool calling and environment interaction, combining coding proficiency with versatile general-purpose abilities.",
   "category": "llm",
   "provider": "qwen",
   "accepts_plugins": true,
   "model_id": "qwen/qwen3-coder-plus",
-  "context_length": 128000,
+  "context_length": 1000000,
   "supported_parameters": [
     "max_tokens",
     "presence_penalty",
@@ -20,18 +20,18 @@
   ],
   "inputs": [
     {
-      "name": "system_prompt",
-      "display_name": "System Prompt",
-      "type": "string or message",
-      "description": "System prompt to instruct the model",
-      "default": null
-    },
-    {
       "name": "messages",
       "display_name": "Conversation",
       "type": "conversation or message or string",
       "description": "Array of chat messages that make up the conversation",
       "required": true
+    },
+    {
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt to instruct the model",
+      "default": null
     },
     {
       "name": "tools",
@@ -40,6 +40,34 @@
       "description": "Array of tools to use",
       "default": null,
       "allow_multiple": true
+    },
+    {
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "object",
+      "description": "Output format specification",
+      "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
     },
     {
       "name": "max_tokens",
@@ -56,38 +84,10 @@
       "default": null
     },
     {
-      "name": "response_format",
-      "display_name": "Response Format",
-      "type": "string or object",
-      "description": "Output format specification",
-      "default": null
-    },
-    {
       "name": "seed",
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
-      "default": null
-    },
-    {
-      "name": "temperature",
-      "display_name": "Temperature",
-      "type": "number",
-      "description": "Controls randomness (0-2)",
-      "default": null
-    },
-    {
-      "name": "tool_choice",
-      "display_name": "Tool Choice",
-      "type": "string",
-      "description": "Tool selection control",
-      "default": null
-    },
-    {
-      "name": "top_p",
-      "display_name": "Top P",
-      "type": "number",
-      "description": "Controls diversity via nucleus sampling",
       "default": null
     }
   ],
@@ -157,13 +157,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 1,
+        "cost": 0.65,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 5,
+        "cost": 3.25,
         "currency": "USD"
       }
     ]

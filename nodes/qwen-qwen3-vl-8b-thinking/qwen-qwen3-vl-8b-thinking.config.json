@@ -1,12 +1,12 @@
 {
   "display_name": "Qwen: Qwen3 VL 8B Thinking",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Qwen3-VL-8B-Thinking is the reasoning-optimized variant of the Qwen3-VL-8B multimodal model, designed for advanced visual and textual reasoning across complex scenes, documents, and temporal sequences. It integrates enhanced multimodal alignment and long-context processing (native 256K, expandable to 1M tokens) for tasks such as scientific visual analysis, causal inference, and mathematical reasoning over image or video inputs.\n\nCompared to the Instruct edition, the Thinking version introduces deeper visual-language fusion and deliberate reasoning pathways that improve performance on long-chain logic tasks, STEM problem-solving, and multi-step video understanding. It achieves stronger temporal grounding via Interleaved-MRoPE and timestamp-aware embeddings, while maintaining robust OCR, multilingual comprehension, and text generation on par with large text-only LLMs.",
   "category": "llm",
   "provider": "qwen",
   "accepts_plugins": true,
   "model_id": "qwen/qwen3-vl-8b-thinking",
-  "context_length": 256000,
+  "context_length": 131072,
   "supported_parameters": [
     "include_reasoning",
     "max_tokens",
@@ -22,18 +22,18 @@
   ],
   "inputs": [
     {
-      "name": "system_prompt",
-      "display_name": "System Prompt",
-      "type": "string or message",
-      "description": "System prompt to instruct the model",
-      "default": null
-    },
-    {
       "name": "messages",
       "display_name": "Conversation",
       "type": "conversation or message or string",
       "description": "Array of chat messages that make up the conversation",
       "required": true
+    },
+    {
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt to instruct the model",
+      "default": null
     },
     {
       "name": "tools",
@@ -44,10 +44,38 @@
       "allow_multiple": true
     },
     {
-      "name": "include_reasoning",
-      "display_name": "Include Reasoning",
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
+      "default": null
+    },
+    {
+      "name": "reasoning",
+      "display_name": "Reasoning",
       "type": "boolean",
-      "description": "Include reasoning in response",
+      "description": "Enable reasoning mode",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "object",
+      "description": "Output format specification",
+      "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
       "default": null
     },
     {
@@ -65,45 +93,10 @@
       "default": null
     },
     {
-      "name": "reasoning",
-      "display_name": "Reasoning",
-      "type": "boolean",
-      "description": "Internal reasoning mode",
-      "default": null
-    },
-    {
-      "name": "response_format",
-      "display_name": "Response Format",
-      "type": "string or object",
-      "description": "Output format specification",
-      "default": null
-    },
-    {
       "name": "seed",
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
-      "default": null
-    },
-    {
-      "name": "temperature",
-      "display_name": "Temperature",
-      "type": "number",
-      "description": "Controls randomness (0-2)",
-      "default": null
-    },
-    {
-      "name": "tool_choice",
-      "display_name": "Tool Choice",
-      "type": "string",
-      "description": "Tool selection control",
-      "default": null
-    },
-    {
-      "name": "top_p",
-      "display_name": "Top P",
-      "type": "number",
-      "description": "Controls diversity via nucleus sampling",
       "default": null
     }
   ],
@@ -186,13 +179,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.18,
+        "cost": 0.117,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 2.0999999999999996,
+        "cost": 1.365,
         "currency": "USD"
       }
     ]

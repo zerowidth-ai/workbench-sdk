@@ -1,0 +1,142 @@
+{
+  "display_name": "xAI: Grok 4.20 Multi-Agent Beta",
+  "tagline": "Generate text",
+  "description": "Grok 4.20 Multi-Agent Beta is a variant of xAI’s Grok 4.20 designed for collaborative, agent-based workflows. Multiple agents operate in parallel to conduct deep research, coordinate tool use, and synthesize information across complex tasks.\n\nReasoning effort behavior:\n- low / medium: 4 agents\n- high / xhigh: 16 agents",
+  "category": "llm",
+  "provider": "x-ai",
+  "accepts_plugins": false,
+  "model_id": "x-ai/grok-4.20-multi-agent-beta",
+  "context_length": 2000000,
+  "supported_parameters": [
+    "include_reasoning",
+    "logprobs",
+    "max_tokens",
+    "reasoning",
+    "response_format",
+    "seed",
+    "structured_outputs",
+    "temperature",
+    "top_logprobs",
+    "top_p"
+  ],
+  "inputs": [
+    {
+      "name": "prompt",
+      "display_name": "Prompt",
+      "type": "string",
+      "description": "Text prompt for completion",
+      "required": true
+    },
+    {
+      "name": "reasoning",
+      "display_name": "Reasoning",
+      "type": "boolean",
+      "description": "Enable reasoning mode",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "object",
+      "description": "Output format specification",
+      "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "top_p",
+      "display_name": "Top P",
+      "type": "number",
+      "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "seed",
+      "display_name": "Seed",
+      "type": "number",
+      "description": "Deterministic outputs",
+      "default": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "content",
+      "display_name": "Content",
+      "can_stream": true,
+      "type": "string",
+      "description": "The generated completion text"
+    },
+    {
+      "name": "usage",
+      "display_name": "Token Usage",
+      "type": "object",
+      "description": "Token usage statistics"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost for processing this request (USD)"
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array",
+      "description": "Detailed breakdown of costs"
+    },
+    {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Log Probabilities",
+      "type": "object",
+      "description": "Token probabilities and logprobs from the model"
+    },
+    {
+      "name": "reasoning",
+      "display_name": "Reasoning",
+      "type": "string",
+      "can_stream": true,
+      "description": "The detailed reasoning chain from the model"
+    },
+    {
+      "name": "refusal",
+      "display_name": "Refusal",
+      "type": "string",
+      "description": "Model refusal response (if any)"
+    }
+  ],
+  "pricing": {
+    "reference": "https://openrouter.ai/models",
+    "items": [
+      {
+        "key": "input_cost_per_million",
+        "label": "Input Tokens (per 1M)",
+        "cost": 2,
+        "currency": "USD"
+      },
+      {
+        "key": "output_cost_per_million",
+        "label": "Output Tokens (per 1M)",
+        "cost": 6,
+        "currency": "USD"
+      }
+    ]
+  }
+}

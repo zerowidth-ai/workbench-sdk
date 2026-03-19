@@ -1,0 +1,41 @@
+[
+  {
+    "description": "Send plain text email",
+    "inputs": {
+      "to": "${SENDGRID_TEST_TO}",
+      "from": "${SENDGRID_TEST_FROM}",
+      "subject": "Test Email from zv1",
+      "text": "This is a test email sent from the zv1 engine."
+    },
+    "expected": {
+      "message": "string"
+    }
+  },
+  {
+    "description": "Send HTML email",
+    "inputs": {
+      "to": "${SENDGRID_TEST_TO}",
+      "from": "${SENDGRID_TEST_FROM}",
+      "subject": "HTML Test Email from zv1",
+      "html": "<h1>Test</h1><p>This is a test email.</p>"
+    },
+    "expected": {
+      "message": "string"
+    }
+  },
+  {
+    "description": "Send email with both text and html",
+    "inputs": {
+      "to": "${SENDGRID_TEST_TO}",
+      "from": "${SENDGRID_TEST_FROM}",
+      "from_name": "zv1 Test",
+      "subject": "Dual Content Test",
+      "text": "Plain text version",
+      "html": "<p>HTML version</p>",
+      "reply_to": "${SENDGRID_TEST_TO}"
+    },
+    "expected": {
+      "message": "string"
+    }
+  }
+]

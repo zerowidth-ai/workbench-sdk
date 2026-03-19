@@ -1,0 +1,13 @@
+[
+  {
+    "description": "Update issue title",
+    "inputs": {
+      "issue_id": "${LINEAR_TEST_ISSUE_ID}",
+      "title": "Updated Title from zv1"
+    },
+    "expected": {
+      "identifier": "string",
+      "url": "string"
+    }
+  }
+]

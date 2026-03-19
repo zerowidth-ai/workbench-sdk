@@ -1,0 +1,74 @@
+{
+  "display_name": "Resend Send Email",
+  "tagline": "Send email via Resend",
+  "description": "Send an email using the Resend API.",
+  "icon": "mail",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "to",
+      "display_name": "To",
+      "type": "string",
+      "description": "Recipient email address(es), comma-separated for multiple",
+      "required": true
+    },
+    {
+      "name": "from",
+      "display_name": "From",
+      "type": "string",
+      "description": "Sender email address (e.g. 'Name <name@domain.com>')",
+      "required": true
+    },
+    {
+      "name": "subject",
+      "display_name": "Subject",
+      "type": "string",
+      "description": "Email subject line",
+      "required": true
+    },
+    {
+      "name": "text",
+      "display_name": "Text Body",
+      "type": "string",
+      "description": "Plain text email body",
+      "required": false
+    },
+    {
+      "name": "html",
+      "display_name": "HTML Body",
+      "type": "string",
+      "description": "HTML email body",
+      "required": false
+    },
+    {
+      "name": "reply_to",
+      "display_name": "Reply To",
+      "type": "string",
+      "description": "Reply-to email address",
+      "required": false
+    },
+    {
+      "name": "cc",
+      "display_name": "CC",
+      "type": "string",
+      "description": "CC email address(es), comma-separated for multiple",
+      "required": false
+    },
+    {
+      "name": "bcc",
+      "display_name": "BCC",
+      "type": "string",
+      "description": "BCC email address(es), comma-separated for multiple",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "id",
+      "display_name": "Email ID",
+      "type": "string",
+      "description": "Resend email ID for tracking"
+    }
+  ]
+}

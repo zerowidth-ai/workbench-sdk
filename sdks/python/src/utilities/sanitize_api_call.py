@@ -12,7 +12,7 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 logger = logging.getLogger(__name__)
 
 AUTH_HEADER_PATTERN = re.compile(
-    r"^(authorization|x-api-key|api-key|cookie)$",
+    r"^(authorization|x-api-key|api-key|apikey|cookie)$",
     re.IGNORECASE,
 )
 

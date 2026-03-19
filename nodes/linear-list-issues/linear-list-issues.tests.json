@@ -1,0 +1,13 @@
+[
+  {
+    "description": "List first 10 issues",
+    "inputs": {
+      "first": 10
+    },
+    "expected": {
+      "issues": "array",
+      "count": "number",
+      "has_more": "boolean"
+    }
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "display_name": "Confluence Get Page",
+  "tagline": "Get Confluence page by ID",
+  "description": "Retrieve a Confluence page by its ID, including content body.",
+  "icon": "file-text",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "page_id",
+      "display_name": "Page ID",
+      "type": "string",
+      "description": "Confluence page ID",
+      "required": true
+    },
+    {
+      "name": "body_format",
+      "display_name": "Body Format",
+      "type": "string",
+      "description": "Format for page body: storage, atlas_doc_format, or view",
+      "required": false,
+      "default": "storage"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "page",
+      "display_name": "Page",
+      "type": "object",
+      "description": "The page object"
+    },
+    {
+      "name": "title",
+      "display_name": "Title",
+      "type": "string",
+      "description": "Page title"
+    },
+    {
+      "name": "body",
+      "display_name": "Body",
+      "type": "string",
+      "description": "Page body content in the requested format"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "display_name": "Jira Update Issue",
+  "tagline": "Update existing Jira issue",
+  "description": "Update an existing issue in Jira by issue key.",
+  "icon": "edit",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "issue_key",
+      "display_name": "Issue Key",
+      "type": "string",
+      "description": "Jira issue key (e.g. ENG-123)",
+      "required": true
+    },
+    {
+      "name": "summary",
+      "display_name": "Summary",
+      "type": "string",
+      "description": "New issue summary/title",
+      "required": false
+    },
+    {
+      "name": "description",
+      "display_name": "Description",
+      "type": "string",
+      "description": "New issue description (plain text)",
+      "required": false
+    },
+    {
+      "name": "priority",
+      "display_name": "Priority",
+      "type": "string",
+      "description": "Priority name (e.g. Highest, High, Medium, Low, Lowest)",
+      "required": false
+    },
+    {
+      "name": "labels",
+      "display_name": "Labels",
+      "type": "array",
+      "description": "Array of label strings (replaces existing labels)",
+      "required": false
+    },
+    {
+      "name": "assignee_id",
+      "display_name": "Assignee ID",
+      "type": "string",
+      "description": "Atlassian account ID to assign the issue to",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "issue_key",
+      "display_name": "Issue Key",
+      "type": "string",
+      "description": "The updated issue key"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "display_name": "OpenAI: GPT-5 Chat",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "GPT-5 Chat is designed for advanced, natural, multimodal, and context-aware conversations for enterprise applications.",
   "category": "llm",
   "provider": "openai",
@@ -22,17 +22,17 @@
       "required": true
     },
     {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "object",
+      "description": "Output format specification",
+      "default": null
+    },
+    {
       "name": "max_tokens",
       "display_name": "Max Tokens",
       "type": "number",
       "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "response_format",
-      "display_name": "Response Format",
-      "type": "string or object",
-      "description": "Output format specification",
       "default": null
     },
     {

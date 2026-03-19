@@ -1,6 +1,6 @@
 {
   "display_name": "Perplexity: Sonar Pro Search",
-  "tagline": "Large Language Model",
+  "tagline": "Generate text",
   "description": "Exclusively available on the OpenRouter API, Sonar Pro's new Pro Search mode is Perplexity's most advanced agentic search system. It is designed for deeper reasoning and analysis. Pricing is based on tokens plus $18 per thousand requests. This model powers the Pro Search mode on the Perplexity platform.\n\nSonar Pro Search adds autonomous, multi-step reasoning to Sonar Pro. So, instead of just one query + synthesis, it plans and executes entire research workflows using tools.",
   "category": "llm",
   "provider": "perplexity",
@@ -28,38 +28,10 @@
       "required": true
     },
     {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "include_reasoning",
-      "display_name": "Include Reasoning",
-      "type": "boolean",
-      "description": "Include reasoning in response",
-      "default": null
-    },
-    {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
-      "default": null
-    },
-    {
       "name": "reasoning",
       "display_name": "Reasoning",
       "type": "boolean",
-      "description": "Internal reasoning mode",
+      "description": "Enable reasoning mode",
       "default": null
     },
     {
@@ -74,6 +46,27 @@
       "display_name": "Top P",
       "type": "number",
       "description": "Controls diversity via nucleus sampling",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
+      "name": "presence_penalty",
+      "display_name": "Presence Penalty",
+      "type": "number",
+      "description": "Encourages new topics (-2 to 2)",
       "default": null
     }
   ],

@@ -1,0 +1,58 @@
+{
+  "display_name": "Linear List Issues",
+  "tagline": "List issues from Linear",
+  "description": "List issues from Linear with optional filtering and pagination.",
+  "icon": "list",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "filter",
+      "display_name": "Filter",
+      "type": "object",
+      "description": "Linear issue filter object (e.g. {\"team\": {\"id\": {\"eq\": \"team-id\"}}, \"state\": {\"name\": {\"eq\": \"In Progress\"}}})",
+      "required": false
+    },
+    {
+      "name": "first",
+      "display_name": "First",
+      "type": "number",
+      "description": "Number of issues to return (max 50)",
+      "required": false,
+      "default": 25
+    },
+    {
+      "name": "after",
+      "display_name": "After Cursor",
+      "type": "string",
+      "description": "Pagination cursor from a previous request",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "issues",
+      "display_name": "Issues",
+      "type": "array",
+      "description": "Array of issue objects"
+    },
+    {
+      "name": "count",
+      "display_name": "Count",
+      "type": "number",
+      "description": "Number of issues returned"
+    },
+    {
+      "name": "has_more",
+      "display_name": "Has More",
+      "type": "boolean",
+      "description": "Whether there are more results"
+    },
+    {
+      "name": "end_cursor",
+      "display_name": "End Cursor",
+      "type": "string",
+      "description": "Cursor for fetching the next page"
+    }
+  ]
+}

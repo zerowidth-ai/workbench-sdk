@@ -34,7 +34,7 @@ async def process(
 
     # Build parameters dict from config inputs
     params = {}
-    config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":True},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":None},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":None}]
+    config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":True},{"name":"response_format","display_name":"Response Format","type":"object","description":"Output format specification","default":None},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":None}]
 
     for input_def in config_inputs:
         if input_def["name"] == "messages":

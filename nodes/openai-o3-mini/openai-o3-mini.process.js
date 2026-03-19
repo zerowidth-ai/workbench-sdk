@@ -26,7 +26,7 @@ export default async ({inputs, settings, config, nodeConfig}) => {
 
         // Build parameters object from config inputs
         const params = {};
-        const configInputs = [{"name":"system_prompt","display_name":"System Prompt","type":"string or message","description":"System prompt to instruct the model","default":null},{"name":"messages","display_name":"Conversation","type":"conversation or message or string","description":"Array of chat messages that make up the conversation","required":true},{"name":"tools","display_name":"Tools","type":"tool or array of tools","description":"Array of tools to use","default":null,"allow_multiple":true},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null},{"name":"tool_choice","display_name":"Tool Choice","type":"string","description":"Tool selection control","default":null}];
+        const configInputs = [{"name":"messages","display_name":"Conversation","type":"conversation or message or string","description":"Array of chat messages that make up the conversation","required":true},{"name":"system_prompt","display_name":"System Message","type":"message or string","description":"System prompt to instruct the model","default":null},{"name":"tools","display_name":"Tools","type":"tool or array of tools","description":"Array of tools to use","default":null,"allow_multiple":true},{"name":"tool_choice","display_name":"Tool Choice","type":"string","description":"Tool selection control","default":null},{"name":"reasoning","display_name":"Reasoning","type":"boolean","description":"Enable reasoning mode","default":null},{"name":"response_format","display_name":"Response Format","type":"object","description":"Output format specification","default":null},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null}];
         
         for (const input of configInputs) {
 
@@ -124,6 +124,8 @@ export default async ({inputs, settings, config, nodeConfig}) => {
             content: response.content,
             role: response.role,
             tool_calls: response.tool_calls,
+            reasoning: response.reasoning,
+            refusal: response.refusal,
             finish_reason: response.finish_reason,
             usage: response.usage,
             cost_total: response.cost_total,

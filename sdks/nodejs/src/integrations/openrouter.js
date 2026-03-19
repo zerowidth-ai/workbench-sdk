@@ -8,17 +8,14 @@ export default class OpenRouterIntegration {
             baseURL: options.baseURL || 'https://openrouter.ai/api/v1',
             apiKey: apiKey,
             defaultHeaders: {
-                // 'Authorization': `Bearer ${this.apiKey}`,
                 'Content-Type': 'application/json',
                 'HTTP-Referer': options.referer || 'https://zv1.ai',
                 'X-Title': options.title || 'zv1 by ZeroWidth'
             }
         });
     }
-    
+
     async chatCompletion(params, nodeConfig = null, engineConfig = null) {
-      
-      
         const {
             model,
             messages,
@@ -35,22 +32,17 @@ export default class OpenRouterIntegration {
             }
         };
 
-
         // Add messages or prompt (required)
         if (messages) {
             payload.messages = messages;
 
-            // for each message remove fields that we add ourselves
+            // Remove internal fields without mutating the original messages
             payload.messages = payload.messages.map(message => {
-              delete message.id;
-              delete message.participant_id;
-              delete message.timestamp;
-
-              if(message.tool_calls !== undefined && message.tool_calls.length === 0){
-                delete message.tool_calls;
+              const { id, participant_id, timestamp, ...clean } = message;
+              if (clean.tool_calls !== undefined && clean.tool_calls.length === 0) {
+                delete clean.tool_calls;
               }
-
-              return message;
+              return clean;
             });
 
         } else if (prompt) {
@@ -71,11 +63,6 @@ export default class OpenRouterIntegration {
             }));
         }
 
-        if(otherParams.tools && otherParams.tools.length === 0){
-          delete payload.tools;
-        }
-      
-
         // Dynamically add parameters that have values
         for (const [key, value] of Object.entries(otherParams)) {
             if (value !== null && value !== undefined) {
@@ -88,12 +75,9 @@ export default class OpenRouterIntegration {
                         payload.reasoning = value;
                     }
                 } else if (key === 'include_reasoning') {
-                    // Handle include_reasoning parameter
-                    if (typeof value === 'boolean') {
-                        if (!payload.reasoning) {
-                            payload.reasoning = { enabled: true };
-                        }
-                        payload.reasoning.exclude = !value;
+                    // Legacy support: treat as reasoning toggle
+                    if (typeof value === 'boolean' && !payload.reasoning) {
+                        payload.reasoning = { enabled: value };
                     }
                 } else {
                     // Pass through all other parameters
@@ -109,7 +93,13 @@ export default class OpenRouterIntegration {
         }
 
         const apiCallStartTime = Date.now();
+        const isImageRequest = Array.isArray(payload.modalities) && payload.modalities.includes('image');
+
         try {
+            // Image models: use non-streaming to preserve images field (OpenAI SDK strips it from stream deltas)
+            if (isImageRequest) {
+                return await this._nonStreamingCompletion(payload, nodeConfig, engineConfig, apiCallStartTime);
+            }
 
             payload.stream = true;
 
@@ -122,6 +112,7 @@ export default class OpenRouterIntegration {
             let refusal = "";
             let reasoning = "";
             let annotations = [];
+            let images = [];
             let tool_calls = [];
 
             let usage = {
@@ -139,9 +130,7 @@ export default class OpenRouterIntegration {
                     nodeType: nodeConfig.type,
                     nodeId: nodeConfig.id,
                     timestamp: new Date().getTime(),
-                    data: {
-                      
-                    }
+                    data: {}
                   }
 
                   if(chunk.choices[0]){
@@ -152,6 +141,7 @@ export default class OpenRouterIntegration {
                         reasoning: chunk.choices[0].delta.reasoning,
                         role: chunk.choices[0].delta.role,
                         tool_calls: chunk.choices[0].delta.tool_calls,
+                        images: chunk.choices[0].delta.images,
                         finish_reason: chunk.choices[0].delta.finish_reason,
                         native_finish_reason: chunk.choices[0].delta.native_finish_reason,
                       }
@@ -195,13 +185,22 @@ export default class OpenRouterIntegration {
                     }
                   }
 
-                  if(chunk.usage){
-                    usage.prompt_tokens += chunk.usage.prompt_tokens;
-                    usage.completion_tokens += chunk.usage.completion_tokens;
-                    usage.total_tokens += chunk.usage.total_tokens;
+                  // Accumulate images from delta (OpenRouter returns images in delta.images)
+                  if(chunk.choices[0]?.delta?.images && Array.isArray(chunk.choices[0].delta.images)){
+                    images.push(...chunk.choices[0].delta.images);
                   }
 
-                  if(engineConfig.onNodeUpdate){
+                  if(event.data.finish_reason){
+                    finish_reason = event.data.finish_reason;
+                  }
+
+                  if(chunk.usage){
+                    usage.prompt_tokens += chunk.usage.prompt_tokens || 0;
+                    usage.completion_tokens += chunk.usage.completion_tokens || 0;
+                    usage.total_tokens += chunk.usage.total_tokens || 0;
+                  }
+
+                  if(engineConfig?.onNodeUpdate){
                     engineConfig.onNodeUpdate(event);
                   }
 
@@ -219,34 +218,17 @@ export default class OpenRouterIntegration {
                 costData = this.calculateCosts(usage, nodeConfig.pricing);
             }
 
-            // Capture all available fields from the response
             const result = {
-                // Standard fields
-                content: content,
-                role: role,
-                finish_reason: finish_reason,
-                tool_calls: tool_calls, // TODO: handle streaming tool calls
-                model: model,
-                usage: usage,
-                
-                // Additional choice fields
-                // index: choice.index,
-                // logprobs: choice.logprobs,
-                // native_finish_reason: choice.native_finish_reason,
-                
-                // Message-specific fields
-                refusal: refusal,
-                reasoning: reasoning,
-                annotations: annotations,
-                
-                // Response-level fields
-                // id: response.data.id,
-                // object: response.data.object,
-                // created: response.data.created,
-                // provider: response.data.provider,
-                // citations: response.data.citations,
-                
-                // Cost data (if calculated)
+                content,
+                role,
+                finish_reason,
+                tool_calls,
+                model,
+                usage,
+                refusal,
+                reasoning,
+                annotations,
+                images: images.length > 0 ? images : undefined,
                 ...(costData && {
                     cost_total: costData.totalCost,
                     cost_itemized: costData.itemizedCosts
@@ -271,7 +253,7 @@ export default class OpenRouterIntegration {
                     },
                     body: payload
                 },
-                response: { status: 200, statusText: 'OK' },
+                response: { status: 200, statusText: 'OK', body: result },
                 duration: Date.now() - apiCallStartTime,
                 error: null
             });
@@ -331,6 +313,82 @@ export default class OpenRouterIntegration {
 
             throw new Error(errorMessage);
         }
+    }
+
+    /**
+     * Non-streaming completion for image models.
+     * Bypasses the OpenAI SDK entirely because it strips OpenRouter-specific
+     * fields like `images` from both streaming deltas and non-streaming messages.
+     * Uses raw fetch to preserve the full response.
+     */
+    async _nonStreamingCompletion(payload, nodeConfig, engineConfig, apiCallStartTime) {
+        const url = `${this.client.baseURL}/chat/completions`;
+        const headers = {
+            'Content-Type': 'application/json',
+            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
+            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
+            'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
+        };
+
+        const res = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+            const errorBody = await res.json().catch(() => null);
+            const errorMessage = errorBody?.error?.message || `HTTP ${res.status}`;
+            throw new Error(`OpenRouter API Error (${res.status}): ${errorMessage}`);
+        }
+
+        const data = await res.json();
+        const choice = data.choices?.[0];
+        const message = choice?.message || {};
+        const usage = data.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+
+        let costData = null;
+        if (nodeConfig?.pricing) {
+            costData = this.calculateCosts(usage, nodeConfig.pricing);
+        }
+
+        // Image models return data on choice directly (text, images, reasoning)
+        // rather than nested under choice.message
+        const result = {
+            content: message.content || choice?.text || '',
+            role: message.role || 'assistant',
+            finish_reason: choice?.finish_reason || '',
+            tool_calls: message.tool_calls || [],
+            model: payload.model,
+            usage,
+            refusal: message.refusal || '',
+            reasoning: message.reasoning || choice?.reasoning || '',
+            annotations: message.annotations || [],
+            images: message.images || choice?.images || undefined,
+            ...(costData && {
+                cost_total: costData.totalCost,
+                cost_itemized: costData.itemizedCosts
+            }),
+        };
+
+        // Emit API call event
+        await emitAPICallEvent(engineConfig || this._engineConfig, {
+            timestamp: apiCallStartTime,
+            integration: 'openrouter',
+            nodeId: nodeConfig?.id || null,
+            nodeType: nodeConfig?.type || null,
+            request: {
+                method: 'POST',
+                url,
+                headers,
+                body: payload
+            },
+            response: { status: res.status, statusText: res.statusText, body: result },
+            duration: Date.now() - apiCallStartTime,
+            error: null
+        });
+
+        return result;
     }
 
     /**

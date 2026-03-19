@@ -1,0 +1,52 @@
+{
+  "display_name": "Stripe List Customers",
+  "tagline": "List customers from Stripe",
+  "description": "List customers from your Stripe account with optional filtering by email.",
+  "icon": "credit-card",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "email",
+      "display_name": "Email",
+      "type": "string",
+      "description": "Filter customers by email address",
+      "required": false
+    },
+    {
+      "name": "limit",
+      "display_name": "Limit",
+      "type": "number",
+      "description": "Maximum number of customers to return (1-100)",
+      "required": false,
+      "default": 10
+    },
+    {
+      "name": "starting_after",
+      "display_name": "Starting After",
+      "type": "string",
+      "description": "Cursor for pagination (customer ID to start after)",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "customers",
+      "display_name": "Customers",
+      "type": "array",
+      "description": "Array of customer objects"
+    },
+    {
+      "name": "has_more",
+      "display_name": "Has More",
+      "type": "boolean",
+      "description": "Whether there are more results available"
+    },
+    {
+      "name": "count",
+      "display_name": "Count",
+      "type": "number",
+      "description": "Number of customers returned"
+    }
+  ]
+}

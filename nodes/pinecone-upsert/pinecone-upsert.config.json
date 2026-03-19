@@ -1,0 +1,32 @@
+{
+  "display_name": "Pinecone Upsert",
+  "tagline": "Upsert vectors to Pinecone index",
+  "description": "Insert or update vectors in a Pinecone index.",
+  "icon": "upload",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "vectors",
+      "display_name": "Vectors",
+      "type": "array",
+      "description": "Array of vector objects, each with id (string), values (array of floats), and optional metadata (object)",
+      "required": true
+    },
+    {
+      "name": "namespace",
+      "display_name": "Namespace",
+      "type": "string",
+      "description": "Pinecone namespace to upsert into",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "upserted_count",
+      "display_name": "Upserted Count",
+      "type": "number",
+      "description": "Number of vectors upserted"
+    }
+  ]
+}

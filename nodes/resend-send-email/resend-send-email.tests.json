@@ -1,0 +1,14 @@
+[
+  {
+    "description": "Send plain text email",
+    "inputs": {
+      "to": "${RESEND_TEST_TO}",
+      "from": "${RESEND_TEST_FROM}",
+      "subject": "Test Email from zv1",
+      "text": "This is a test email sent via Resend."
+    },
+    "expected": {
+      "id": "string"
+    }
+  }
+]

@@ -1,0 +1,51 @@
+{
+  "display_name": "Slack Send Message",
+  "tagline": "Post message to Slack channel",
+  "description": "Send a message to a Slack channel or thread using the Slack Web API.",
+  "icon": "message-square",
+  "category": "third-party",
+  "is_plugin": true,
+  "inputs": [
+    {
+      "name": "channel",
+      "display_name": "Channel",
+      "type": "string",
+      "description": "Slack channel ID or name (e.g. C1234567890 or #general)",
+      "required": true
+    },
+    {
+      "name": "text",
+      "display_name": "Text",
+      "type": "string",
+      "description": "Message text (supports Slack markdown/mrkdwn)",
+      "required": true
+    },
+    {
+      "name": "thread_ts",
+      "display_name": "Thread Timestamp",
+      "type": "string",
+      "description": "Timestamp of parent message to reply in thread",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "message",
+      "display_name": "Message",
+      "type": "object",
+      "description": "The posted message object"
+    },
+    {
+      "name": "ts",
+      "display_name": "Timestamp",
+      "type": "string",
+      "description": "Message timestamp (can be used for threading)"
+    },
+    {
+      "name": "channel",
+      "display_name": "Channel",
+      "type": "string",
+      "description": "Channel the message was posted to"
+    }
+  ]
+}

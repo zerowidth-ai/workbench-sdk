@@ -168,7 +168,7 @@ export async function loadIntegrations(config, flow = null) {
   }
 
   // map of basic keys that share a integrationformat and implementation
-  const basicKeyIntegrations = ['firecrawl', 'newsdata_io', 'openai', 'google_custom_search', 'airtable', 'notion'];
+  const basicKeyIntegrations = ['firecrawl', 'newsdata_io', 'openai', 'google_custom_search', 'airtable', 'notion', 'sendgrid', 'slack', 'supabase', 'pinecone', 'twilio', 'github', 'linear', 'stripe', 'resend', 'jira', 'confluence'];
 
   // Load basic integrations in parallel
   await Promise.all(basicKeyIntegrations.map(async integration => {

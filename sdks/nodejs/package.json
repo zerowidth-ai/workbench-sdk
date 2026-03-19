@@ -1,6 +1,6 @@
 {
   "name": "zv1",
-  "version": "0.4.3",
+  "version": "1.0.0",
   "dependencies": {
     "adm-zip": "^0.5.16",
     "ajv": "^8.17.1",
@@ -15,6 +15,10 @@
   "repository": "https://github.com/zerowidth-ai/zv1",
   "description": "The zv1 SDK for making processing flows created via zv1.ai, by ZeroWidth",
   "main": "./src/index.js",
+  "files": ["src/", "nodes/", "types/", "LICENSE", "README.md"],
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "devDependencies": {
     "dotenv": "^17.2.2"
   },

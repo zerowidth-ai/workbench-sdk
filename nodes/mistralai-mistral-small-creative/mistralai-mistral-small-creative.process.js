@@ -26,7 +26,7 @@ export default async ({inputs, settings, config, nodeConfig}) => {
 
         // Build parameters object from config inputs
         const params = {};
-        const configInputs = [{"name":"system_prompt","display_name":"System Prompt","type":"string or message","description":"System prompt to instruct the model","default":null},{"name":"messages","display_name":"Conversation","type":"conversation or message or string","description":"Array of chat messages that make up the conversation","required":true},{"name":"tools","display_name":"Tools","type":"tool or array of tools","description":"Array of tools to use","default":null,"allow_multiple":true},{"name":"tool_choice","display_name":"Tool Choice","type":"string","description":"Tool selection control","default":null}];
+        const configInputs = [{"name":"messages","display_name":"Conversation","type":"conversation or message or string","description":"Array of chat messages that make up the conversation","required":true},{"name":"system_prompt","display_name":"System Message","type":"message or string","description":"System prompt to instruct the model","default":null},{"name":"tools","display_name":"Tools","type":"tool or array of tools","description":"Array of tools to use","default":null,"allow_multiple":true},{"name":"tool_choice","display_name":"Tool Choice","type":"string","description":"Tool selection control","default":null}];
         
         for (const input of configInputs) {
 

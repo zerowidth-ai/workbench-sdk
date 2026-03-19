@@ -34,7 +34,7 @@ async def process(
 
     # Build parameters dict from config inputs
     params = {}
-    config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":True},{"name":"frequency_penalty","display_name":"Frequency Penalty","type":"number","description":"Reduces repetition (-2 to 2)","default":None},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":None},{"name":"presence_penalty","display_name":"Presence Penalty","type":"number","description":"Encourages new topics (-2 to 2)","default":None},{"name":"response_format","display_name":"Response Format","type":"string or object","description":"Output format specification","default":None},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":None},{"name":"stop","display_name":"Stop","type":"string or array","description":"Custom stop sequences","default":None},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":None},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":None}]
+    config_inputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":True},{"name":"response_format","display_name":"Response Format","type":"object","description":"Output format specification","default":None},{"name":"stop","display_name":"Stop","type":"string or array","description":"Custom stop sequences","default":None},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":None},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":None},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":None},{"name":"frequency_penalty","display_name":"Frequency Penalty","type":"number","description":"Reduces repetition (-2 to 2)","default":None},{"name":"presence_penalty","display_name":"Presence Penalty","type":"number","description":"Encourages new topics (-2 to 2)","default":None},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":None}]
 
     for input_def in config_inputs:
         if input_def["name"] == "messages":
@@ -64,7 +64,6 @@ async def process(
 
     return {
         "content": response.get("content"),
-        "logprobs": response.get("logprobs"),
         "finish_reason": response.get("finish_reason"),
         "usage": response.get("usage"),
         "cost_total": response.get("cost_total"),

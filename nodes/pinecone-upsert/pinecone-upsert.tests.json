@@ -1,0 +1,13 @@
+[
+  {
+    "description": "Upsert single vector",
+    "inputs": {
+      "vectors": [
+        {"id": "vec-1", "values": [0.1, 0.2, 0.3], "metadata": {"label": "test"}}
+      ]
+    },
+    "expected": {
+      "upserted_count": "number"
+    }
+  }
+]
