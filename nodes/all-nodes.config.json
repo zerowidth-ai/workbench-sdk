@@ -3661,6 +3661,97 @@
         "id": "qwen-qwen3-30b-a3b-instruct-2507"
     },
     {
+        "display_name": "Perplexity: Embed V1 0.6B",
+        "tagline": "Generate embeddings",
+        "description": "pplx-embed-v1-0.6B is one of Perplexity's state-of-the-art text embedding models built for real-world, web-scale retrieval. pplx-embed-v1 is optimized for standard dense text retrieval with the 0.6B parameter model targeting lightweight, low-latency...",
+        "category": "embedding",
+        "provider": "perplexity",
+        "model_id": "perplexity/pplx-embed-v1-0.6b",
+        "context_length": 32000,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.004,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "perplexity-pplx-embed-v1-0-6b"
+    },
+    {
         "display_name": "Input Data",
         "tagline": "Receive input data",
         "description": "Defines a single data input that can be requested from the user during flow execution",
@@ -4315,6 +4406,101 @@
             "openai"
         ],
         "id": "combine-document-chunks"
+    },
+    {
+        "display_name": "Google: Gemini Embedding 2",
+        "tagline": "Generate embeddings",
+        "description": "Gemini Embedding 2 is Google's first multimodal embedding model. We currently support mapping text and images into a unified vector space for semantic search and retrieval-augmented generation (RAG). It supports...",
+        "category": "embedding",
+        "provider": "google",
+        "model_id": "google/gemini-embedding-2",
+        "context_length": 8192,
+        "input_modalities": [
+            "text",
+            "image",
+            "file",
+            "audio",
+            "video"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.19999999999999998,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "google-gemini-embedding-2"
     },
     {
         "display_name": "OpenAI: GPT-4o-mini (2024-07-18)",
@@ -7398,6 +7584,101 @@
         "id": "google-gemini-3-1-flash-image-preview"
     },
     {
+        "display_name": "Google: Gemini Embedding 2 Preview",
+        "tagline": "Generate embeddings",
+        "description": "Gemini Embedding 2 Preview is Google's first multimodal embedding model. We currently support mapping text and images into a unified vector space for semantic search and retrieval-augmented generation (RAG). It...",
+        "category": "embedding",
+        "provider": "google",
+        "model_id": "google/gemini-embedding-2-preview",
+        "context_length": 8192,
+        "input_modalities": [
+            "text",
+            "image",
+            "file",
+            "audio",
+            "video"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.19999999999999998,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "google-gemini-embedding-2-preview"
+    },
+    {
         "display_name": "Google: Nano Banana (Gemini 2.5 Flash Image)",
         "tagline": "Generate images and text",
         "description": "Gemini 2.5 Flash Image, a.k.a. \"Nano Banana,\" is now generally available. It is a state of the art image generation model with contextual understanding. It is capable of image generation, edits, and multi-turn conversations. Aspect ratios can be controlled with the [image_config API Parameter](https://openrouter.ai/docs/features/multimodal/image-generation#image-aspect-ratio-configuration)",
@@ -10078,6 +10359,97 @@
         "timeout": 3000,
         "retry_limit": 3,
         "id": "delete-object-property"
+    },
+    {
+        "display_name": "Thenlper: GTE-Large",
+        "tagline": "Generate embeddings",
+        "description": "The gte-large embedding model converts English sentences, paragraphs and moderate-length documents into a 1024-dimensional dense vector space, delivering high-quality semantic embeddings optimized for information retrieval, semantic textual similarity, reranking and...",
+        "category": "embedding",
+        "provider": "thenlper",
+        "model_id": "thenlper/gte-large",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.01,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "thenlper-gte-large"
     },
     {
         "display_name": "Qwen: Qwen-Turbo",
@@ -12893,6 +13265,97 @@
         "id": "array-length"
     },
     {
+        "display_name": "Sentence Transformers: multi-qa-mpnet-base-dot-v1",
+        "tagline": "Generate embeddings",
+        "description": "The multi-qa-mpnet-base-dot-v1 embedding model transforms sentences and short paragraphs into a 768-dimensional dense vector space, generating high-quality semantic embeddings optimized for question-and-answer retrieval, semantic search, and similarity-scoring across diverse content.",
+        "category": "embedding",
+        "provider": "sentence-transformers",
+        "model_id": "sentence-transformers/multi-qa-mpnet-base-dot-v1",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.005,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "sentence-transformers-multi-qa-mpnet-base-dot-v1"
+    },
+    {
         "display_name": "xAI: Grok 4.20 Multi-Agent Beta",
         "tagline": "Generate text",
         "description": "Grok 4.20 Multi-Agent Beta is a variant of xAI\u2019s Grok 4.20 designed for collaborative, agent-based workflows. Multiple agents operate in parallel to conduct deep research, coordinate tool use, and synthesize information across complex tasks.\n\nReasoning effort behavior:\n- low / medium: 4 agents\n- high / xhigh: 16 agents",
@@ -15668,6 +16131,97 @@
         "id": "openai-o4-mini-high"
     },
     {
+        "display_name": "BAAI: bge-large-en-v1.5",
+        "tagline": "Generate embeddings",
+        "description": "The bge-large-en-v1.5 embedding model maps English sentences, paragraphs, and documents into a 1024-dimensional dense vector space, delivering high-fidelity semantic embeddings optimized for semantic search, document retrieval, and downstream NLP tasks...",
+        "category": "embedding",
+        "provider": "baai",
+        "model_id": "baai/bge-large-en-v1.5",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.01,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "baai-bge-large-en-v1-5"
+    },
+    {
         "display_name": "System Prompt",
         "tagline": "Set system instructions",
         "description": "Draft a text-based system prompt for an LLM, with configurable variables.",
@@ -16578,6 +17132,275 @@
         ],
         "settings": [],
         "id": "firecrawl-scrape"
+    },
+    {
+        "display_name": "Embedding",
+        "tagline": "Generate embeddings (any model)",
+        "description": "Generate vector embeddings using any OpenRouter embedding model. The model is an input, so it can be specified or swapped from outside the flow rather than baked into the node.",
+        "category": "embedding",
+        "provider": "openrouter",
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "model",
+                "display_name": "Model",
+                "type": "string",
+                "description": "OpenRouter embedding model id (e.g. openai/text-embedding-3-small, google/gemini-embedding-001, qwen/qwen3-embedding-8b). Wire this from a flow input to swap models externally.",
+                "default": "openai/text-embedding-3-small"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "model",
+                "display_name": "Model Used",
+                "type": "string",
+                "description": "The embedding model that actually produced the vectors"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost (USD), reported by OpenRouter usage accounting for the chosen model."
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed cost breakdown (input/output line items)"
+            }
+        ],
+        "id": "embedding"
+    },
+    {
+        "display_name": "Cohere: Rerank 4 Pro",
+        "tagline": "Rerank documents by relevance",
+        "description": "Cohere's AI search foundation model for enhancing the relevance of information surfaced within search and RAG systems. Features a 32K context window, multilingual support across 100+ languages, no data pre-processing...",
+        "category": "rerank",
+        "provider": "cohere",
+        "model_id": "cohere/rerank-4-pro",
+        "context_length": 32768,
+        "inputs": [
+            {
+                "name": "query",
+                "display_name": "Query",
+                "type": "string",
+                "description": "The search query to rank documents against",
+                "required": true
+            },
+            {
+                "name": "documents",
+                "display_name": "Documents",
+                "type": "array",
+                "description": "Candidate documents to rerank. Accepts an array of strings, or an array of objects (e.g. search results) \u2014 for objects, text is read from text_field or common fields like content/text.",
+                "required": true
+            },
+            {
+                "name": "top_n",
+                "display_name": "Top N",
+                "type": "number",
+                "description": "Optional: return only the top N most relevant documents",
+                "default": null
+            },
+            {
+                "name": "text_field",
+                "display_name": "Text Field",
+                "type": "string",
+                "description": "Optional: when documents are objects, which field holds the text to rank (defaults to trying content, text, document, page_content, chunk, body)",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "results",
+                "display_name": "Results",
+                "type": "array",
+                "description": "Reranked results, highest relevance first: { index, relevance_score, document } where document is the original input item"
+            },
+            {
+                "name": "ranked_documents",
+                "display_name": "Ranked Documents",
+                "type": "array",
+                "description": "The original documents reordered by relevance (highest first)"
+            },
+            {
+                "name": "top_document",
+                "display_name": "Top Document",
+                "type": "any",
+                "description": "The single most relevant document"
+            },
+            {
+                "name": "usage",
+                "display_name": "Usage",
+                "type": "object",
+                "description": "Usage / billed units reported by the provider (if any)"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for this request (USD), when token usage is reported"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "note": "Rerank is typically billed per search (1 query + up to ~100 docs), not per token. OpenRouter does not expose a per-token rerank price.",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "cohere-rerank-4-pro"
+    },
+    {
+        "display_name": "Sentence Transformers: all-mpnet-base-v2",
+        "tagline": "Generate embeddings",
+        "description": "The all-mpnet-base-v2 embedding model encodes sentences and short paragraphs into a 768-dimensional dense vector space, providing high-fidelity semantic embeddings well suited for tasks like information retrieval, clustering, similarity scoring, and...",
+        "category": "embedding",
+        "provider": "sentence-transformers",
+        "model_id": "sentence-transformers/all-mpnet-base-v2",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.005,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "sentence-transformers-all-mpnet-base-v2"
     },
     {
         "display_name": "JSON to XML",
@@ -18650,6 +19473,97 @@
         "id": "deepseek-deepseek-r1"
     },
     {
+        "display_name": "Qwen: Qwen3 Embedding 8B",
+        "tagline": "Generate embeddings",
+        "description": "The Qwen3 Embedding model series is the latest proprietary model of the Qwen family, specifically designed for text embedding and ranking tasks. This series inherits the exceptional multilingual capabilities, long-text...",
+        "category": "embedding",
+        "provider": "qwen",
+        "model_id": "qwen/qwen3-embedding-8b",
+        "context_length": 32000,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.01,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "qwen-qwen3-embedding-8b"
+    },
+    {
         "display_name": "LiquidAI: LFM2-24B-A2B",
         "tagline": "Generate text",
         "description": "LFM2-24B-A2B is the largest model in the LFM2 family of hybrid architectures designed for efficient on-device deployment. Built as a 24B parameter Mixture-of-Experts model with only 2B active parameters per token, it delivers high-quality generation while maintaining low inference costs. The model fits within 32 GB of RAM, making it practical to run on consumer laptops and desktops without sacrificing capability.",
@@ -19986,6 +20900,97 @@
         "id": "array-split"
     },
     {
+        "display_name": "Sentence Transformers: all-MiniLM-L12-v2",
+        "tagline": "Generate embeddings",
+        "description": "The all-MiniLM-L12-v2 embedding model maps sentences and short paragraphs into a 384-dimensional dense vector space, producing efficient and high-quality semantic embeddings optimized for tasks such as semantic search, clustering, and...",
+        "category": "embedding",
+        "provider": "sentence-transformers",
+        "model_id": "sentence-transformers/all-minilm-l12-v2",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.005,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "sentence-transformers-all-minilm-l12-v2"
+    },
+    {
         "display_name": "Google: Gemini 2.5 Pro",
         "tagline": "Generate text",
         "description": "Gemini 2.5 Pro is Google\u2019s state-of-the-art AI model designed for advanced reasoning, coding, mathematics, and scientific tasks. It employs \u201cthinking\u201d capabilities, enabling it to reason through responses with enhanced accuracy and nuanced context handling. Gemini 2.5 Pro achieves top-tier performance on multiple benchmarks, including first-place positioning on the LMArena leaderboard, reflecting superior human-preference alignment and complex problem-solving abilities.",
@@ -20804,6 +21809,102 @@
             ]
         },
         "id": "openai-gpt-oss-20b"
+    },
+    {
+        "display_name": "Cohere: Rerank v3.5",
+        "tagline": "Rerank documents by relevance",
+        "description": "Rerank v3.5 is designed to reorder search results for improved relevance. It supports multi-aspect and semi-structured data reranking over 100+ languages. Ideal for refining results from semantic or keyword search...",
+        "category": "rerank",
+        "provider": "cohere",
+        "model_id": "cohere/rerank-v3.5",
+        "context_length": 4096,
+        "inputs": [
+            {
+                "name": "query",
+                "display_name": "Query",
+                "type": "string",
+                "description": "The search query to rank documents against",
+                "required": true
+            },
+            {
+                "name": "documents",
+                "display_name": "Documents",
+                "type": "array",
+                "description": "Candidate documents to rerank. Accepts an array of strings, or an array of objects (e.g. search results) \u2014 for objects, text is read from text_field or common fields like content/text.",
+                "required": true
+            },
+            {
+                "name": "top_n",
+                "display_name": "Top N",
+                "type": "number",
+                "description": "Optional: return only the top N most relevant documents",
+                "default": null
+            },
+            {
+                "name": "text_field",
+                "display_name": "Text Field",
+                "type": "string",
+                "description": "Optional: when documents are objects, which field holds the text to rank (defaults to trying content, text, document, page_content, chunk, body)",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "results",
+                "display_name": "Results",
+                "type": "array",
+                "description": "Reranked results, highest relevance first: { index, relevance_score, document } where document is the original input item"
+            },
+            {
+                "name": "ranked_documents",
+                "display_name": "Ranked Documents",
+                "type": "array",
+                "description": "The original documents reordered by relevance (highest first)"
+            },
+            {
+                "name": "top_document",
+                "display_name": "Top Document",
+                "type": "any",
+                "description": "The single most relevant document"
+            },
+            {
+                "name": "usage",
+                "display_name": "Usage",
+                "type": "object",
+                "description": "Usage / billed units reported by the provider (if any)"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for this request (USD), when token usage is reported"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "note": "Rerank is typically billed per search (1 query + up to ~100 docs), not per token. OpenRouter does not expose a per-token rerank price.",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "cohere-rerank-v3-5"
     },
     {
         "display_name": "Mistral: Mistral 7B Instruct v0.1",
@@ -26148,6 +27249,97 @@
         "id": "x-ai-grok-code-fast-1"
     },
     {
+        "display_name": "BAAI: bge-m3",
+        "tagline": "Generate embeddings",
+        "description": "The bge-m3 embedding model encodes sentences, paragraphs, and long documents into a 1024-dimensional dense vector space, delivering high-quality semantic embeddings optimized for multilingual retrieval, semantic search, and large-context applications.",
+        "category": "embedding",
+        "provider": "baai",
+        "model_id": "baai/bge-m3",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.01,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "baai-bge-m3"
+    },
+    {
         "display_name": "Has Object Property",
         "tagline": "Check object property",
         "description": "Check if an object has a specific property/key.",
@@ -26203,77 +27395,122 @@
         "id": "has-object-property"
     },
     {
-        "display_name": "Simple Agent (beta)",
-        "tagline": "Run a simple agent",
-        "description": "A simple AI agent that accepts tools and processes messages. Perfect template for creating starter agents.",
+        "display_name": "Simple Agent",
+        "tagline": "Run an agent with any model",
+        "description": "A configurable AI agent: pick the model via input, give it a system prompt, and attach tools as plugins. The engine runs the full tool-calling loop. Use it as a flow node or attach it to another LLM as a sub-agent tool.",
         "category": "ai",
-        "is_macro": true,
         "is_plugin": true,
         "accepts_plugins": true,
-        "macro_flow": {
-            "nodes": [
-                {
-                    "id": "input_messages",
-                    "type": "input-data",
-                    "settings": {
-                        "key": "messages"
-                    }
-                },
-                {
-                    "id": "llm",
-                    "type": "openai-gpt-4-1-nano"
-                },
-                {
-                    "id": "output_message",
-                    "type": "output-data",
-                    "settings": {
-                        "key": "message"
-                    }
-                }
-            ],
-            "links": [
-                {
-                    "from": {
-                        "node_id": "input_messages",
-                        "port_name": "value"
-                    },
-                    "to": {
-                        "node_id": "llm",
-                        "port_name": "messages"
-                    }
-                },
-                {
-                    "from": {
-                        "node_id": "llm",
-                        "port_name": "message"
-                    },
-                    "to": {
-                        "node_id": "output_message",
-                        "port_name": "value"
-                    }
-                }
-            ]
-        },
         "inputs": [
             {
                 "name": "messages",
                 "display_name": "Messages",
-                "type": "array of messages or message or string",
+                "type": "conversation or message or string",
                 "description": "Chat messages to process",
                 "required": true
+            },
+            {
+                "name": "system_prompt",
+                "display_name": "System Message",
+                "type": "message or string",
+                "description": "System prompt that defines the agent's behavior",
+                "default": null
+            },
+            {
+                "name": "model",
+                "display_name": "Model",
+                "type": "string",
+                "description": "OpenRouter chat model id (e.g. openai/gpt-4.1-nano, anthropic/claude-opus-4.5, google/gemini-3-pro). Wire this from a flow input to swap models externally.",
+                "default": "openai/gpt-4.1-nano"
+            },
+            {
+                "name": "tools",
+                "display_name": "Tools",
+                "type": "tool or array of tools",
+                "description": "Tools the agent may call. Plugins attached to this node are added automatically by the engine.",
+                "default": null,
+                "allow_multiple": true
+            },
+            {
+                "name": "tool_choice",
+                "display_name": "Tool Choice",
+                "type": "string",
+                "description": "Tool selection control",
+                "default": null
+            },
+            {
+                "name": "temperature",
+                "display_name": "Temperature",
+                "type": "number",
+                "description": "Controls randomness (0-2)",
+                "default": null
+            },
+            {
+                "name": "max_tokens",
+                "display_name": "Max Tokens",
+                "type": "number",
+                "description": "Maximum tokens to generate",
+                "default": null
             }
         ],
         "outputs": [
             {
-                "name": "message",
-                "display_name": "Message",
-                "type": "message",
-                "description": "The agent's response message"
-            }
-        ],
-        "plugins": [
+                "name": "conversation",
+                "display_name": "Conversation",
+                "type": "conversation",
+                "can_stream": true,
+                "description": "An array of messages including any tool call & response messages as well as the final generated output."
+            },
             {
-                "connects_to": "llm"
+                "name": "message",
+                "display_name": "Final Message",
+                "type": "message",
+                "can_stream": true,
+                "description": "The final generated response message."
+            },
+            {
+                "name": "content",
+                "display_name": "Content",
+                "type": "string",
+                "can_stream": true,
+                "description": "The content portion of the final generated response message."
+            },
+            {
+                "name": "role",
+                "display_name": "Role",
+                "type": "string",
+                "can_stream": true,
+                "description": "Role of the response (usually 'assistant')"
+            },
+            {
+                "name": "tool_calls",
+                "display_name": "Tool Calls",
+                "type": "array of tools",
+                "description": "Tool calls made by the model"
+            },
+            {
+                "name": "finish_reason",
+                "display_name": "Finish Reason",
+                "type": "string",
+                "description": "Why the completion finished"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost (USD), reported by OpenRouter usage accounting for the chosen model."
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed cost breakdown (input/output line items)"
             }
         ],
         "settings": [],
@@ -28352,6 +29589,97 @@
         "id": "yaml-to-json"
     },
     {
+        "display_name": "Google: Gemini Embedding 001",
+        "tagline": "Generate embeddings",
+        "description": "gemini-embedding-001 provides a unified cutting edge experience across domains, including science, legal, finance, and coding. This embedding model has consistently held a top spot on the Massive Text Embedding Benchmark...",
+        "category": "embedding",
+        "provider": "google",
+        "model_id": "google/gemini-embedding-001",
+        "context_length": 20000,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.15,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "google-gemini-embedding-001"
+    },
+    {
         "display_name": "Greater Than",
         "tagline": "Compare two numbers",
         "description": "Checks if the first number is greater than the second number",
@@ -28744,6 +30072,188 @@
             ]
         },
         "id": "qwen-qwen-2-5-coder-32b-instruct"
+    },
+    {
+        "display_name": "Intfloat: E5-Base-v2",
+        "tagline": "Generate embeddings",
+        "description": "The e5-base-v2 embedding model encodes English sentences and paragraphs into a 768-dimensional dense vector space, producing efficient and high-quality semantic embeddings optimized for tasks such as semantic search, similarity scoring,...",
+        "category": "embedding",
+        "provider": "intfloat",
+        "model_id": "intfloat/e5-base-v2",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.005,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "intfloat-e5-base-v2"
+    },
+    {
+        "display_name": "OpenAI: Text Embedding 3 Small",
+        "tagline": "Generate embeddings",
+        "description": "text-embedding-3-small is OpenAI's improved, more performant version of the ada embedding model. Embeddings are a numerical representation of text that can be used to measure the relatedness between two pieces...",
+        "category": "embedding",
+        "provider": "openai",
+        "model_id": "openai/text-embedding-3-small",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.02,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "openai-text-embedding-3-small"
     },
     {
         "display_name": "Notion Query Database",
@@ -29211,6 +30721,97 @@
             ]
         },
         "id": "openai-o3"
+    },
+    {
+        "display_name": "BAAI: bge-base-en-v1.5",
+        "tagline": "Generate embeddings",
+        "description": "The bge-base-en-v1.5 embedding model converts English sentences and paragraphs into 768-dimensional dense vectors, delivering efficient, high-quality semantic embeddings optimized for retrieval, semantic search, and document-matching workflows. This version (v1.5) features...",
+        "category": "embedding",
+        "provider": "baai",
+        "model_id": "baai/bge-base-en-v1.5",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.005,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "baai-bge-base-en-v1-5"
     },
     {
         "display_name": "Absolute Value",
@@ -32572,6 +34173,97 @@
         "id": "object-merge"
     },
     {
+        "display_name": "OpenAI: Text Embedding Ada 002",
+        "tagline": "Generate embeddings",
+        "description": "text-embedding-ada-002 is OpenAI's legacy text embedding model.",
+        "category": "embedding",
+        "provider": "openai",
+        "model_id": "openai/text-embedding-ada-002",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.09999999999999999,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "openai-text-embedding-ada-002"
+    },
+    {
         "display_name": "OpenAI: GPT-5.4 Nano",
         "tagline": "Generate text",
         "description": "GPT-5.4 nano is the most lightweight and cost-efficient variant of the GPT-5.4 family, optimized for speed-critical and high-volume tasks. It supports text and image inputs and is designed for low-latency use cases such as classification, data extraction, ranking, and sub-agent execution.\n\nThe model prioritizes responsiveness and efficiency over deep reasoning, making it ideal for pipelines that require fast, reliable outputs at scale. GPT-5.4 nano is well suited for background tasks, real-time systems, and distributed agent architectures where minimizing cost and latency is essential.",
@@ -34101,6 +35793,97 @@
         "id": "openai-gpt-5-4"
     },
     {
+        "display_name": "Perplexity: Embed V1 4B",
+        "tagline": "Generate embeddings",
+        "description": "pplx-embed-v1 -4B is one of Perplexity's state-of-the-art text embedding models built for real-world, web-scale retrieval. pplx-embed-v1 is optimized for standard dense text retrieval with the 4B parameter model maximizing retrieval...",
+        "category": "embedding",
+        "provider": "perplexity",
+        "model_id": "perplexity/pplx-embed-v1-4b",
+        "context_length": 32000,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.03,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "perplexity-pplx-embed-v1-4b"
+    },
+    {
         "display_name": "Google: Gemma 3 12B (free)",
         "tagline": "Generate text",
         "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities, including structured outputs and function calling. Gemma 3 12B is the second largest in the family of Gemma 3 models after [Gemma 3 27B](google/gemma-3-27b-it)",
@@ -34553,6 +36336,102 @@
         "timeout": 3000,
         "retry_limit": 3,
         "id": "random-error"
+    },
+    {
+        "display_name": "Cohere: Rerank 4 Fast",
+        "tagline": "Rerank documents by relevance",
+        "description": "Cohere's AI search foundation model for enhancing the relevance of information surfaced within search and RAG systems. Features a 32K context window, multilingual support across 100+ languages, no data pre-processing...",
+        "category": "rerank",
+        "provider": "cohere",
+        "model_id": "cohere/rerank-4-fast",
+        "context_length": 32768,
+        "inputs": [
+            {
+                "name": "query",
+                "display_name": "Query",
+                "type": "string",
+                "description": "The search query to rank documents against",
+                "required": true
+            },
+            {
+                "name": "documents",
+                "display_name": "Documents",
+                "type": "array",
+                "description": "Candidate documents to rerank. Accepts an array of strings, or an array of objects (e.g. search results) \u2014 for objects, text is read from text_field or common fields like content/text.",
+                "required": true
+            },
+            {
+                "name": "top_n",
+                "display_name": "Top N",
+                "type": "number",
+                "description": "Optional: return only the top N most relevant documents",
+                "default": null
+            },
+            {
+                "name": "text_field",
+                "display_name": "Text Field",
+                "type": "string",
+                "description": "Optional: when documents are objects, which field holds the text to rank (defaults to trying content, text, document, page_content, chunk, body)",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "results",
+                "display_name": "Results",
+                "type": "array",
+                "description": "Reranked results, highest relevance first: { index, relevance_score, document } where document is the original input item"
+            },
+            {
+                "name": "ranked_documents",
+                "display_name": "Ranked Documents",
+                "type": "array",
+                "description": "The original documents reordered by relevance (highest first)"
+            },
+            {
+                "name": "top_document",
+                "display_name": "Top Document",
+                "type": "any",
+                "description": "The single most relevant document"
+            },
+            {
+                "name": "usage",
+                "display_name": "Usage",
+                "type": "object",
+                "description": "Usage / billed units reported by the provider (if any)"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for this request (USD), when token usage is reported"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "note": "Rerank is typically billed per search (1 query + up to ~100 docs), not per token. OpenRouter does not expose a per-token rerank price.",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "cohere-rerank-4-fast"
     },
     {
         "display_name": "Mistral: Mixtral 8x7B Instruct",
@@ -35207,6 +37086,97 @@
             }
         ],
         "id": "openai-omni-moderation-latest"
+    },
+    {
+        "display_name": "OpenAI: Text Embedding 3 Large",
+        "tagline": "Generate embeddings",
+        "description": "text-embedding-3-large is OpenAI's most capable embedding model for both english and non-english tasks. Embeddings are a numerical representation of text that can be used to measure the relatedness between two...",
+        "category": "embedding",
+        "provider": "openai",
+        "model_id": "openai/text-embedding-3-large",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.13,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "openai-text-embedding-3-large"
     },
     {
         "display_name": "Anthropic: Claude Opus 4.6",
@@ -36176,6 +38146,98 @@
         "id": "anthropic-claude-opus-4-1"
     },
     {
+        "display_name": "NVIDIA: Llama Nemotron Embed VL 1B V2 (free)",
+        "tagline": "Generate embeddings",
+        "description": "The Llama Nemotron Embed VL 1B V2 embedding model is optimized for multimodal question-answering retrieval. The model can embed 'documents' in the form of image, text, or image and text...",
+        "category": "embedding",
+        "provider": "nvidia",
+        "model_id": "nvidia/llama-nemotron-embed-vl-1b-v2:free",
+        "context_length": 131072,
+        "input_modalities": [
+            "text",
+            "image"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "nvidia-llama-nemotron-embed-vl-1b-v2-free"
+    },
+    {
         "display_name": "Message Role Swap",
         "tagline": "Swap message roles",
         "description": "Swap message roles between assistant and user in a messages array, returning a new array with swapped roles",
@@ -36389,6 +38451,97 @@
             ]
         },
         "id": "mistralai-pixtral-large-2411"
+    },
+    {
+        "display_name": "Sentence Transformers: all-MiniLM-L6-v2",
+        "tagline": "Generate embeddings",
+        "description": "The all-MiniLM-L6-v2 embedding model maps sentences and short paragraphs into a 384-dimensional dense vector space, enabling high-quality semantic representations that are ideal for downstream tasks such as information retrieval, clustering,...",
+        "category": "embedding",
+        "provider": "sentence-transformers",
+        "model_id": "sentence-transformers/all-minilm-l6-v2",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.005,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "sentence-transformers-all-minilm-l6-v2"
     },
     {
         "display_name": "OpenAI: GPT-5 Pro",
@@ -37963,6 +40116,188 @@
         "id": "notion-get-page"
     },
     {
+        "display_name": "Mistral: Codestral Embed 2505",
+        "tagline": "Generate embeddings",
+        "description": "Mistral Codestral Embed is specially designed for code, perfect for embedding code databases, repositories, and powering coding assistants with state-of-the-art retrieval.",
+        "category": "embedding",
+        "provider": "mistralai",
+        "model_id": "mistralai/codestral-embed-2505",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.15,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "mistralai-codestral-embed-2505"
+    },
+    {
+        "display_name": "Intfloat: Multilingual-E5-Large",
+        "tagline": "Generate embeddings",
+        "description": "The multilingual-e5-large embedding model encodes sentences, paragraphs, and documents across over 90 languages into a 1024-dimensional dense vector space, delivering robust semantic embeddings optimized for multilingual retrieval, cross-language similarity, and...",
+        "category": "embedding",
+        "provider": "intfloat",
+        "model_id": "intfloat/multilingual-e5-large",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.01,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "intfloat-multilingual-e5-large"
+    },
+    {
         "display_name": "Google: Gemma 2 27B",
         "tagline": "Generate text",
         "description": "Gemma 2 27B by Google is an open model built from the same research and technology used to create the [Gemini models](/models?q=gemini).\n\nGemma models are well-suited for a variety of text generation tasks, including question answering, summarization, and reasoning.\n\nSee the [launch announcement](https://blog.google/technology/developers/google-gemma-2/) for more details. Usage of Gemma is subject to Google's [Gemma Terms of Use](https://ai.google.dev/gemma/terms).",
@@ -39093,6 +41428,97 @@
             }
         ],
         "id": "extract-json"
+    },
+    {
+        "display_name": "Intfloat: E5-Large-v2",
+        "tagline": "Generate embeddings",
+        "description": "The e5-large-v2 embedding model maps English sentences, paragraphs, and documents into a 1024-dimensional dense vector space, delivering high-accuracy semantic embeddings optimized for retrieval, semantic search, reranking, and similarity-scoring tasks.",
+        "category": "embedding",
+        "provider": "intfloat",
+        "model_id": "intfloat/e5-large-v2",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.01,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "intfloat-e5-large-v2"
     },
     {
         "display_name": "Qwen: Qwen3 Coder 480B A35B",
@@ -41636,6 +44062,97 @@
         "id": "string-template"
     },
     {
+        "display_name": "Mistral: Mistral Embed 2312",
+        "tagline": "Generate embeddings",
+        "description": "Mistral Embed is a specialized embedding model for text data, optimized for semantic search and RAG applications. Developed by Mistral AI in late 2023, it produces 1024-dimensional vectors that effectively...",
+        "category": "embedding",
+        "provider": "mistralai",
+        "model_id": "mistralai/mistral-embed-2312",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.09999999999999999,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "mistralai-mistral-embed-2312"
+    },
+    {
         "display_name": "Delay",
         "tagline": "Add a delay",
         "description": "Waits for specified time before continuing",
@@ -42916,6 +45433,97 @@
             ]
         },
         "id": "perplexity-sonar-pro"
+    },
+    {
+        "display_name": "Sentence Transformers: paraphrase-MiniLM-L6-v2",
+        "tagline": "Generate embeddings",
+        "description": "The paraphrase-MiniLM-L6-v2 embedding model converts sentences and short paragraphs into a 384-dimensional dense vector space, producing high-quality semantic embeddings optimized for paraphrase detection, semantic similarity scoring, clustering, and lightweight retrieval...",
+        "category": "embedding",
+        "provider": "sentence-transformers",
+        "model_id": "sentence-transformers/paraphrase-minilm-l6-v2",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.005,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "sentence-transformers-paraphrase-minilm-l6-v2"
     },
     {
         "display_name": "OpenAI: GPT-5.4 Pro",
@@ -46737,6 +49345,97 @@
         "id": "tool"
     },
     {
+        "display_name": "Qwen: Qwen3 Embedding 4B",
+        "tagline": "Generate embeddings",
+        "description": "The Qwen3 Embedding model series is the latest proprietary model of the Qwen family, specifically designed for text embedding and ranking tasks. This series inherits the exceptional multilingual capabilities, long-text...",
+        "category": "embedding",
+        "provider": "qwen",
+        "model_id": "qwen/qwen3-embedding-4b",
+        "context_length": 32768,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.02,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "qwen-qwen3-embedding-4b"
+    },
+    {
         "display_name": "Extract URLs",
         "tagline": "Extract URLs",
         "description": "Extract all URLs from text using regex patterns",
@@ -47705,6 +50404,97 @@
             }
         ],
         "id": "histogram"
+    },
+    {
+        "display_name": "Thenlper: GTE-Base",
+        "tagline": "Generate embeddings",
+        "description": "The gte-base embedding model encodes English sentences and paragraphs into a 768-dimensional dense vector space, delivering efficient and effective semantic embeddings optimized for textual similarity, semantic search, and clustering applications.",
+        "category": "embedding",
+        "provider": "thenlper",
+        "model_id": "thenlper/gte-base",
+        "context_length": 8192,
+        "input_modalities": [
+            "text"
+        ],
+        "inputs": [
+            {
+                "name": "input",
+                "display_name": "Input",
+                "type": "string or array of strings",
+                "description": "Text, or an array of texts, to convert into embedding vectors",
+                "required": true
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+                "default": null
+            },
+            {
+                "name": "encoding_format",
+                "display_name": "Encoding Format",
+                "type": "string",
+                "description": "Optional: \"float\" (default) or \"base64\"",
+                "default": null
+            }
+        ],
+        "outputs": [
+            {
+                "name": "embedding",
+                "display_name": "Embedding",
+                "type": "array",
+                "description": "The embedding vector for the first (or only) input"
+            },
+            {
+                "name": "embeddings",
+                "display_name": "Embeddings",
+                "type": "array",
+                "description": "Array of embedding vectors, one per input (in input order)"
+            },
+            {
+                "name": "dimensions",
+                "display_name": "Dimensions",
+                "type": "number",
+                "description": "Length of each embedding vector"
+            },
+            {
+                "name": "usage",
+                "display_name": "Token Usage",
+                "type": "object",
+                "description": "Token usage statistics"
+            },
+            {
+                "name": "cost_total",
+                "display_name": "Total Cost",
+                "type": "number",
+                "description": "Total cost for processing this request (USD)"
+            },
+            {
+                "name": "cost_itemized",
+                "display_name": "Itemized Cost",
+                "type": "array",
+                "description": "Detailed breakdown of costs"
+            }
+        ],
+        "pricing": {
+            "reference": "https://openrouter.ai/models",
+            "items": [
+                {
+                    "key": "input_cost_per_million",
+                    "label": "Input Tokens (per 1M)",
+                    "cost": 0.005,
+                    "currency": "USD"
+                },
+                {
+                    "key": "output_cost_per_million",
+                    "label": "Output Tokens (per 1M)",
+                    "cost": 0,
+                    "currency": "USD"
+                }
+            ]
+        },
+        "id": "thenlper-gte-base"
     },
     {
         "display_name": "OpenAI: gpt-oss-20b (free)",

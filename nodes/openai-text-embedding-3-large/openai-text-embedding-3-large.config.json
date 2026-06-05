@@ -1,0 +1,90 @@
+{
+  "display_name": "OpenAI: Text Embedding 3 Large",
+  "tagline": "Generate embeddings",
+  "description": "text-embedding-3-large is OpenAI's most capable embedding model for both english and non-english tasks. Embeddings are a numerical representation of text that can be used to measure the relatedness between two...",
+  "category": "embedding",
+  "provider": "openai",
+  "model_id": "openai/text-embedding-3-large",
+  "context_length": 8192,
+  "input_modalities": [
+    "text"
+  ],
+  "inputs": [
+    {
+      "name": "input",
+      "display_name": "Input",
+      "type": "string or array of strings",
+      "description": "Text, or an array of texts, to convert into embedding vectors",
+      "required": true
+    },
+    {
+      "name": "dimensions",
+      "display_name": "Dimensions",
+      "type": "number",
+      "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+      "default": null
+    },
+    {
+      "name": "encoding_format",
+      "display_name": "Encoding Format",
+      "type": "string",
+      "description": "Optional: \"float\" (default) or \"base64\"",
+      "default": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "embedding",
+      "display_name": "Embedding",
+      "type": "array",
+      "description": "The embedding vector for the first (or only) input"
+    },
+    {
+      "name": "embeddings",
+      "display_name": "Embeddings",
+      "type": "array",
+      "description": "Array of embedding vectors, one per input (in input order)"
+    },
+    {
+      "name": "dimensions",
+      "display_name": "Dimensions",
+      "type": "number",
+      "description": "Length of each embedding vector"
+    },
+    {
+      "name": "usage",
+      "display_name": "Token Usage",
+      "type": "object",
+      "description": "Token usage statistics"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost for processing this request (USD)"
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array",
+      "description": "Detailed breakdown of costs"
+    }
+  ],
+  "pricing": {
+    "reference": "https://openrouter.ai/models",
+    "items": [
+      {
+        "key": "input_cost_per_million",
+        "label": "Input Tokens (per 1M)",
+        "cost": 0.13,
+        "currency": "USD"
+      },
+      {
+        "key": "output_cost_per_million",
+        "label": "Output Tokens (per 1M)",
+        "cost": 0,
+        "currency": "USD"
+      }
+    ]
+  }
+}

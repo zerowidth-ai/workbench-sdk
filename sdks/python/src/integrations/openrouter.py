@@ -129,6 +129,9 @@ class OpenRouterIntegration:
                 "data_collection": "deny",
                 "require_parameters": True,
             },
+            # Request OpenRouter usage accounting so the response carries the
+            # authoritative cost (usage.cost). build_cost_data prefers it.
+            "usage": {"include": True},
         }
 
         # Add messages (cleaned up)
@@ -310,8 +313,10 @@ class OpenRouterIntegration:
         )
 
         cost_data = None
-        if node_config and node_config.get("pricing"):
-            cost_data = self.calculate_costs(usage, node_config["pricing"])
+        if node_config:
+            cost_data = self.build_cost_data(
+                {**usage.to_dict(), "cost": usage_raw.get("cost")}, node_config.get("pricing")
+            )
 
         # Image models return data on choice directly (text, images, reasoning)
         # rather than nested under choice.message
@@ -368,6 +373,8 @@ class OpenRouterIntegration:
             extra_body["provider"] = payload.pop("provider")
         if "reasoning" in payload:
             extra_body["reasoning"] = payload.pop("reasoning")
+        if "usage" in payload:
+            extra_body["usage"] = payload.pop("usage")
 
         # Create streaming request
         stream = await self.client.chat.completions.create(
@@ -382,6 +389,7 @@ class OpenRouterIntegration:
         images: list[dict[str, Any]] = []
         tool_calls: list[dict[str, Any]] = []
         usage = UsageStats()
+        api_cost: float | None = None  # authoritative cost from usage accounting
 
         count = 0
         async for chunk in stream:
@@ -460,6 +468,12 @@ class OpenRouterIntegration:
                     usage.prompt_tokens += chunk.usage.prompt_tokens or 0
                     usage.completion_tokens += chunk.usage.completion_tokens or 0
                     usage.total_tokens += chunk.usage.total_tokens or 0
+                    # OpenRouter returns cost in the final usage chunk (custom field)
+                    cost_val = getattr(chunk.usage, "cost", None)
+                    if cost_val is None and getattr(chunk.usage, "model_extra", None):
+                        cost_val = chunk.usage.model_extra.get("cost")
+                    if cost_val is not None:
+                        api_cost = cost_val
 
                 # Call onNodeUpdate callback if provided
                 if engine_config and engine_config.get("on_node_update"):
@@ -483,10 +497,13 @@ class OpenRouterIntegration:
             except (json_module.JSONDecodeError, TypeError):
                 pass  # Keep as string if not valid JSON
 
-        # Calculate costs
+        # Calculate costs. build_cost_data prefers the API-reported cost (usage
+        # accounting) and falls back to baked pricing.
         cost_data = None
-        if node_config and node_config.get("pricing"):
-            cost_data = self.calculate_costs(usage, node_config["pricing"])
+        if node_config:
+            cost_data = self.build_cost_data(
+                {**usage.to_dict(), "cost": api_cost}, node_config.get("pricing")
+            )
 
         result: dict[str, Any] = {
             "content": content,
@@ -568,3 +585,311 @@ class OpenRouterIntegration:
                 {"label": "Output Tokens", "cost": output_cost, "tokens": usage.completion_tokens},
             ],
         )
+
+    def build_cost_data(
+        self, usage: dict[str, Any], pricing: dict[str, Any] | None = None
+    ) -> CostBreakdown | None:
+        """
+        Build cost data preserving the {total_cost, itemized_costs} shape.
+
+        Prefers OpenRouter usage accounting (usage["cost"], requested via
+        usage={"include": True}) as the authoritative total. Falls back to baked
+        per-model pricing when the API doesn't report a cost — so existing
+        per-model nodes keep their previous output when accounting is unavailable,
+        while dynamic-model nodes (no baked pricing) still get real costs.
+
+        itemized_costs always sums to total_cost. The input/output split uses the
+        baked pricing rates when available, otherwise it's apportioned by tokens.
+        """
+        prompt_tokens = usage.get("prompt_tokens", 0) or 0
+        completion_tokens = usage.get("completion_tokens", 0) or 0
+        api_cost = usage.get("cost")
+        has_api_cost = isinstance(api_cost, (int, float))
+
+        if not has_api_cost and not pricing:
+            return None
+
+        if pricing:
+            items = pricing.get("items", [])
+            in_rate = (
+                next((p.get("cost", 0) for p in items if p.get("key") == "input_cost_per_million"), 0) or 0
+            ) / 1_000_000
+            out_rate = (
+                next((p.get("cost", 0) for p in items if p.get("key") == "output_cost_per_million"), 0) or 0
+            ) / 1_000_000
+            input_weight = prompt_tokens * in_rate
+            output_weight = completion_tokens * out_rate
+        else:
+            input_weight = prompt_tokens
+            output_weight = completion_tokens
+
+        total_weight = input_weight + output_weight
+
+        # Authoritative total: API cost when present, otherwise pricing-derived total
+        total_cost = api_cost if has_api_cost else total_weight
+
+        if total_weight > 0:
+            input_cost = total_cost * (input_weight / total_weight)
+            output_cost = total_cost * (output_weight / total_weight)
+        else:
+            # No token-weighted basis (e.g. rerank): attribute everything to one line
+            input_cost = total_cost
+            output_cost = 0
+
+        return CostBreakdown(
+            total_cost=round(total_cost, 8),
+            itemized_costs=[
+                {"label": "Input Tokens", "cost": round(input_cost, 8), "tokens": prompt_tokens},
+                {"label": "Output Tokens", "cost": round(output_cost, 8), "tokens": completion_tokens},
+            ],
+        )
+
+    async def create_embedding(
+        self,
+        *,
+        model: str,
+        input: str | list[str],
+        node_config: dict[str, Any] | None = None,
+        engine_config: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """
+        Create embeddings via OpenRouter's OpenAI-compatible /embeddings endpoint.
+
+        Uses raw httpx (like image completions) so we control the exact request
+        body and preserve the full response.
+
+        Args:
+            model: Embedding model identifier (e.g., "openai/text-embedding-3-small").
+            input: Text or list of texts to embed.
+            node_config: Node configuration (provides `pricing` for cost calc).
+            engine_config: Engine configuration (for API call events).
+            **kwargs: Optional params (dimensions, encoding_format, ...).
+
+        Returns:
+            Dict with embeddings, embedding, dimensions, model, usage, costs.
+        """
+        import httpx
+
+        if input is None:
+            raise ValueError("input is required to create embeddings")
+
+        payload: dict[str, Any] = {"model": model, "input": input, "usage": {"include": True}}
+        for key, value in kwargs.items():
+            if value is not None:
+                payload[key] = value
+
+        url = f"{self.base_url}/embeddings"
+        headers = {
+            "Content-Type": "application/json",
+            "HTTP-Referer": self.referer,
+            "X-Title": self.title,
+            "Authorization": f"Bearer {self.api_key}",
+        }
+
+        api_call_start_time = int(time.time() * 1000)
+
+        try:
+            async with httpx.AsyncClient(timeout=300) as client:
+                res = await client.post(url, headers=headers, json=payload)
+
+            if res.status_code >= 400:
+                error_body = (
+                    res.json()
+                    if res.headers.get("content-type", "").startswith("application/json")
+                    else None
+                )
+                error_msg = (error_body or {}).get("error", {}).get(
+                    "message", f"HTTP {res.status_code}"
+                )
+                raise Exception(f"OpenRouter API Error ({res.status_code}): {error_msg}")
+
+            data = res.json()
+
+            # OpenAI-compatible shape: { data: [{ embedding: [...], index }], model, usage }
+            items = data.get("data") or []
+            embeddings = [item.get("embedding") for item in items]
+            embedding = embeddings[0] if embeddings else None
+            dimensions = len(embedding) if isinstance(embedding, list) else 0
+
+            usage_raw = data.get("usage", {}) or {}
+            usage = UsageStats(
+                prompt_tokens=usage_raw.get("prompt_tokens", 0) or 0,
+                completion_tokens=usage_raw.get("completion_tokens", 0) or 0,
+                total_tokens=usage_raw.get("total_tokens", 0)
+                or usage_raw.get("prompt_tokens", 0)
+                or 0,
+            )
+
+            cost_data = None
+            if node_config:
+                cost_data = self.build_cost_data(
+                    {**usage.to_dict(), "cost": usage_raw.get("cost")}, node_config.get("pricing")
+                )
+
+            result: dict[str, Any] = {
+                "embeddings": embeddings,
+                "embedding": embedding,
+                "dimensions": dimensions,
+                "model": data.get("model", model),
+                "usage": usage.to_dict(),
+            }
+            if cost_data:
+                result["cost_total"] = cost_data.total_cost
+                result["cost_itemized"] = cost_data.itemized_costs
+
+            _cfg = engine_config or getattr(self, "_engine_config", None)
+            await emit_api_call_event(_cfg, {
+                "timestamp": api_call_start_time,
+                "integration": "openrouter",
+                "nodeId": node_config.get("id") if node_config else None,
+                "nodeType": node_config.get("type") if node_config else None,
+                "request": {"method": "POST", "url": url, "headers": headers, "body": payload},
+                "response": {
+                    "status": res.status_code,
+                    "statusText": res.reason_phrase,
+                    "body": result,
+                },
+                "duration": int(time.time() * 1000) - api_call_start_time,
+                "error": None,
+            })
+
+            return result
+        except Exception as e:
+            _cfg = engine_config or getattr(self, "_engine_config", None)
+            await emit_api_call_event(_cfg, {
+                "timestamp": api_call_start_time,
+                "integration": "openrouter",
+                "nodeId": node_config.get("id") if node_config else None,
+                "nodeType": node_config.get("type") if node_config else None,
+                "request": {"method": "POST", "url": url, "headers": headers, "body": payload},
+                "response": {"status": 0, "statusText": "Error", "body": None},
+                "duration": int(time.time() * 1000) - api_call_start_time,
+                "error": {"message": str(e)},
+            })
+            logger.error(f"OpenRouter Embedding Error: {e}")
+            raise
+
+    async def rerank(
+        self,
+        *,
+        model: str,
+        query: str,
+        documents: list[str],
+        node_config: dict[str, Any] | None = None,
+        engine_config: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """
+        Rerank documents against a query via OpenRouter's Cohere-compatible
+        /rerank endpoint.
+
+        Returns raw relevance results ({ index, relevance_score }); callers
+        reattach original documents by index.
+
+        Args:
+            model: Rerank model identifier (e.g., "cohere/rerank-v3.5").
+            query: The search query.
+            documents: List of document strings to rerank.
+            node_config: Node configuration (provides `pricing`).
+            engine_config: Engine configuration (for API call events).
+            **kwargs: Optional params (top_n, ...).
+
+        Returns:
+            Dict with results, usage, model, and optional cost data.
+        """
+        import httpx
+
+        if query is None:
+            raise ValueError("query is required for rerank")
+        if not isinstance(documents, list):
+            raise ValueError("documents (list of strings) is required for rerank")
+
+        payload: dict[str, Any] = {"model": model, "query": query, "documents": documents, "usage": {"include": True}}
+        for key, value in kwargs.items():
+            if value is not None:
+                payload[key] = value
+
+        url = f"{self.base_url}/rerank"
+        headers = {
+            "Content-Type": "application/json",
+            "HTTP-Referer": self.referer,
+            "X-Title": self.title,
+            "Authorization": f"Bearer {self.api_key}",
+        }
+
+        api_call_start_time = int(time.time() * 1000)
+
+        try:
+            async with httpx.AsyncClient(timeout=300) as client:
+                res = await client.post(url, headers=headers, json=payload)
+
+            if res.status_code >= 400:
+                error_body = (
+                    res.json()
+                    if res.headers.get("content-type", "").startswith("application/json")
+                    else None
+                )
+                error_msg = (error_body or {}).get("error", {}).get(
+                    "message", f"HTTP {res.status_code}"
+                )
+                raise Exception(f"OpenRouter API Error ({res.status_code}): {error_msg}")
+
+            data = res.json()
+
+            # Cohere-compatible shape: { results: [{ index, relevance_score }], usage|meta }
+            raw_results = data.get("results") or []
+            results = [
+                {
+                    "index": r.get("index"),
+                    "relevance_score": r.get("relevance_score", r.get("score")),
+                }
+                for r in raw_results
+            ]
+
+            usage = data.get("usage") or (data.get("meta") or {}).get("billed_units") or {}
+
+            cost_data = None
+            if node_config:
+                cost_data = self.build_cost_data(usage, node_config.get("pricing"))
+
+            result: dict[str, Any] = {
+                "results": results,
+                "usage": usage,
+                "model": data.get("model", model),
+            }
+            if cost_data:
+                result["cost_total"] = cost_data.total_cost
+                result["cost_itemized"] = cost_data.itemized_costs
+
+            _cfg = engine_config or getattr(self, "_engine_config", None)
+            await emit_api_call_event(_cfg, {
+                "timestamp": api_call_start_time,
+                "integration": "openrouter",
+                "nodeId": node_config.get("id") if node_config else None,
+                "nodeType": node_config.get("type") if node_config else None,
+                "request": {"method": "POST", "url": url, "headers": headers, "body": payload},
+                "response": {
+                    "status": res.status_code,
+                    "statusText": res.reason_phrase,
+                    "body": result,
+                },
+                "duration": int(time.time() * 1000) - api_call_start_time,
+                "error": None,
+            })
+
+            return result
+        except Exception as e:
+            _cfg = engine_config or getattr(self, "_engine_config", None)
+            await emit_api_call_event(_cfg, {
+                "timestamp": api_call_start_time,
+                "integration": "openrouter",
+                "nodeId": node_config.get("id") if node_config else None,
+                "nodeType": node_config.get("type") if node_config else None,
+                "request": {"method": "POST", "url": url, "headers": headers, "body": payload},
+                "response": {"status": 0, "statusText": "Error", "body": None},
+                "duration": int(time.time() * 1000) - api_call_start_time,
+                "error": {"message": str(e)},
+            })
+            logger.error(f"OpenRouter Rerank Error: {e}")
+            raise

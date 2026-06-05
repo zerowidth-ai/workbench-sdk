@@ -1,0 +1,26 @@
+[
+  {
+    "description": "Embed a single string with the default model",
+    "inputs": {
+      "input": "The quick brown fox jumps over the lazy dog."
+    },
+    "expectedSchema": {
+      "embedding": { "type": "array" },
+      "dimensions": { "type": "number", "minimum": 1 },
+      "model": { "type": "string" },
+      "usage": { "type": "object" }
+    }
+  },
+  {
+    "description": "Swap the model via input and embed an array",
+    "inputs": {
+      "model": "openai/text-embedding-3-large",
+      "input": ["first text", "second text"]
+    },
+    "expectedSchema": {
+      "embeddings": { "type": "array" },
+      "dimensions": { "type": "number", "minimum": 1 },
+      "model": { "type": "string" }
+    }
+  }
+]

@@ -1,0 +1,48 @@
+[
+  {
+    "description": "Embed a single string",
+    "inputs": {
+      "input": "The quick brown fox jumps over the lazy dog."
+    },
+    "expectedSchema": {
+      "embedding": {
+        "type": "array"
+      },
+      "dimensions": {
+        "type": "number",
+        "minimum": 1
+      },
+      "usage": {
+        "type": "object"
+      },
+      "cost_total": {
+        "type": "number",
+        "minimum": 0
+      },
+      "cost_itemized": {
+        "type": "array"
+      }
+    }
+  },
+  {
+    "description": "Embed an array of strings",
+    "inputs": {
+      "input": [
+        "first piece of text",
+        "second piece of text"
+      ]
+    },
+    "expectedSchema": {
+      "embeddings": {
+        "type": "array"
+      },
+      "dimensions": {
+        "type": "number",
+        "minimum": 1
+      },
+      "usage": {
+        "type": "object"
+      }
+    }
+  }
+]

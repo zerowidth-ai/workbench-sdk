@@ -74,12 +74,18 @@ array-slice,Array Slice,Extracts a portion of an array between start and end ind
 array-sort,Array Sort,Sorts array elements in ascending or descending order
 array-split,Array Split,Splits an array into multiple chunks based on different criteria
 array-unique,Array Unique,Removes duplicate elements from an array
+baai-bge-base-en-v1-5,BAAI: bge-base-en-v1.5,The bge-base-en-v1.5 embedding model converts English sentences and paragraphs into 768-dimensional dense vectors, delivering efficient, high-quality semantic embeddings optimized for retrieval, semantic search, and document-matching workflows. This version (v1.5) features...
+baai-bge-large-en-v1-5,BAAI: bge-large-en-v1.5,The bge-large-en-v1.5 embedding model maps English sentences, paragraphs, and documents into a 1024-dimensional dense vector space, delivering high-fidelity semantic embeddings optimized for semantic search, document retrieval, and downstream NLP tasks...
+baai-bge-m3,BAAI: bge-m3,The bge-m3 embedding model encodes sentences, paragraphs, and long documents into a 1024-dimensional dense vector space, delivering high-quality semantic embeddings optimized for multilingual retrieval, semantic search, and large-context applications.
 base64-decode,Base64 Decode,Decodes a Base64 encoded string.
 base64-encode,Base64 Encode,Encodes a string to Base64 format.
 boolean,Boolean Switch,A simple switch node that outputs true or false
 boolean-inverter,Boolean Inverter,Inverts the input boolean value
 ceil,Ceil,Rounds up to nearest integer
 clean-text,Clean Text,Clean and normalize text by removing extra whitespace and normalizing line breaks
+cohere-rerank-4-fast,Cohere: Rerank 4 Fast,Cohere's AI search foundation model for enhancing the relevance of information surfaced within search and RAG systems. Features a 32K context window, multilingual support across 100+ languages, no data pre-processing...
+cohere-rerank-4-pro,Cohere: Rerank 4 Pro,Cohere's AI search foundation model for enhancing the relevance of information surfaced within search and RAG systems. Features a 32K context window, multilingual support across 100+ languages, no data pre-processing...
+cohere-rerank-v3-5,Cohere: Rerank v3.5,Rerank v3.5 is designed to reorder search results for improved relevance. It supports multi-aspect and semi-structured data reranking over 100+ languages. Ideal for refining results from semantic or keyword search...
 combine-document-chunks,Combine Document Chunks,Retrieve all chunks for a document and combine them into a single markdown content string
 condition-check,Condition Check,Conditional pass-through that routes data to passed or blocked based on a condition
 confluence-get-page,Confluence Get Page,Retrieve a Confluence page by its ID, including content body.
@@ -130,6 +136,7 @@ delay,Delay,Waits for specified time before continuing
 delete-object-property,Delete Object Property,Remove a specific property from an object, returning a new object without that property.
 divide,Divide,Divides first number by second
 duration-calculator,Duration Calculator,Calculate duration between two timestamps in various units (seconds, minutes, hours, days)
+embedding,Embedding,Generate vector embeddings using any OpenRouter embedding model. The model is an input, so it can be specified or swapped from outside the flow rather than baked into the node.
 equals,Equals,Checks if two values are equal, with deep comparison for objects and arrays
 extract-code,Extract Code,Extracts code blocks from LLM responses that use markdown formatting. Returns the code content and detected language.
 extract-emails,Extract Emails,Extract all email addresses from text using regex patterns
@@ -181,6 +188,9 @@ It offers industry-leading text rendering in images (including long passages and
 google-gemini-3-pro-preview,Google: Gemini 3 Pro Preview,Gemini 3 Pro is Google’s flagship frontier model for high-precision multimodal reasoning, combining strong performance across text, image, video, audio, and code with a 1M-token context window. Reasoning Details must be preserved when using multi-turn tool calling, see our docs here: https://openrouter.ai/docs/use-cases/reasoning-tokens#preserving-reasoning-blocks. It delivers state-of-the-art benchmark results in general reasoning, STEM problem solving, factual QA, and multimodal understanding, including leading scores on LMArena, GPQA Diamond, MathArena Apex, MMMU-Pro, and Video-MMMU. Interactions emphasize depth and interpretability: the model is designed to infer intent with minimal prompting and produce direct, insight-focused responses.
 
 Built for advanced development and agentic workflows, Gemini 3 Pro provides robust tool-calling, long-horizon planning stability, and strong zero-shot generation for complex UI, visualization, and coding tasks. It excels at agentic coding (SWE-Bench Verified, Terminal-Bench 2.0), multimodal analysis, and structured long-form tasks such as research synthesis, planning, and interactive learning experiences. Suitable applications include autonomous agents, coding assistants, multimodal analytics, scientific reasoning, and high-context information processing.
+google-gemini-embedding-001,Google: Gemini Embedding 001,gemini-embedding-001 provides a unified cutting edge experience across domains, including science, legal, finance, and coding. This embedding model has consistently held a top spot on the Massive Text Embedding Benchmark...
+google-gemini-embedding-2,Google: Gemini Embedding 2,Gemini Embedding 2 is Google's first multimodal embedding model. We currently support mapping text and images into a unified vector space for semantic search and retrieval-augmented generation (RAG). It supports...
+google-gemini-embedding-2-preview,Google: Gemini Embedding 2 Preview,Gemini Embedding 2 Preview is Google's first multimodal embedding model. We currently support mapping text and images into a unified vector space for semantic search and retrieval-augmented generation (RAG). It...
 google-gemma-2-27b-it,Google: Gemma 2 27B,Gemma 2 27B by Google is an open model built from the same research and technology used to create the [Gemini models](/models?q=gemini).
 
 Gemma models are well-suited for a variety of text generation tasks, including question answering, summarization, and reasoning.
@@ -218,6 +228,9 @@ input-chat,Input Chat,Accepts chat messages as input to the conversation flow
 input-data,Input Data,Defines a single data input that can be requested from the user during flow execution
 input-plugins,Input Tools,Provides available tools/plugins to the flow.
 input-prompt,Prompt Input,For direct instructing with a single text prompt instead of a conversation.
+intfloat-e5-base-v2,Intfloat: E5-Base-v2,The e5-base-v2 embedding model encodes English sentences and paragraphs into a 768-dimensional dense vector space, producing efficient and high-quality semantic embeddings optimized for tasks such as semantic search, similarity scoring,...
+intfloat-e5-large-v2,Intfloat: E5-Large-v2,The e5-large-v2 embedding model maps English sentences, paragraphs, and documents into a 1024-dimensional dense vector space, delivering high-accuracy semantic embeddings optimized for retrieval, semantic search, reranking, and similarity-scoring tasks.
+intfloat-multilingual-e5-large,Intfloat: Multilingual-E5-Large,The multilingual-e5-large embedding model encodes sentences, paragraphs, and documents across over 90 languages into a 1024-dimensional dense vector space, delivering robust semantic embeddings optimized for multilingual retrieval, cross-language similarity, and...
 jira-create-issue,Jira Create Issue,Create a new issue in a Jira project.
 jira-list-issues,Jira List Issues,Search for issues in Jira using JQL (Jira Query Language).
 jira-update-issue,Jira Update Issue,Update an existing issue in Jira by issue key.
@@ -248,6 +261,7 @@ message-role-swap,Message Role Swap,Swap message roles between assistant and use
 mistralai-codestral-2508,Mistral: Codestral 2508,Mistral's cutting-edge language model for coding released end of July 2025. Codestral specializes in low-latency, high-frequency tasks such as fill-in-the-middle (FIM), code correction and test generation.
 
 [Blog Post](https://mistral.ai/news/codestral-25-08)
+mistralai-codestral-embed-2505,Mistral: Codestral Embed 2505,Mistral Codestral Embed is specially designed for code, perfect for embedding code databases, repositories, and powering coding assistants with state-of-the-art retrieval.
 mistralai-devstral-2512,Mistral: Devstral 2 2512,Devstral 2 is a state-of-the-art open-source model by Mistral AI specializing in agentic coding. It is a 123B-parameter dense transformer model supporting a 256K context window.
 
 Devstral 2 supports exploring codebases and orchestrating changes across multiple files while maintaining architecture-level context. It tracks framework dependencies, detects failures, and retries with corrections—solving challenges like bug fixing and modernizing legacy systems. The model can be fine-tuned to prioritize specific languages or optimize for large enterprise codebases. It is available under a modified MIT license.
@@ -262,6 +276,7 @@ mistralai-ministral-14b-2512,Mistral: Ministral 3 14B 2512,The largest model in 
 mistralai-ministral-3b-2512,Mistral: Ministral 3 3B 2512,The smallest model in the Ministral 3 family, Ministral 3 3B is a powerful, efficient tiny language model with vision capabilities.
 mistralai-ministral-8b-2512,Mistral: Ministral 3 8B 2512,A balanced model in the Ministral 3 family, Ministral 3 8B is a powerful, efficient tiny language model with vision capabilities.
 mistralai-mistral-7b-instruct-v0-1,Mistral: Mistral 7B Instruct v0.1,A 7.3B parameter model that outperforms Llama 2 13B on all benchmarks, with optimizations for speed and context length.
+mistralai-mistral-embed-2312,Mistral: Mistral Embed 2312,Mistral Embed is a specialized embedding model for text data, optimized for semantic search and RAG applications. Developed by Mistral AI in late 2023, it produces 1024-dimensional vectors that effectively...
 mistralai-mistral-large,Mistral Large,This is Mistral AI's flagship model, Mistral Large 2 (version `mistral-large-2407`). It's a proprietary weights-available model and excels at reasoning, code, JSON, chat, and more. Read the launch announcement [here](https://mistral.ai/news/mistral-large-2407/).
 
 It supports dozens of languages including French, German, Spanish, Italian, Portuguese, Arabic, Hindi, Russian, Chinese, Japanese, and Korean, along with 80+ coding languages including Python, Java, C, C++, JavaScript, and Bash. Its long context window allows precise information recall from large documents.
@@ -331,6 +346,7 @@ notion-search,Notion Search,Search pages and databases in a Notion workspace
 notion-update-page,Notion Update Page,Update properties of an existing Notion page
 null-bomb,Null Bomb,Randomly returns null/undefined based on probability, useful for testing null handling in flows.
 number,Number,A simple number node that outputs a constant numeric value
+nvidia-llama-nemotron-embed-vl-1b-v2-free,NVIDIA: Llama Nemotron Embed VL 1B V2 (free),The Llama Nemotron Embed VL 1B V2 embedding model is optimized for multimodal question-answering retrieval. The model can embed 'documents' in the form of image, text, or image and text...
 object-merge,Object Merge,Deep merges multiple objects into one. Later objects override earlier ones. Nested objects are recursively merged.
 openai-gpt-3-5-turbo,OpenAI: GPT-3.5 Turbo,GPT-3.5 Turbo is OpenAI's fastest model. It can understand and generate natural language or code, and is optimized for chat and traditional completion tasks.
 
@@ -486,10 +502,15 @@ OpenAI o4-mini is a compact reasoning model in the o-series, optimized for fast,
 
 Despite its smaller size, o4-mini exhibits high accuracy in STEM tasks, visual problem solving (e.g., MathVista, MMMU), and code editing. It is especially well-suited for high-throughput scenarios where latency or cost is critical. Thanks to its efficient architecture and refined reinforcement learning training, o4-mini can chain tools, generate structured outputs, and solve multi-step tasks with minimal delay—often in under a minute.
 openai-omni-moderation-latest,OpenAI: Omni Moderation Latest,Identify potentially harmful content in text and images using OpenAI's omni-moderation-latest model. This model supports more categorization options and multi-modal inputs compared to the legacy text-moderation-latest model.
+openai-text-embedding-3-large,OpenAI: Text Embedding 3 Large,text-embedding-3-large is OpenAI's most capable embedding model for both english and non-english tasks. Embeddings are a numerical representation of text that can be used to measure the relatedness between two...
+openai-text-embedding-3-small,OpenAI: Text Embedding 3 Small,text-embedding-3-small is OpenAI's improved, more performant version of the ada embedding model. Embeddings are a numerical representation of text that can be used to measure the relatedness between two pieces...
+openai-text-embedding-ada-002,OpenAI: Text Embedding Ada 002,text-embedding-ada-002 is OpenAI's legacy text embedding model.
 or-gate,OR Gate,A logic gate that outputs true if either input is true
 output-chat,Chat Output,Outputs a chat message to the user
 output-data,Data Output,Outputs labeled data from the flow
 parse-url,Parse URL,Parses a URL into its components: protocol, host, pathname, query parameters, etc.
+perplexity-pplx-embed-v1-0-6b,Perplexity: Embed V1 0.6B,pplx-embed-v1-0.6B is one of Perplexity's state-of-the-art text embedding models built for real-world, web-scale retrieval. pplx-embed-v1 is optimized for standard dense text retrieval with the 0.6B parameter model targeting lightweight, low-latency...
+perplexity-pplx-embed-v1-4b,Perplexity: Embed V1 4B,pplx-embed-v1 -4B is one of Perplexity's state-of-the-art text embedding models built for real-world, web-scale retrieval. pplx-embed-v1 is optimized for standard dense text retrieval with the 4B parameter model maximizing retrieval...
 perplexity-sonar,Perplexity: Sonar,Sonar is lightweight, affordable, fast, and simple to use — now featuring citations and the ability to customize sources. It is designed for companies seeking to integrate lightweight question-and-answer features optimized for speed.
 perplexity-sonar-deep-research,Perplexity: Sonar Deep Research,Sonar Deep Research is a research-focused model designed for multi-step retrieval, synthesis, and reasoning across complex topics. It autonomously searches, reads, and evaluates sources, refining its approach as it gathers information. This enables comprehensive report generation across domains like finance, technology, health, and current events.
 
@@ -605,6 +626,8 @@ qwen-qwen3-coder-next,Qwen: Qwen3 Coder Next,Qwen3-Coder-Next is an open-weight 
 
 The model is trained with a strong agentic focus and performs reliably on long-horizon coding tasks, complex tool usage, and recovery from execution failures. With a native 256k context window, it integrates cleanly into real-world CLI and IDE environments and adapts well to common agent scaffolds used by modern coding tools. The model operates exclusively in non-thinking mode and does not emit <think> blocks, simplifying integration for production coding agents.
 qwen-qwen3-coder-plus,Qwen: Qwen3 Coder Plus,Qwen3 Coder Plus is Alibaba's proprietary version of the Open Source Qwen3 Coder 480B A35B. It is a powerful coding agent model specializing in autonomous programming via tool calling and environment interaction, combining coding proficiency with versatile general-purpose abilities.
+qwen-qwen3-embedding-4b,Qwen: Qwen3 Embedding 4B,The Qwen3 Embedding model series is the latest proprietary model of the Qwen family, specifically designed for text embedding and ranking tasks. This series inherits the exceptional multilingual capabilities, long-text...
+qwen-qwen3-embedding-8b,Qwen: Qwen3 Embedding 8B,The Qwen3 Embedding model series is the latest proprietary model of the Qwen family, specifically designed for text embedding and ranking tasks. This series inherits the exceptional multilingual capabilities, long-text...
 qwen-qwen3-max,Qwen: Qwen3 Max,Qwen3-Max is an updated release built on the Qwen3 series, offering major improvements in reasoning, instruction following, multilingual support, and long-tail knowledge coverage compared to the January 2025 version. It delivers higher accuracy in math, coding, logic, and science tasks, follows complex instructions in Chinese and English more reliably, reduces hallucinations, and produces higher-quality responses for open-ended Q&A, writing, and conversation. The model supports over 100 languages with stronger translation and commonsense reasoning, and is optimized for retrieval-augmented generation (RAG) and tool calling, though it does not include a dedicated “thinking” mode.
 qwen-qwen3-max-thinking,Qwen: Qwen3 Max Thinking,Qwen3-Max-Thinking is the flagship reasoning model in the Qwen3 series, designed for high-stakes cognitive tasks that require deep, multi-step reasoning. By significantly scaling model capacity and reinforcement learning compute, it delivers major gains in factual accuracy, complex reasoning, instruction following, alignment with human preferences, and agentic behavior.
 qwen-qwen3-next-80b-a3b-instruct,Qwen: Qwen3 Next 80B A3B Instruct,Qwen3-Next-80B-A3B-Instruct is an instruction-tuned chat model in the Qwen3-Next series optimized for fast, stable responses without “thinking” traces. It targets complex tasks across reasoning, code generation, knowledge QA, and multilingual use, while remaining robust on alignment and formatting. Compared with prior Qwen3 instruct variants, it focuses on higher throughput and stability on ultra-long inputs and multi-turn dialogues, making it well-suited for RAG, tool use, and agentic workflows that require consistent final answers rather than visible chain-of-thought.
@@ -645,8 +668,13 @@ search-internet,Search the Internet,Search the web using Google Custom Search - 
 self-healing-error,Self Healing Error,Throws an error initially but succeeds on retry, useful for testing retry logic and error recovery.
 semantic-search,Semantic Search,Search knowledge base using semantic similarity and vector embeddings
 sendgrid-send-email,SendGrid Send Email,Send an email using the SendGrid Mail Send API.
+sentence-transformers-all-minilm-l12-v2,Sentence Transformers: all-MiniLM-L12-v2,The all-MiniLM-L12-v2 embedding model maps sentences and short paragraphs into a 384-dimensional dense vector space, producing efficient and high-quality semantic embeddings optimized for tasks such as semantic search, clustering, and...
+sentence-transformers-all-minilm-l6-v2,Sentence Transformers: all-MiniLM-L6-v2,The all-MiniLM-L6-v2 embedding model maps sentences and short paragraphs into a 384-dimensional dense vector space, enabling high-quality semantic representations that are ideal for downstream tasks such as information retrieval, clustering,...
+sentence-transformers-all-mpnet-base-v2,Sentence Transformers: all-mpnet-base-v2,The all-mpnet-base-v2 embedding model encodes sentences and short paragraphs into a 768-dimensional dense vector space, providing high-fidelity semantic embeddings well suited for tasks like information retrieval, clustering, similarity scoring, and...
+sentence-transformers-multi-qa-mpnet-base-dot-v1,Sentence Transformers: multi-qa-mpnet-base-dot-v1,The multi-qa-mpnet-base-dot-v1 embedding model transforms sentences and short paragraphs into a 768-dimensional dense vector space, generating high-quality semantic embeddings optimized for question-and-answer retrieval, semantic search, and similarity-scoring across diverse content.
+sentence-transformers-paraphrase-minilm-l6-v2,Sentence Transformers: paraphrase-MiniLM-L6-v2,The paraphrase-MiniLM-L6-v2 embedding model converts sentences and short paragraphs into a 384-dimensional dense vector space, producing high-quality semantic embeddings optimized for paraphrase detection, semantic similarity scoring, clustering, and lightweight retrieval...
 set-object-property,Set Object Property,Set or add a key-value pair to an object, returning a new object with the property set. Can also create a new object from scratch if the input object is empty or null.
-simple-agent,Simple Agent (beta),A simple AI agent that accepts tools and processes messages. Perfect template for creating starter agents.
+simple-agent,Simple Agent,A configurable AI agent: pick the model via input, give it a system prompt, and attach tools as plugins. The engine runs the full tool-calling loop. Use it as a flow node or attach it to another LLM as a sub-agent tool.
 slack-send-message,Slack Send Message,Send a message to a Slack channel or thread using the Slack Web API.
 split-into-chunks,Split Into Chunks,Splits text into smaller chunks by character count, word count, or sentence count. Useful for processing long content in batches.
 standard-deviation,Standard Deviation,Calculates standard deviation of numbers
@@ -670,6 +698,8 @@ system-prompt,System Prompt,Draft a text-based system prompt for an LLM, with co
 temperature,Temperature,A temperature slider useful for controlling randomness in model outputs. Lower values (0.0-0.3) produce very deterministic outputs ideal for factual content, code, or documentation. Medium values (0.4-0.7) balance creativity and coherence for general conversation and controlled creative writing. Higher values (0.8-1.0) introduce more randomness for brainstorming, poetry, and ideation. Values above 1.0 become very random and may be incoherent, suitable only for experimental purposes.
 text-scratch-pad,Text Scratch Pad,Accumulate text input over multiple executions. Each new input gets concatenated to the existing content with an optional delimiter.
 text-to-conversation,Text to Conversation,Parses a text transcript back into a conversation message array. Recognizes role labels like 'User:', 'Assistant:', 'System:'.
+thenlper-gte-base,Thenlper: GTE-Base,The gte-base embedding model encodes English sentences and paragraphs into a 768-dimensional dense vector space, delivering efficient and effective semantic embeddings optimized for textual similarity, semantic search, and clustering applications.
+thenlper-gte-large,Thenlper: GTE-Large,The gte-large embedding model converts English sentences, paragraphs and moderate-length documents into a 1024-dimensional dense vector space, delivering high-quality semantic embeddings optimized for information retrieval, semantic textual similarity, reranking and...
 throw-error,Throw Error,Throws an error with a custom message and optional context for testing error handling.
 time-adder,Time Adder,Add or subtract time from a timestamp. Supports various time units and operations.
 timestamp,Timestamp,Generate current timestamp in various formats. Runs as a constant to provide current time at flow start.

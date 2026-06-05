@@ -1,0 +1,95 @@
+{
+  "display_name": "Cohere: Rerank v3.5",
+  "tagline": "Rerank documents by relevance",
+  "description": "Rerank v3.5 is designed to reorder search results for improved relevance. It supports multi-aspect and semi-structured data reranking over 100+ languages. Ideal for refining results from semantic or keyword search...",
+  "category": "rerank",
+  "provider": "cohere",
+  "model_id": "cohere/rerank-v3.5",
+  "context_length": 4096,
+  "inputs": [
+    {
+      "name": "query",
+      "display_name": "Query",
+      "type": "string",
+      "description": "The search query to rank documents against",
+      "required": true
+    },
+    {
+      "name": "documents",
+      "display_name": "Documents",
+      "type": "array",
+      "description": "Candidate documents to rerank. Accepts an array of strings, or an array of objects (e.g. search results) — for objects, text is read from text_field or common fields like content/text.",
+      "required": true
+    },
+    {
+      "name": "top_n",
+      "display_name": "Top N",
+      "type": "number",
+      "description": "Optional: return only the top N most relevant documents",
+      "default": null
+    },
+    {
+      "name": "text_field",
+      "display_name": "Text Field",
+      "type": "string",
+      "description": "Optional: when documents are objects, which field holds the text to rank (defaults to trying content, text, document, page_content, chunk, body)",
+      "default": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "results",
+      "display_name": "Results",
+      "type": "array",
+      "description": "Reranked results, highest relevance first: { index, relevance_score, document } where document is the original input item"
+    },
+    {
+      "name": "ranked_documents",
+      "display_name": "Ranked Documents",
+      "type": "array",
+      "description": "The original documents reordered by relevance (highest first)"
+    },
+    {
+      "name": "top_document",
+      "display_name": "Top Document",
+      "type": "any",
+      "description": "The single most relevant document"
+    },
+    {
+      "name": "usage",
+      "display_name": "Usage",
+      "type": "object",
+      "description": "Usage / billed units reported by the provider (if any)"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost for this request (USD), when token usage is reported"
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array",
+      "description": "Detailed breakdown of costs"
+    }
+  ],
+  "pricing": {
+    "reference": "https://openrouter.ai/models",
+    "note": "Rerank is typically billed per search (1 query + up to ~100 docs), not per token. OpenRouter does not expose a per-token rerank price.",
+    "items": [
+      {
+        "key": "input_cost_per_million",
+        "label": "Input Tokens (per 1M)",
+        "cost": 0,
+        "currency": "USD"
+      },
+      {
+        "key": "output_cost_per_million",
+        "label": "Output Tokens (per 1M)",
+        "cost": 0,
+        "currency": "USD"
+      }
+    ]
+  }
+}
