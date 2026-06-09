@@ -124,7 +124,6 @@ export default async ({inputs, settings, config, nodeConfig}) => {
             content: response.content,
             role: response.role,
             tool_calls: response.tool_calls,
-            logprobs: response.logprobs,
             finish_reason: response.finish_reason,
             usage: response.usage,
             cost_total: response.cost_total,

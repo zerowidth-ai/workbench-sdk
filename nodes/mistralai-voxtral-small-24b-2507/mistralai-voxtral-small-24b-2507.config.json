@@ -1,7 +1,7 @@
 {
   "display_name": "Mistral: Voxtral Small 24B 2507",
   "tagline": "Generate text",
-  "description": "Voxtral Small is an enhancement of Mistral Small 3, incorporating state-of-the-art audio input capabilities while retaining best-in-class text performance. It excels at speech transcription, translation and audio understanding. Input audio is priced at $100 per million seconds.",
+  "description": "Voxtral Small is an enhancement of Mistral Small 3, incorporating state-of-the-art audio input capabilities while retaining best-in-class text performance. It excels at speech transcription, translation and audio understanding. Input audio...",
   "category": "llm",
   "provider": "mistralai",
   "accepts_plugins": true,

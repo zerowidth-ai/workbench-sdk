@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const { tombstoneMissingNodes, modelDeprecationFields, readConfig } = require('./lib/node-deprecation');
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -83,6 +84,8 @@ class EmbeddingNodeGenerator {
         : {};
       const response = await axios.get(OPENROUTER_MODELS_URL, { headers });
       this.models = response.data.data || [];
+      // Full live embedding set, before filterModels() narrows this.models.
+      this.liveModelIds = new Set(this.models.map(m => m.id));
 
       console.log(`Found ${this.models.length} models with embeddings output modality`);
       return this.models;
@@ -439,6 +442,9 @@ async def process(
 
     console.log(`Generating node: ${nodeName}`);
 
+    // Capture prior config before deletion to preserve deprecation history.
+    const priorConfig = readConfig(NODES_DIR, nodeName);
+
     if (!this.options.dryRun) {
       if (fs.existsSync(nodeDir)) {
         fs.rmSync(nodeDir, { recursive: true });
@@ -447,6 +453,8 @@ async def process(
     }
 
     const config = this.generateConfig(model);
+    // Stamp deprecation if OpenRouter flags this (live) model as deprecated/expiring.
+    Object.assign(config, modelDeprecationFields(model, priorConfig));
     const jsProcess = this.generateJSProcess(model);
     const pythonProcess = this.generatePythonProcess(model);
     const tests = this.generateTests(model);
@@ -526,18 +534,27 @@ async def process(
     await this.fetchModels();
     const filteredModels = this.filterModels();
 
-    if (this.config.output.cleanup_old_nodes) {
-      this.removeExistingEmbeddingNodes();
-    } else {
-      console.log('Skipping cleanup of old embedding nodes (cleanup_old_nodes: false)');
-    }
-
     for (const model of filteredModels) {
       try {
         this.generateNode(model);
       } catch (error) {
         console.error(`Error generating node for ${model.id}:`, error.message);
       }
+    }
+
+    // Tombstone (DON'T delete) nodes whose model is no longer on OpenRouter, so
+    // saved flows referencing them still load.
+    if (this.config.output.cleanup_old_nodes) {
+      const tombstoned = tombstoneMissingNodes({
+        nodesDir: NODES_DIR,
+        category: this.config.generation.category,
+        liveModelIds: this.liveModelIds || new Set(),
+        dryRun: this.options.dryRun
+      });
+      console.log(`Tombstoned ${tombstoned.length} node(s) for models no longer on OpenRouter (kept + marked deprecated).`);
+      if (tombstoned.length) console.log('  ' + tombstoned.join('\n  '));
+    } else {
+      console.log('Skipping tombstone pass (cleanup_old_nodes: false)');
     }
 
     console.log(`\nGeneration complete! Generated ${this.generatedNodes.length} embedding nodes.`);

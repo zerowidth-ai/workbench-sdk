@@ -1,0 +1,54 @@
+export default async ({inputs, settings, config, nodeConfig}) => {
+    try {
+        // Get OpenRouter integration from engine
+        const openrouter = config.integrations?.openrouter;
+        if (!openrouter) {
+            throw new Error("OpenRouter integration not found");
+        }
+
+        // No message processing needed for completion models
+
+        // Build parameters object from config inputs
+        const params = {};
+        const configInputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"reasoning","display_name":"Reasoning","type":"boolean","description":"Enable reasoning mode","default":null},{"name":"response_format","display_name":"Response Format","type":"object","description":"Output format specification","default":null},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":null},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":null},{"name":"max_tokens","display_name":"Max Tokens","type":"number","description":"Maximum tokens to generate","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null},{"name":"logprobs","display_name":"Logprobs","type":"boolean","description":"Return log probabilities of the output tokens","default":null},{"name":"top_logprobs","display_name":"Top Logprobs","type":"number","description":"Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.","default":null}];
+        
+        for (const input of configInputs) {
+
+            if(input.name === 'messages') continue;
+
+            const value = inputs[input.name];
+            if (value !== null && value !== undefined) {
+                // Flatten tools array to handle both individual tools and arrays of tools
+                if (input.name === 'tools' && Array.isArray(value)) {
+                    params.tools = value.flat();
+                } else {
+                    params[input.name] = value;
+                }
+            }
+        }
+
+        
+
+        const response = await openrouter.chatCompletion({
+            model: "x-ai/grok-4.20-multi-agent",
+            prompt: inputs.prompt,
+            ...params
+        }, nodeConfig, config);
+
+        
+
+        return {
+            content: response.content,
+            reasoning: response.reasoning,
+            refusal: response.refusal,
+            logprobs: response.logprobs,
+            finish_reason: response.finish_reason,
+            usage: response.usage,
+            cost_total: response.cost_total,
+            cost_itemized: response.cost_itemized
+        };
+    } catch (error) {
+        console.log('error', error);
+        throw new Error(`xAI: Grok 4.20 Multi-Agent node error: ${error.message}`);
+    }
+};

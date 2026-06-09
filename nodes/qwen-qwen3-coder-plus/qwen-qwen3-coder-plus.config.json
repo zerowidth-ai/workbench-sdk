@@ -1,7 +1,7 @@
 {
   "display_name": "Qwen: Qwen3 Coder Plus",
   "tagline": "Generate text",
-  "description": "Qwen3 Coder Plus is Alibaba's proprietary version of the Open Source Qwen3 Coder 480B A35B. It is a powerful coding agent model specializing in autonomous programming via tool calling and environment interaction, combining coding proficiency with versatile general-purpose abilities.",
+  "description": "Qwen3 Coder Plus is Alibaba's proprietary version of the Open Source Qwen3 Coder 480B A35B. It is a powerful coding agent model specializing in autonomous programming via tool calling and...",
   "category": "llm",
   "provider": "qwen",
   "accepts_plugins": true,

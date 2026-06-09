@@ -1,7 +1,7 @@
 {
   "display_name": "OpenAI: GPT-5",
   "tagline": "Generate text",
-  "description": "GPT-5 is OpenAI’s most advanced model, offering major improvements in reasoning, code quality, and user experience. It is optimized for complex tasks that require step-by-step reasoning, instruction following, and accuracy in high-stakes use cases. It supports test-time routing features and advanced prompt understanding, including user-specified intent like \"think hard about this.\" Improvements include reductions in hallucination, sycophancy, and better performance in coding, writing, and health-related tasks.",
+  "description": "GPT-5 is OpenAI’s most advanced model, offering major improvements in reasoning, code quality, and user experience. It is optimized for complex tasks that require step-by-step reasoning, instruction following, and accuracy...",
   "category": "llm",
   "provider": "openai",
   "accepts_plugins": true,
@@ -9,6 +9,7 @@
   "context_length": 400000,
   "supported_parameters": [
     "include_reasoning",
+    "max_completion_tokens",
     "max_tokens",
     "reasoning",
     "response_format",

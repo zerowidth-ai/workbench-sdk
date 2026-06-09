@@ -1,7 +1,7 @@
 {
   "display_name": "Qwen: Qwen3.5-Flash",
   "tagline": "Generate text",
-  "description": "The Qwen3.5 native vision-language Flash models are built on a hybrid architecture that integrates a linear attention mechanism with a sparse mixture-of-experts model, achieving higher inference efficiency. Compared to the 3 series, these models deliver a leap forward in performance for both pure text and multimodal tasks, offering fast response times while balancing inference speed and overall performance.",
+  "description": "The Qwen3.5 native vision-language Flash models are built on a hybrid architecture that integrates a linear attention mechanism with a sparse mixture-of-experts model, achieving higher inference efficiency. Compared to the...",
   "category": "llm",
   "provider": "qwen",
   "accepts_plugins": true,

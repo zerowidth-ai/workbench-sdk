@@ -1,7 +1,7 @@
 {
   "display_name": "Qwen: Qwen3 235B A22B Instruct 2507",
   "tagline": "Generate text",
-  "description": "Qwen3-235B-A22B-Instruct-2507 is a multilingual, instruction-tuned mixture-of-experts language model based on the Qwen3-235B architecture, with 22B active parameters per forward pass. It is optimized for general-purpose text generation, including instruction following, logical reasoning, math, code, and tool usage. The model supports a native 262K context length and does not implement \"thinking mode\" (<think> blocks).\n\nCompared to its base variant, this version delivers significant gains in knowledge coverage, long-context reasoning, coding benchmarks, and alignment with open-ended tasks. It is particularly strong on multilingual understanding, math reasoning (e.g., AIME, HMMT), and alignment evaluations like Arena-Hard and WritingBench.",
+  "description": "Qwen3-235B-A22B-Instruct-2507 is a multilingual, instruction-tuned mixture-of-experts language model based on the Qwen3-235B architecture, with 22B active parameters per forward pass. It is optimized for general-purpose text generation, including instruction following,...",
   "category": "llm",
   "provider": "qwen",
   "accepts_plugins": true,
@@ -9,14 +9,10 @@
   "context_length": 262144,
   "supported_parameters": [
     "frequency_penalty",
-    "include_reasoning",
     "logit_bias",
-    "logprobs",
     "max_tokens",
     "min_p",
     "presence_penalty",
-    "reasoning",
-    "reasoning_effort",
     "repetition_penalty",
     "response_format",
     "seed",
@@ -56,13 +52,6 @@
       "display_name": "Tool Choice",
       "type": "string",
       "description": "Tool selection control",
-      "default": null
-    },
-    {
-      "name": "reasoning",
-      "display_name": "Reasoning",
-      "type": "boolean",
-      "description": "Enable reasoning mode",
       "default": null
     },
     {
@@ -180,25 +169,6 @@
       "display_name": "Finish Reason",
       "type": "string",
       "description": "Why the completion finished"
-    },
-    {
-      "name": "logprobs",
-      "display_name": "Log Probabilities",
-      "type": "object",
-      "description": "Token probabilities and logprobs from the model"
-    },
-    {
-      "name": "reasoning",
-      "display_name": "Reasoning",
-      "type": "string",
-      "can_stream": true,
-      "description": "The detailed reasoning chain from the model"
-    },
-    {
-      "name": "refusal",
-      "display_name": "Refusal",
-      "type": "string",
-      "description": "Model refusal response (if any)"
     }
   ],
   "pricing": {

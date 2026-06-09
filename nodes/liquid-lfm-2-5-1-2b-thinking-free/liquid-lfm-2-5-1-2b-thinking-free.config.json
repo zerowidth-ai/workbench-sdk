@@ -1,7 +1,7 @@
 {
   "display_name": "LiquidAI: LFM2.5-1.2B-Thinking (free)",
   "tagline": "Generate text",
-  "description": "LFM2.5-1.2B-Thinking is a lightweight reasoning-focused model optimized for agentic tasks, data extraction, and RAG—while still running comfortably on edge devices. It supports long context (up to 32K tokens) and is designed to provide higher-quality “thinking” responses in a small 1.2B model.",
+  "description": "LFM2.5-1.2B-Thinking is a lightweight reasoning-focused model optimized for agentic tasks, data extraction, and RAG—while still running comfortably on edge devices. It supports long context (up to 32K tokens) and is...",
   "category": "llm",
   "provider": "liquid",
   "accepts_plugins": false,

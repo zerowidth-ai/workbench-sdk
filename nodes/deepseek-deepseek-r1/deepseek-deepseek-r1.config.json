@@ -1,21 +1,24 @@
 {
   "display_name": "DeepSeek: R1",
   "tagline": "Generate text",
-  "description": "DeepSeek R1 is here: Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active in an inference pass.\n\nFully open-source model & [technical report](https://api-docs.deepseek.com/news/news250120).\n\nMIT licensed: Distill & commercialize freely!",
+  "description": "DeepSeek R1 is here: Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active in an inference pass....",
   "category": "llm",
   "provider": "deepseek",
   "accepts_plugins": true,
   "model_id": "deepseek/deepseek-r1",
-  "context_length": 64000,
+  "context_length": 163840,
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
+    "max_completion_tokens",
     "max_tokens",
     "presence_penalty",
     "reasoning",
     "repetition_penalty",
+    "response_format",
     "seed",
     "stop",
+    "structured_outputs",
     "temperature",
     "tool_choice",
     "tools",
@@ -57,6 +60,13 @@
       "display_name": "Reasoning",
       "type": "boolean",
       "description": "Enable reasoning mode",
+      "default": null
+    },
+    {
+      "name": "response_format",
+      "display_name": "Response Format",
+      "type": "object",
+      "description": "Output format specification",
       "default": null
     },
     {

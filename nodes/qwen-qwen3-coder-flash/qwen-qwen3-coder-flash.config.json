@@ -1,7 +1,7 @@
 {
   "display_name": "Qwen: Qwen3 Coder Flash",
   "tagline": "Generate text",
-  "description": "Qwen3 Coder Flash is Alibaba's fast and cost efficient version of their proprietary Qwen3 Coder Plus. It is a powerful coding agent model specializing in autonomous programming via tool calling and environment interaction, combining coding proficiency with versatile general-purpose abilities.",
+  "description": "Qwen3 Coder Flash is Alibaba's fast and cost efficient version of their proprietary Qwen3 Coder Plus. It is a powerful coding agent model specializing in autonomous programming via tool calling...",
   "category": "llm",
   "provider": "qwen",
   "accepts_plugins": true,

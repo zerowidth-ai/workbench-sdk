@@ -1,7 +1,7 @@
 {
   "display_name": "Mistral: Mistral Small 4",
   "tagline": "Generate text",
-  "description": "Mistral Small 4 is the next major release in the Mistral Small family, unifying the capabilities of several flagship Mistral models into a single system. It combines strong reasoning from Magistral, multimodal understanding from Pixtral, and agentic coding capabilities from Devstral, enabling one model to handle complex analysis, software development, and visual tasks within the same workflow.",
+  "description": "Mistral Small 4 is the next major release in the Mistral Small family, unifying the capabilities of several flagship Mistral models into a single system. It combines strong reasoning from...",
   "category": "llm",
   "provider": "mistralai",
   "accepts_plugins": true,
@@ -20,6 +20,7 @@
     "temperature",
     "tool_choice",
     "tools",
+    "top_k",
     "top_p"
   ],
   "inputs": [

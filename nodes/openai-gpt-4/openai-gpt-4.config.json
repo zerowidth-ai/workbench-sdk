@@ -1,7 +1,7 @@
 {
   "display_name": "OpenAI: GPT-4",
   "tagline": "Generate text",
-  "description": "OpenAI's flagship model, GPT-4 is a large-scale multimodal language model capable of solving difficult problems with greater accuracy than previous models due to its broader general knowledge and advanced reasoning capabilities. Training data: up to Sep 2021.",
+  "description": "OpenAI's flagship model, GPT-4 is a large-scale multimodal language model capable of solving difficult problems with greater accuracy than previous models due to its broader general knowledge and advanced reasoning...",
   "category": "llm",
   "provider": "openai",
   "accepts_plugins": true,
@@ -11,6 +11,7 @@
     "frequency_penalty",
     "logit_bias",
     "logprobs",
+    "max_completion_tokens",
     "max_tokens",
     "presence_penalty",
     "response_format",
@@ -107,6 +108,20 @@
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
+      "default": null
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Logprobs",
+      "type": "boolean",
+      "description": "Return log probabilities of the output tokens",
+      "default": null
+    },
+    {
+      "name": "top_logprobs",
+      "display_name": "Top Logprobs",
+      "type": "number",
+      "description": "Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.",
       "default": null
     }
   ],

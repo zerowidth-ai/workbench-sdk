@@ -9,6 +9,7 @@
   "context_length": 400000,
   "supported_parameters": [
     "include_reasoning",
+    "max_completion_tokens",
     "max_tokens",
     "reasoning",
     "response_format",

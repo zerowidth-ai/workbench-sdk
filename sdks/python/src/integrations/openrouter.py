@@ -218,6 +218,24 @@ class OpenRouterIntegration:
             if specific_msg:
                 error_message += f": {specific_msg}"
 
+            # OpenRouter wraps the actual upstream provider error in metadata.raw.
+            # Surface it (e.g. "logprobs are not supported with reasoning models"),
+            # otherwise callers only see the generic "Provider returned error".
+            if isinstance(error_body, dict):
+                meta = (error_body.get("error") or {}).get("metadata") if isinstance(
+                    error_body.get("error"), dict
+                ) else error_body.get("metadata")
+                if isinstance(meta, dict) and meta.get("raw"):
+                    upstream = None
+                    try:
+                        import json as _json
+                        upstream = (_json.loads(meta["raw"]).get("error") or {}).get("message")
+                    except Exception:
+                        upstream = meta["raw"] if isinstance(meta["raw"], str) else None
+                    if upstream and upstream != specific_msg:
+                        prov = meta.get("provider_name")
+                        error_message += f" — {prov + ': ' if prov else ''}{upstream}"
+
             # Emit API call event with full error detail
             _cfg = engine_config or getattr(self, "_engine_config", None)
             await emit_api_call_event(_cfg, {
@@ -329,6 +347,7 @@ class OpenRouterIntegration:
             "usage": usage.to_dict(),
             "reasoning": message.get("reasoning") or choice.get("reasoning") or None,
             "images": message.get("images") or choice.get("images") or None,
+            "logprobs": choice.get("logprobs"),
         }
 
         if cost_data:
@@ -390,6 +409,7 @@ class OpenRouterIntegration:
         tool_calls: list[dict[str, Any]] = []
         usage = UsageStats()
         api_cost: float | None = None  # authoritative cost from usage accounting
+        logprobs_content: list[Any] = []  # accumulated per-token logprobs across chunks
 
         count = 0
         async for chunk in stream:
@@ -459,6 +479,16 @@ class OpenRouterIntegration:
                 if delta_imgs and isinstance(delta_imgs, list):
                     images.extend(delta_imgs)
 
+                # Accumulate logprobs (per-token, in choices[].logprobs.content)
+                if chunk.choices:
+                    lp = getattr(chunk.choices[0], "logprobs", None)
+                    lp_content = getattr(lp, "content", None) if lp else None
+                    if lp_content:
+                        logprobs_content.extend(
+                            c.model_dump() if hasattr(c, "model_dump") else c
+                            for c in lp_content
+                        )
+
                 # Handle finish reason
                 if event["data"].get("finish_reason"):
                     finish_reason = event["data"]["finish_reason"]
@@ -514,6 +544,7 @@ class OpenRouterIntegration:
             "usage": usage.to_dict(),
             "reasoning": reasoning if reasoning else None,
             "images": images if images else None,
+            "logprobs": {"content": logprobs_content} if logprobs_content else None,
         }
 
         if cost_data:

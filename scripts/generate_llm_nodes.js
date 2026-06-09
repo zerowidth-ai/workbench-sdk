@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const { tombstoneMissingNodes, modelDeprecationFields, readConfig } = require('./lib/node-deprecation');
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -116,6 +117,16 @@ const PARAMETER_MAPPINGS = {
     description: 'Deterministic outputs',
     default: null
   },
+  'logprobs': {
+    type: 'boolean',
+    description: 'Return log probabilities of the output tokens',
+    default: null
+  },
+  'top_logprobs': {
+    type: 'number',
+    description: 'Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.',
+    default: null
+  },
   'reasoning': {
     type: 'boolean',
     description: 'Enable reasoning mode',
@@ -161,7 +172,11 @@ class LLMNodeGenerator {
     try {
       const response = await axios.get(OPENROUTER_MODELS_URL);
       this.models = response.data.data || [];
-      
+
+      // Full live set, captured before filterModels() narrows this.models —
+      // used to tombstone nodes whose model has disappeared from OpenRouter.
+      this.liveModelIds = new Set(this.models.map(m => m.id));
+
       console.log(`Found ${this.models.length} total models`);
       return this.models;
     } catch (error) {
@@ -387,6 +402,7 @@ class LLMNodeGenerator {
       'response_format', 'stop',
       // Numbers
       'temperature', 'top_p', 'max_tokens', 'frequency_penalty', 'presence_penalty', 'seed',
+      'logprobs', 'top_logprobs',
     ];
 
     return inputs.sort((a, b) => {
@@ -1386,6 +1402,10 @@ ${returnValues}
     
     console.log(`Generating node: ${nodeName}`);
 
+    // Capture prior config before deletion so deprecation history (e.g. `since`)
+    // is preserved across regenerations.
+    const priorConfig = readConfig(NODES_DIR, nodeName);
+
     // Create node directory
     if (!this.options.dryRun) {
       if (fs.existsSync(nodeDir)) {
@@ -1396,6 +1416,8 @@ ${returnValues}
 
     // Generate files
     const config = this.generateConfig(model);
+    // Stamp deprecation if OpenRouter flags this (live) model as deprecated/expiring.
+    Object.assign(config, modelDeprecationFields(model, priorConfig));
     const jsProcess = this.generateJSProcess(model);
     const pythonProcess = this.generatePythonProcess(model);
     const tests = this.generateTests(model);
@@ -1507,20 +1529,29 @@ ${returnValues}
     await this.fetchModels();
     const filteredModels = this.filterModels();
 
-    // Remove existing LLM nodes if cleanup is enabled
-    if (this.config.output.cleanup_old_nodes) {
-      this.removeExistingLLMNodes();
-    } else {
-      console.log('Skipping cleanup of old LLM nodes (cleanup_old_nodes: false)');
-    }
-
-    // Generate nodes for each model
+    // Generate nodes for each current model (overwrites their dirs in place)
     for (const model of filteredModels) {
       try {
         this.generateNode(model);
       } catch (error) {
         console.error(`Error generating node for ${model.id}:`, error.message);
       }
+    }
+
+    // Tombstone (DON'T delete) nodes whose model is no longer on OpenRouter.
+    // Deleting silently breaks saved flows that reference the node type, so we
+    // keep the node and mark it deprecated instead.
+    if (this.config.output.cleanup_old_nodes) {
+      const tombstoned = tombstoneMissingNodes({
+        nodesDir: NODES_DIR,
+        category: this.config.generation.category,
+        liveModelIds: this.liveModelIds || new Set(),
+        dryRun: this.options.dryRun
+      });
+      console.log(`Tombstoned ${tombstoned.length} node(s) for models no longer on OpenRouter (kept + marked deprecated).`);
+      if (tombstoned.length) console.log('  ' + tombstoned.join('\n  '));
+    } else {
+      console.log('Skipping tombstone pass (cleanup_old_nodes: false)');
     }
 
     console.log(`\nGeneration complete! Generated ${this.generatedNodes.length} LLM nodes.`);

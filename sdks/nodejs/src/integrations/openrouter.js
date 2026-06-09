@@ -106,7 +106,12 @@ export default class OpenRouterIntegration {
 
             payload.stream = true;
 
-            const stream = await this.client.chat.completions.create(JSON.parse(JSON.stringify(payload)));
+            // Pass the flow's abort signal so a flow timeout cancels the stream.
+            const signal = engineConfig?.signal || this._engineConfig?.signal;
+            const stream = await this.client.chat.completions.create(
+                JSON.parse(JSON.stringify(payload)),
+                signal ? { signal } : undefined
+            );
 
             let content = "";
             let role = "";
@@ -117,6 +122,7 @@ export default class OpenRouterIntegration {
             let annotations = [];
             let images = [];
             let tool_calls = [];
+            let logprobsContent = []; // accumulated per-token logprobs across chunks
 
             let usage = {
               prompt_tokens: 0,
@@ -197,6 +203,11 @@ export default class OpenRouterIntegration {
                     images.push(...chunk.choices[0].delta.images);
                   }
 
+                  // Accumulate logprobs (per-token, arrives in choices[].logprobs.content)
+                  if(chunk.choices[0]?.logprobs?.content && Array.isArray(chunk.choices[0].logprobs.content)){
+                    logprobsContent.push(...chunk.choices[0].logprobs.content);
+                  }
+
                   if(event.data.finish_reason){
                     finish_reason = event.data.finish_reason;
                   }
@@ -241,6 +252,7 @@ export default class OpenRouterIntegration {
                 reasoning,
                 annotations,
                 images: images.length > 0 ? images : undefined,
+                logprobs: logprobsContent.length > 0 ? { content: logprobsContent } : undefined,
                 ...(costData && {
                     cost_total: costData.totalCost,
                     cost_itemized: costData.itemizedCosts
@@ -288,6 +300,20 @@ export default class OpenRouterIntegration {
                 || (typeof errorBody === 'string' ? errorBody : null)
                 || error.message;
             if (specificMessage) errorMessage += `: ${specificMessage}`;
+
+            // OpenRouter wraps the actual upstream provider error in metadata.raw.
+            // Surface it — that's where the useful detail lives (e.g. "logprobs are
+            // not supported with reasoning models"), otherwise callers only see the
+            // generic "Provider returned error".
+            const meta = errorBody?.error?.metadata || errorBody?.metadata;
+            if (meta?.raw) {
+                let upstream = null;
+                try { upstream = JSON.parse(meta.raw)?.error?.message; } catch { /* raw may be plain text */ }
+                if (!upstream && typeof meta.raw === 'string') upstream = meta.raw;
+                if (upstream && upstream !== specificMessage) {
+                    errorMessage += ` — ${meta.provider_name ? meta.provider_name + ': ' : ''}${upstream}`;
+                }
+            }
 
             // Emit API call event with full error detail
             await emitAPICallEvent(engineConfig || this._engineConfig, {
@@ -346,6 +372,7 @@ export default class OpenRouterIntegration {
             method: 'POST',
             headers,
             body: JSON.stringify(payload),
+            signal: engineConfig?.signal || this._engineConfig?.signal,
         });
 
         if (!res.ok) {
@@ -377,6 +404,7 @@ export default class OpenRouterIntegration {
             reasoning: message.reasoning || choice?.reasoning || '',
             annotations: message.annotations || [],
             images: message.images || choice?.images || undefined,
+            logprobs: choice?.logprobs || undefined,
             ...(costData && {
                 cost_total: costData.totalCost,
                 cost_itemized: costData.itemizedCosts
@@ -535,6 +563,7 @@ export default class OpenRouterIntegration {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(payload),
+                signal: engineConfig?.signal || this._engineConfig?.signal,
             });
 
             if (!res.ok) {
@@ -649,6 +678,7 @@ export default class OpenRouterIntegration {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(payload),
+                signal: engineConfig?.signal || this._engineConfig?.signal,
             });
 
             if (!res.ok) {
