@@ -12,7 +12,7 @@
     "tiktoken": "^1.0.22",
     "uuid": "^11.1.0"
   },
-  "repository": "https://github.com/zerowidth-ai/zv1",
+  "repository": "https://github.com/zerowidth-ai/workbench-sdk",
   "description": "Workbench SDK — execute Workbench-authored flows in production. Successor to the zv1 package; see https://zerowidth.ai for the design surface.",
   "main": "./src/index.js",
   "files": ["src/", "nodes/", "types/", "LICENSE", "README.md"],

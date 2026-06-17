@@ -1,6 +1,6 @@
 # Node Development Guidelines
 
-This document outlines the standards and best practices for developing nodes in the zv1 framework. Following these guidelines ensures consistency, maintainability, and proper integration with the zv1 execution engine.
+This document outlines the standards and best practices for developing nodes in the Workbench framework. Following these guidelines ensures consistency, maintainability, and proper integration with the Workbench execution engine.
 
 ## Table of Contents
 
@@ -709,12 +709,12 @@ Macros can accept plugins (tools) that will be passed to internal LLM nodes. Whe
 
 ## Custom Tools API
 
-The zv1 engine supports passing custom tools to LLM nodes via the configuration. This is particularly useful when you want to provide external functionality to LLMs without modifying the flow definition.
+The Workbench engine supports passing custom tools to LLM nodes via the configuration. This is particularly useful when you want to provide external functionality to LLMs without modifying the flow definition.
 
 ### Developer-Facing API
 
 ```javascript
-const engine = await zv1.create('./myflow.zv1', {
+const engine = await Workbench.create('./myflow.zwf', {
   keys: { openai: 'sk-...' },
   tools: {
     // Full definition: schema + implementation
@@ -785,7 +785,7 @@ This API is also used internally by the engine to pass plugin functionality from
 By default, macro nodes fire only their own start/complete/error events, hiding the internal node executions. If you want to see all internal node events (for debugging or monitoring), use the `includeInternalEvents` option:
 
 ```javascript
-const engine = await zv1.create('./myflow.zv1', {
+const engine = await Workbench.create('./myflow.zwf', {
   keys: { openai: 'sk-...' },
   includeInternalEvents: true,  // See internal macro/import events
   onNodeStart: (event) => {
@@ -825,4 +825,4 @@ Before submitting a new node, ensure:
 
 ---
 
-Following these guidelines ensures consistency, maintainability, and proper integration with the zv1 framework. When in doubt, look at existing nodes for examples of best practices.
+Following these guidelines ensures consistency, maintainability, and proper integration with the Workbench framework. When in doubt, look at existing nodes for examples of best practices.

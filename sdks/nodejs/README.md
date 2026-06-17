@@ -1,6 +1,8 @@
-# zv1
+# @zerowidth/workbench-sdk
 
-A Node.js implementation of ZeroWidth's zv1 framework for executing AI and automation workflows through a visual node-based interface. Design flows on zv1.ai, export as JSON, and execute with precision and control.
+A Node.js implementation of ZeroWidth's Workbench framework for executing AI and automation workflows through a visual node-based interface. Design flows on [zerowidth.ai](https://zerowidth.ai), export them, and execute with precision and control.
+
+> **Migrating from `zv1`?** This package is the drop-in successor to the legacy `zv1` npm package. Run `npm uninstall zv1 && npm install @zerowidth/workbench-sdk`, then `import Workbench from '@zerowidth/workbench-sdk'`. The public API is unchanged.
 
 [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
@@ -23,7 +25,7 @@ A Node.js implementation of ZeroWidth's zv1 framework for executing AI and autom
 
 ## Overview
 
-The zv1 Flow Engine enables you to:
+The Workbench Flow Engine enables you to:
 - Execute complex AI and automation workflows
 - Connect various node types (data processing, AI models, tools, testing utilities)
 - Handle asynchronous operations with precision
@@ -35,16 +37,16 @@ The zv1 Flow Engine enables you to:
 ## Installation
 
 ```bash
-npm install zv1
+npm install @zerowidth/workbench-sdk
 ```
 
 ## Quick Start
 
 ```javascript
-import zv1 from 'zv1';
+import Workbench from '@zerowidth/workbench-sdk';
 
 // Create engine instance by passing the location of your configured flow
-const engine = await Workbench.create('./path/to/myflow.zv1', {
+const engine = await Workbench.create('./path/to/myflow.zwf', {
   keys: {
     openrouter: process.env.OPENROUTER_API_KEY
   }
@@ -63,14 +65,14 @@ const result = await engine.run({
 
 ## Flow File Formats
 
-The zv1 engine supports two flow file formats:
+The Workbench engine supports two flow file formats:
 
-### New .zv1 Format (Recommended)
+### Workbench Flow Archive — `.zwf` (Recommended)
 
-The new `.zv1` format is a ZIP-based archive that supports hierarchical imports and modular flow design:
+The `.zwf` format is a ZIP-based archive that supports hierarchical imports and modular flow design. (`.zwf` is the current extension; the legacy `.zv1` extension refers to the same archive format and is still accepted.)
 
 ```
-myflow.zv1
+myflow.zwf
 ├── orchestration.json          # Main flow definition
 ├── imports/                    # Optional imports folder
 │   └── a1b2c3d4-e5f6-7890-abcd-ef1234567890/   # Import folder (importId only)
@@ -116,7 +118,7 @@ The legacy format is a single JSON file with an optional `imports` array:
 
 ### Import Resolution
 
-The new .zv1 format supports two import declaration styles:
+The `.zwf` archive format supports two import declaration styles:
 
 **1. Imports Object (Recommended):**
 ```json
@@ -397,7 +399,7 @@ if (errorType === 'node' && retryCount < maxRetries) {
 When using knowledge databases or complex flows with imports, it's important to clean up resources:
 
 ```javascript
-const engine = await Workbench.create('./myflow.zv1', config);
+const engine = await Workbench.create('./myflow.zwf', config);
 
 try {
   const result = await engine.run(inputs);
@@ -559,16 +561,16 @@ The engine includes specialized testing nodes:
 
 ## API Reference
 
-### zv1 Class
+### Workbench Class
 
 ```javascript
 class Workbench {
   
   /**
-   * Create a new zv1 instance (recommended)
-   * @param {string|Object|Buffer} flow - File path (.zv1 or .json), flow definition object, or ZIP data (Buffer)
+   * Create a new Workbench instance (recommended)
+   * @param {string|Object|Buffer} flow - File path (.zwf, .zv1, or .json), flow definition object, or ZIP data (Buffer)
    * @param {Object} config - Configuration options and context for the engine
-   * @returns {Promise<zv1>} Fully initialized zv1 instance
+   * @returns {Promise<Workbench>} Fully initialized Workbench instance
    */
   static async create(flow, config)
   
@@ -595,8 +597,8 @@ class Workbench {
 **Recommended: Use the static `create` method**
 
 ```javascript
-// Load from .zv1 file (new format)
-const engine = await Workbench.create('./myflow.zv1', config);
+// Load from .zwf file (recommended format)
+const engine = await Workbench.create('./myflow.zwf', config);
 
 // Load from legacy JSON file
 const engine = await Workbench.create('./legacy.json', config);
@@ -605,7 +607,7 @@ const engine = await Workbench.create('./legacy.json', config);
 const engine = await Workbench.create(flowObject, config);
 
 // Load from ZIP data in memory (Buffer)
-const zipBuffer = fs.readFileSync('./myflow.zv1');
+const zipBuffer = fs.readFileSync('./myflow.zwf');
 const engine = await Workbench.create(zipBuffer, config);
 ```
 
@@ -616,11 +618,11 @@ await engine.cleanup();
 ```
 
 The static `create` method:
-- **Auto-detects format**: Supports `.zv1` files, `.json` files, flow objects, and ZIP data (Buffer)
+- **Auto-detects format**: Supports `.zwf` files (and legacy `.zv1`), `.json` files, flow objects, and ZIP data (Buffer)
 - **Handles imports**: Loads hierarchical imports automatically
 - **Validates structure**: Ensures flow integrity before execution
 - **Loads dependencies**: Node definitions, custom types, and integrations
-- **Memory efficient**: Can load `.zv1` files directly from memory without writing to disk
+- **Memory efficient**: Can load `.zwf` files directly from memory without writing to disk
 - **Returns ready instance**: Fully initialized and ready to run
 
 
@@ -794,4 +796,4 @@ Apache 2.0 © ZeroWidth
 
 ---
 
-This engine is part of the zv1 platform. Visit our [documentation](https://zv1.ai/docs) for more information about the visual Workbench and other platform features.
+This engine is part of the Workbench platform. Visit our [documentation](https://zerowidth.ai/docs) for more information about the visual Workbench designer and other platform features.

@@ -1,4 +1,4 @@
-import zv1 from '../../src/index.js';
+import Workbench from '../../src/index.js';
 
 async function runInputOutputTypesExample() {
   try {
@@ -6,7 +6,7 @@ async function runInputOutputTypesExample() {
     console.log('=====================================');
     
     // Create engine instance
-    const engine = await zv1.create('./flow.json');
+    const engine = await Workbench.create('./flow.json');
     
     // Demonstrate different input types
     const inputData = {
@@ -17,7 +17,7 @@ async function runInputOutputTypesExample() {
       conversation: [
         { role: "user", content: "Hello there!" },
         { role: "assistant", content: "Hi! How can I help you today?" },
-        { role: "user", content: "I'm learning about zv1 flows." }
+        { role: "user", content: "I'm learning about Workbench flows." }
       ],
       
       // input-prompt type: string prompt/instruction

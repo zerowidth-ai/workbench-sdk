@@ -1,6 +1,6 @@
-# ZV1 Scripts
+# Workbench Scripts
 
-This directory contains scripts for generating LLM nodes and synchronizing shared assets across the zv1 monorepo.
+This directory contains scripts for generating LLM nodes and synchronizing shared assets across the Workbench monorepo.
 
 ## Scripts
 

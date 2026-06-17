@@ -1,17 +1,17 @@
-# CLAUDE.md - zv1 Project Guide
+# CLAUDE.md - Workbench Project Guide
 
-This file provides context for Claude Code when working with the zv1 codebase.
+This file provides context for Claude Code when working with the Workbench codebase. (Workbench is the successor name to the legacy `zv1` project; the GitHub repo and some legacy artifacts still carry the `zv1` name.)
 
 ## Project Overview
 
-zv1 is ZeroWidth's open-source AI orchestration framework. Users design flows visually at zv1.ai, export as `.zv1` files, and execute them locally using language-specific SDKs.
+Workbench is ZeroWidth's open-source AI orchestration framework. Users design flows visually at zerowidth.ai, export as `.zwf` files (the legacy `.zv1` extension is still accepted), and execute them locally using language-specific SDKs.
 
 **Architecture**: Monorepo with shared node definitions and type schemas distributed to language-specific execution engines.
 
 ## Repository Structure
 
 ```
-zv1/
+workbench-sdk/
 ├── nodes/                    # 200+ shared node definitions (synced to SDKs)
 │   └── <node-name>/
 │       ├── <node-name>.config.json    # Node schema and metadata
@@ -20,7 +20,7 @@ zv1/
 │       └── <node-name>.tests.json     # Test cases
 ├── types/                    # Shared type definitions (synced to SDKs)
 ├── tests/                    # Shared flow test files
-│   └── flows/                # .zv1 and .json test flows
+│   └── flows/                # .zwf/.zv1 and .json test flows
 ├── sdks/
 │   ├── nodejs/               # Node.js SDK (production ready)
 │   │   └── src/index.js      # Main engine implementation
@@ -96,7 +96,7 @@ async def process(
 ### Flow Test Formats
 
 1. **Legacy JSON** (embedded flow): `flow.name.json` with `{"flow": {...}, "inputs": {...}, "expected": {...}}`
-2. **New .zv1 format** (separate metadata): `flow.name.zv1` + `flow.name.test.json` with `{"inputs": {...}, "expected": {...}}`
+2. **Flow archive format** (`.zwf` current, legacy `.zv1` still accepted; separate metadata): `flow.name.zwf` + `flow.name.test.json` with `{"inputs": {...}, "expected": {...}}`
 
 ## Key Files to Know
 
@@ -124,7 +124,7 @@ async def process(
 
 - Production ready
 - Uses event-based signaling for node completion (P2 fix)
-- Main class: `Zv1` in `src/index.js`
+- Main class: `Workbench` in `src/index.js`
 - Cache system in `src/utilities/cache.js`
 
 ### Python SDK
@@ -132,7 +132,7 @@ async def process(
 - In active development
 - Requires Python 3.9+ (use `Union[]` not `|` for type hints)
 - Uses keyword-only arguments (`*`) in process functions
-- Main class: `Zv1` in `src/__init__.py`
+- Main class: `Workbench` in `src/__init__.py`
 
 ### .NET SDK
 
@@ -172,11 +172,11 @@ cd sdks/nodejs && node tests/test.all-nodes.js --node my-node
 
 Enable debug mode in engine config:
 ```javascript
-const engine = await zv1.create(flow, { debug: true });
+const engine = await Workbench.create(flow, { debug: true });
 ```
 
 ```python
-engine = await Zv1.create(flow, {"debug": True})
+engine = await Workbench.create(flow, {"debug": True})
 ```
 
 ## Important Considerations

@@ -1,6 +1,6 @@
 # Basic Flow Example
 
-This example demonstrates the simplest possible zv1 flow: transforming text input to uppercase output.
+This example demonstrates the simplest possible Workbench flow: transforming text input to uppercase output.
 
 ## Flow Structure
 
@@ -15,7 +15,7 @@ input-data → string-case → output-data
 ## How to Run
 
 ```bash
-cd zv1/sdk/engines/nodejs/examples/01-basic-flow
+cd sdks/nodejs/examples/01-basic-flow
 node run.js
 ```
 
@@ -32,7 +32,7 @@ node run.js
 
 ## What This Demonstrates
 
-- Basic flow execution with `zv1.create()` and `engine.run()`
+- Basic flow execution with `Workbench.create()` and `engine.run()`
 - Simple input/output handling
 - Text transformation using built-in nodes
 - Execution timeline and performance metrics

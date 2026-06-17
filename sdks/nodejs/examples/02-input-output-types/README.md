@@ -1,6 +1,6 @@
 # Input/Output Types Example
 
-This example demonstrates all the different input and output node types available in zv1, showing how to handle structured data, chat messages, and text prompts.
+This example demonstrates all the different input and output node types available in Workbench, showing how to handle structured data, chat messages, and text prompts.
 
 ## Flow Structure
 
@@ -26,7 +26,7 @@ input-chat ───────────→ output-chat (most recent message
 ## How to Run
 
 ```bash
-cd zv1/sdk/engines/nodejs/examples/02-input-output-types
+cd sdks/nodejs/examples/02-input-output-types
 node run.js
 ```
 
@@ -40,7 +40,7 @@ node run.js
   conversation: [
     { "role": "user", "content": "Hello there!" },
     { "role": "assistant", "content": "Hi! How can I help you today?" },
-    { "role": "user", "content": "I'm learning about zv1 flows." }
+    { "role": "user", "content": "I'm learning about Workbench flows." }
   ]
   system_prompt: You are a helpful AI assistant focused on teaching.
 
@@ -49,7 +49,7 @@ node run.js
   system_prompt_output (from output-data): You are a helpful AI assistant focused on teaching.
   conversation_output (from output-chat): [
     {
-      "content": "I'm learning about zv1 flows.",
+      "content": "I'm learning about Workbench flows.",
       "role": "assistant"
     }
   ]

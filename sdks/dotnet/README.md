@@ -1,6 +1,8 @@
-# zv1
+# ZeroWidth.Workbench
 
-A .NET implementation of ZeroWidth's zv1 framework for executing AI and automation workflows through a visual node-based interface. Design flows on zv1.ai, export as JSON, and execute with precision and control.
+A .NET implementation of ZeroWidth's Workbench framework for executing AI and automation workflows through a visual node-based interface. Design flows on [zerowidth.ai](https://zerowidth.ai), export them, and execute with precision and control.
+
+> **Status:** The .NET SDK is in early development (scaffolded, not yet fully tested). The API below is the target shape and may not match the current source exactly — see [`DEVELOPMENT_STATUS.md`](./DEVELOPMENT_STATUS.md).
 
 [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/ZeroWidth.Workbench.svg)](https://www.nuget.org/packages/ZeroWidth.Workbench)
@@ -24,7 +26,7 @@ A .NET implementation of ZeroWidth's zv1 framework for executing AI and automati
 
 ## Overview
 
-The zv1 Flow Engine enables you to:
+The Workbench Flow Engine enables you to:
 - Execute complex AI and automation workflows
 - Connect various node types (data processing, AI models, tools, testing utilities)
 - Handle asynchronous operations with precision
@@ -50,8 +52,8 @@ Install-Package ZeroWidth.Workbench
 ### From Source
 
 ```bash
-git clone https://github.com/zerowidth/zv1.git
-cd zv1/sdks/dotnet
+git clone https://github.com/zerowidth-ai/workbench-sdk.git
+cd workbench-sdk/sdks/dotnet
 dotnet build
 ```
 
@@ -61,7 +63,7 @@ dotnet build
 using ZeroWidth.Workbench;
 
 // Create engine instance by passing the location of your configured flow
-await using var engine = await WorkbenchEngineEngine.CreateAsync("./path/to/myflow.zv1", new WorkbenchEngineConfig
+await using var engine = await WorkbenchEngine.CreateAsync("./path/to/myflow.zwf", new WorkbenchOptions
 {
     Keys = new Dictionary<string, object?>
     {
@@ -87,14 +89,14 @@ Console.WriteLine(result.Outputs);
 
 ## Flow File Formats
 
-The zv1 engine supports two flow file formats:
+The Workbench engine supports two flow file formats:
 
-### New .zv1 Format (Recommended)
+### Workbench Flow Archive — `.zwf` (Recommended)
 
-The new `.zv1` format is a ZIP-based archive that supports hierarchical imports and modular flow design:
+The `.zwf` format is a ZIP-based archive that supports hierarchical imports and modular flow design. (`.zwf` is the current extension; the legacy `.zv1` extension refers to the same archive format and is still accepted.)
 
 ```
-myflow.zv1
+myflow.zwf
 ├── orchestration.json          # Main flow definition
 ├── imports/                    # Optional imports folder
 │   └── a1b2c3d4-e5f6-7890-abcd-ef1234567890/   # Import folder (importId only)
@@ -164,7 +166,7 @@ Nodes are the building blocks of your flow, connected by links that define data 
 The engine follows a specific order of operations:
 
 1. **Initialization**
-   - Use `WorkbenchEngineEngine.CreateAsync()` to asynchronously load node definitions and custom types
+   - Use `WorkbenchEngine.CreateAsync()` to asynchronously load node definitions and custom types
    - Validate flow structure
    - Setup execution environment
    - Initialize ErrorManager
@@ -225,7 +227,7 @@ The engine supports secure API key management for nodes that require external se
 ### Configuration
 
 ```csharp
-var engine = await WorkbenchEngineEngine.CreateAsync(flow, new WorkbenchEngineConfig
+var engine = await WorkbenchEngine.CreateAsync(flow, new WorkbenchOptions
 {
     Keys = new Dictionary<string, object?>
     {
@@ -255,7 +257,7 @@ The engine validates key availability before execution.
 Monitor and extend flow execution with event handlers:
 
 ```csharp
-var engine = await WorkbenchEngineEngine.CreateAsync(flow, new WorkbenchEngineConfig
+var engine = await WorkbenchEngine.CreateAsync(flow, new WorkbenchOptions
 {
     OnNodeStart = async (node) =>
     {
@@ -333,7 +335,7 @@ catch (WorkbenchEngineException ex)
 The engine implements `IAsyncDisposable` for automatic cleanup:
 
 ```csharp
-await using var engine = await WorkbenchEngineEngine.CreateAsync("./myflow.zv1", config);
+await using var engine = await WorkbenchEngine.CreateAsync("./myflow.zwf", config);
 
 var result = await engine.RunAsync(inputs);
 Console.WriteLine(result);
@@ -343,7 +345,7 @@ Console.WriteLine(result);
 Or manually:
 
 ```csharp
-var engine = await WorkbenchEngineEngine.CreateAsync("./myflow.zv1", config);
+var engine = await WorkbenchEngine.CreateAsync("./myflow.zwf", config);
 
 try
 {
@@ -391,7 +393,7 @@ var tool = new ToolDefinition
 Integrate with external tools via MCP:
 
 ```csharp
-var engine = await WorkbenchEngineEngine.CreateAsync(flow, new WorkbenchEngineConfig
+var engine = await WorkbenchEngine.CreateAsync(flow, new WorkbenchOptions
 {
     Mcp = new McpConfig
     {
@@ -470,18 +472,18 @@ var summary = await runner.RunTestsStartingFromAsync("array-map");
 
 ## API Reference
 
-### WorkbenchEngineEngine Class
+### WorkbenchEngine Class
 
 ```csharp
-public class WorkbenchEngineEngine : IAsyncDisposable
+public class WorkbenchEngine : IAsyncDisposable
 {
     /// <summary>
-    /// Create a new WorkbenchEngineEngine instance (recommended).
+    /// Create a new WorkbenchEngine instance (recommended).
     /// </summary>
-    /// <param name="flow">File path (.zv1 or .json), flow definition, or stream</param>
+    /// <param name="flow">File path (.zwf, .zv1, or .json), flow definition, or stream</param>
     /// <param name="config">Configuration options and context for the engine</param>
-    /// <returns>Fully initialized WorkbenchEngineEngine instance</returns>
-    public static Task<WorkbenchEngineEngine> CreateAsync(object flow, WorkbenchEngineConfig? config = null);
+    /// <returns>Fully initialized WorkbenchEngine instance</returns>
+    public static Task<WorkbenchEngine> CreateAsync(object flow, WorkbenchOptions? config = null);
 
     /// <summary>
     /// Run the flow and return the final output.
@@ -505,7 +507,7 @@ public class WorkbenchEngineEngine : IAsyncDisposable
 ### Configuration Options
 
 ```csharp
-public class WorkbenchEngineConfig
+public class WorkbenchOptions
 {
     // Optional: API keys for external services
     public Dictionary<string, object?>? Keys { get; set; }
@@ -611,7 +613,7 @@ var flow = new Dictionary<string, object?>
     }
 };
 
-await using var engine = await WorkbenchEngineEngine.CreateAsync(flow);
+await using var engine = await WorkbenchEngine.CreateAsync(flow);
 var result = await engine.RunAsync(new Dictionary<string, object?> { ["text"] = "hello world" });
 Console.WriteLine(result.Outputs?["data"]);  // "HELLO WORLD"
 ```
@@ -621,7 +623,7 @@ Console.WriteLine(result.Outputs?["data"]);  // "HELLO WORLD"
 ```csharp
 using ZeroWidth.Workbench;
 
-await using var engine = await WorkbenchEngineEngine.CreateAsync("./chat-flow.zv1", new WorkbenchEngineConfig
+await using var engine = await WorkbenchEngine.CreateAsync("./chat-flow.zwf", new WorkbenchOptions
 {
     Keys = new Dictionary<string, object?>
     {
@@ -648,7 +650,7 @@ Console.WriteLine(chat);
 ### Streaming with Event Handlers
 
 ```csharp
-await using var engine = await WorkbenchEngineEngine.CreateAsync("./streaming-flow.zv1", new WorkbenchEngineConfig
+await using var engine = await WorkbenchEngine.CreateAsync("./streaming-flow.zwf", new WorkbenchOptions
 {
     Keys = new Dictionary<string, object?> { ["openrouter"] = apiKey },
     OnNodeUpdate = async (update) =>
@@ -670,4 +672,4 @@ Apache 2.0 © ZeroWidth
 
 ---
 
-This engine is part of the zv1 platform. Visit our [documentation](https://zv1.ai/docs) for more information about the visual Workbench and other platform features.
+This engine is part of the Workbench platform. Visit our [documentation](https://zerowidth.ai/docs) for more information about the visual Workbench designer and other platform features.

@@ -12,7 +12,7 @@ This guide explains how to set up a Notion workspace for testing the Notion inte
 1. Go to [notion.so/my-integrations](https://www.notion.so/my-integrations)
 2. Click **"+ New integration"**
 3. Configure:
-   - **Name**: `zv1 Test Integration`
+   - **Name**: `Workbench Test Integration`
    - **Associated workspace**: Select your workspace
    - **Capabilities**: Enable all (Read, Update, Insert content)
 4. Click **"Submit"**
@@ -20,7 +20,7 @@ This guide explains how to set up a Notion workspace for testing the Notion inte
 
 ## Step 2: Create a Test Database
 
-1. In Notion, create a new page called "zv1 Test Workspace"
+1. In Notion, create a new page called "Workbench Test Workspace"
 2. Inside that page, create a **Database - Full page**
 3. Name it "TestDatabase"
 4. Configure these properties:
@@ -39,7 +39,7 @@ This guide explains how to set up a Notion workspace for testing the Notion inte
 
 ## Step 3: Create a Test Page
 
-1. Inside "zv1 Test Workspace", create a regular page called "TestPage"
+1. Inside "Workbench Test Workspace", create a regular page called "TestPage"
 2. Add some content (paragraphs, headings, etc.) for block tests
 3. Note this page's ID for `NOTION_TEST_PAGE_ID`
 
@@ -47,9 +47,9 @@ This guide explains how to set up a Notion workspace for testing the Notion inte
 
 **Important**: Notion integrations can only access pages explicitly shared with them.
 
-1. Open "zv1 Test Workspace" page
+1. Open "Workbench Test Workspace" page
 2. Click **"..."** (menu) → **"Connections"** → **"Add connections"**
-3. Select your **"zv1 Test Integration"**
+3. Select your **"Workbench Test Integration"**
 4. This shares the page AND all child pages/databases with the integration
 
 ## Step 5: Get IDs

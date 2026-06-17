@@ -17,7 +17,7 @@ import { sanitizeAPICallEvent } from "./utilities/sanitizeAPICall.js";
 
 
 /**
- * zv1 - Core class for executing node-based flows
+ * Workbench - Core class for executing node-based flows
  * Handles node loading, input/output validation, and flow execution
  */
 export default class Workbench {
@@ -25,8 +25,8 @@ export default class Workbench {
 
 
   /**
-   * Create a new zv1 instance
-   * @param {Object} flow - The flow definition containing nodes and links  
+   * Create a new Workbench instance
+   * @param {Object} flow - The flow definition containing nodes and links
    * @param {Object} config - Configuration options and context for the engine
    */
   constructor(flow, config = {}) {
