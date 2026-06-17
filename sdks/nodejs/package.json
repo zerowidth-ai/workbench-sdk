@@ -1,6 +1,6 @@
 {
   "name": "@zerowidth/workbench-sdk",
-  "version": "2.0.0-pre.1",
+  "version": "2.0.0-alpha.0",
   "dependencies": {
     "adm-zip": "^0.5.16",
     "ajv": "^8.17.1",
@@ -16,6 +16,10 @@
   "description": "Workbench SDK — execute Workbench-authored flows in production. Successor to the zv1 package; see https://zerowidth.ai for the design surface.",
   "main": "./src/index.js",
   "files": ["src/", "nodes/", "types/", "LICENSE", "README.md"],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
   "engines": {
     "node": ">=20.0.0"
   },
