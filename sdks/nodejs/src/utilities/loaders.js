@@ -235,9 +235,10 @@ export async function loadZv1File(filePath) {
     throw new Error(`Zv1 file not found: ${filePath}`);
   }
 
-  // Validate file extension
-  if (!filePath.endsWith('.zv1')) {
-    throw new Error(`Invalid file extension. Expected .zv1, got: ${path.extname(filePath)}`);
+  // Validate file extension. `.zwf` is the current extension; `.zv1` is
+  // the legacy name for the identical zip format — still accepted.
+  if (!filePath.endsWith('.zwf') && !filePath.endsWith('.zv1')) {
+    throw new Error(`Invalid file extension. Expected .zwf or .zv1, got: ${path.extname(filePath)}`);
   }
 
   try {
@@ -632,8 +633,9 @@ export async function detectAndLoadFlow(input) {
   if (typeof input === 'string') {
     const filePath = path.resolve(input);
     
-    // Check file extension to determine format
-    if (filePath.endsWith('.zv1')) {
+    // Check file extension to determine format (.zwf current, .zv1 legacy —
+    // identical zip archive either way).
+    if (filePath.endsWith('.zwf') || filePath.endsWith('.zv1')) {
       return await loadZv1File(filePath);
     } else if (filePath.endsWith('.json')) {
       // Load legacy JSON file

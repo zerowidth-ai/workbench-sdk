@@ -304,7 +304,9 @@ async def detect_and_load_flow(
         if not file_path.exists():
             raise FileNotFoundError(f"Flow file not found: {file_path}")
 
-        if file_path.suffix == ".zv1":
+        # .zwf is the current extension; .zv1 is the legacy name for the
+        # identical zip format — still accepted.
+        if file_path.suffix in (".zwf", ".zv1"):
             return await load_zv1_file(file_path)
         elif file_path.suffix == ".json":
             with open(file_path) as f:
@@ -317,7 +319,7 @@ async def detect_and_load_flow(
             return flow_data
         else:
             raise ValueError(
-                f"Unsupported file format. Expected .zv1 or .json, got: {file_path.suffix}"
+                f"Unsupported file format. Expected .zwf, .zv1, or .json, got: {file_path.suffix}"
             )
 
     raise ValueError(
@@ -346,8 +348,8 @@ async def load_zv1_file(file_path: Path) -> dict[str, Any]:
     if not file_path.exists():
         raise FileNotFoundError(f"Zv1 file not found: {file_path}")
 
-    if file_path.suffix != ".zv1":
-        raise ValueError(f"Invalid file extension. Expected .zv1, got: {file_path.suffix}")
+    if file_path.suffix not in (".zwf", ".zv1"):
+        raise ValueError(f"Invalid file extension. Expected .zwf or .zv1, got: {file_path.suffix}")
 
     try:
         with zipfile.ZipFile(file_path, "r") as zf:

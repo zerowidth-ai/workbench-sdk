@@ -127,11 +127,11 @@ public class FlowTestRunner
             };
         }
 
-        // Get all test files (.json and .zv1, but not .test.json)
+        // Get all test files (.json and .zwf/.zv1, but not .test.json)
         var testFiles = Directory.GetFiles(_flowsDir)
             .Select(Path.GetFileName)
             .Where(f => f != null &&
-                ((f.EndsWith(".json") && !f.EndsWith(".test.json")) || f.EndsWith(".zv1")))
+                ((f.EndsWith(".json") && !f.EndsWith(".test.json")) || f.EndsWith(".zwf") || f.EndsWith(".zv1")))
             .OrderBy(f => f)
             .ToList();
 
@@ -257,9 +257,9 @@ public class FlowTestRunner
         var testPath = Path.Combine(_flowsDir, testFile);
         var testCase = new FlowTestCase { FileName = testFile };
 
-        if (testFile.EndsWith(".zv1"))
+        if (testFile.EndsWith(".zwf") || testFile.EndsWith(".zv1"))
         {
-            // New .zv1 format with companion .test.json
+            // .zwf (current) / .zv1 (legacy) zip format with companion .test.json
             var testMetadataPath = Path.ChangeExtension(testPath, ".test.json");
 
             if (!File.Exists(testMetadataPath))
