@@ -130,8 +130,8 @@ public class OpenRouterIntegration : IAsyncDisposable
     public OpenRouterIntegration(
         string apiKey,
         string baseUrl = "https://openrouter.ai/api/v1",
-        string referer = "https://zv1.ai",
-        string title = "zv1 by ZeroWidth")
+        string referer = "https://workbench.zerowidth.ai",
+        string title = "Workbench by ZeroWidth")
     {
         _baseUrl = baseUrl;
         _httpClient = new HttpClient

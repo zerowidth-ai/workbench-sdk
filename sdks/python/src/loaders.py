@@ -175,8 +175,8 @@ async def load_integrations(
             integrations["openrouter"] = OpenRouterIntegration(
                 api_key=keys["openrouter"],
                 base_url=config.get("openrouter_base_url", "https://openrouter.ai/api/v1"),
-                referer="https://zv1.ai",
-                title="zv1 by ZeroWidth",
+                referer="https://workbench.zerowidth.ai",
+                title="Workbench by ZeroWidth",
             )
             if debug:
                 logger.debug("Loaded OpenRouter integration")

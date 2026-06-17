@@ -107,8 +107,8 @@ export async function loadIntegrations(config, flow = null) {
           const OpenRouterIntegration = await import(openrouterPath).then(module => module.default);
           integrations.openrouter = new OpenRouterIntegration(config.keys.openrouter, {
               baseURL: config.openrouterBaseURL || 'https://openrouter.ai/api/v1',
-              referer: 'https://zv1.ai',
-              title: 'zv1 by ZeroWidth'
+              referer: 'https://workbench.zerowidth.ai',
+              title: 'Workbench by ZeroWidth'
           });
       } catch (error) {
           throw error;

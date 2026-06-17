@@ -9,8 +9,8 @@ export default class OpenRouterIntegration {
             apiKey: apiKey,
             defaultHeaders: {
                 'Content-Type': 'application/json',
-                'HTTP-Referer': options.referer || 'https://zv1.ai',
-                'X-Title': options.title || 'zv1 by ZeroWidth'
+                'HTTP-Referer': options.referer || 'https://workbench.zerowidth.ai',
+                'X-Title': options.title || 'Workbench by ZeroWidth'
             }
         });
     }
@@ -271,8 +271,8 @@ export default class OpenRouterIntegration {
                     url: `${this.client.baseURL}/chat/completions`,
                     headers: {
                         'Content-Type': 'application/json',
-                        'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
-                        'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
+                        'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+                        'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
                         'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
                     },
                     body: payload
@@ -331,8 +331,8 @@ export default class OpenRouterIntegration {
                     url: `${this.client.baseURL}/chat/completions`,
                     headers: {
                         'Content-Type': 'application/json',
-                        'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
-                        'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
+                        'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+                        'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
                         'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
                     },
                     body: payload
@@ -368,8 +368,8 @@ export default class OpenRouterIntegration {
         const url = `${this.client.baseURL}/chat/completions`;
         const headers = {
             'Content-Type': 'application/json',
-            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
-            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
+            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
             'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
         };
 
@@ -556,8 +556,8 @@ export default class OpenRouterIntegration {
         const url = `${this.client.baseURL}/embeddings`;
         const headers = {
             'Content-Type': 'application/json',
-            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
-            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
+            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
             'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
         };
 
@@ -671,8 +671,8 @@ export default class OpenRouterIntegration {
         const url = `${this.client.baseURL}/rerank`;
         const headers = {
             'Content-Type': 'application/json',
-            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
-            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
+            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
             'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
         };
 

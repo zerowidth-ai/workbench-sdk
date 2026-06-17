@@ -58,8 +58,8 @@ class OpenRouterIntegration:
         self,
         api_key: str,
         base_url: str = "https://openrouter.ai/api/v1",
-        referer: str = "https://zv1.ai",
-        title: str = "zv1 by ZeroWidth",
+        referer: str = "https://workbench.zerowidth.ai",
+        title: str = "Workbench by ZeroWidth",
     ) -> None:
         """
         Initialize the OpenRouter integration.
