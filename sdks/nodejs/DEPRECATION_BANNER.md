@@ -1,8 +1,8 @@
 <!-- ─────────────────────────────────────────────────────────────────────
-     DRAFT — prepend this block to the TOP of sdks/nodejs/README.md
-     when publishing the deprecating release of `zv1` (e.g. 1.0.2).
-     Don't commit this `DEPRECATION_BANNER.md` file to main; it's a
-     review artifact only.
+     Deprecation notice for the legacy `zv1` npm package. Prepend this
+     block to the TOP of the `zv1@1.x` package README when cutting its
+     final (deprecating) release. Kept under version control here so the
+     wording lives alongside the SDK it redirects people toward.
      ────────────────────────────────────────────────────────────────── -->
 
 > ## ⚠️ This package has moved
