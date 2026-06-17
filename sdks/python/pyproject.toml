@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "zv1"
+name = "workbench-sdk"
 version = "0.4.3"
-description = "The zv1 SDK for executing AI orchestration flows created via zv1.ai, by ZeroWidth"
+description = "The Workbench SDK for executing AI orchestration flows, by ZeroWidth"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
@@ -45,14 +45,14 @@ sqlite = [
     "sqlite-vec>=0.1.1",
 ]
 all = [
-    "zv1[dev,sqlite]",
+    "workbench-sdk[dev,sqlite]",
 ]
 
 [project.urls]
-Homepage = "https://zv1.ai"
-Documentation = "https://zv1.ai/docs"
-Repository = "https://github.com/zerowidth-ai/zv1"
-Issues = "https://github.com/zerowidth-ai/zv1/issues"
+Homepage = "https://workbench.zerowidth.ai"
+Documentation = "https://workbench.zerowidth.ai/docs"
+Repository = "https://github.com/zerowidth-ai/workbench-sdk"
+Issues = "https://github.com/zerowidth-ai/workbench-sdk/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]

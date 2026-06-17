@@ -6,15 +6,17 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
 
-    <!-- Package metadata -->
-    <PackageId>ZeroWidth.Zv1</PackageId>
+    <!-- Package metadata. Published package identity is "Workbench" (the
+         ZeroWidth tool's SDK); the engine namespace stays ZeroWidth.Zv1
+         (the orchestration engine), matching the nodejs/python SDKs. -->
+    <PackageId>ZeroWidth.Workbench</PackageId>
     <Version>0.1.0</Version>
     <Authors>ZeroWidth</Authors>
     <Company>ZeroWidth</Company>
-    <Description>A node and link style AI agent processing engine for .NET</Description>
+    <Description>The Workbench SDK — a node and link style AI agent processing engine for .NET</Description>
     <PackageTags>ai;agents;llm;workflow;nodes</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/zerowidth/zv1</RepositoryUrl>
+    <RepositoryUrl>https://github.com/zerowidth-ai/workbench-sdk</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
 
     <!-- Enable XML documentation -->
