@@ -228,7 +228,7 @@ export async function loadIntegrations(config, flow = null) {
  * @returns {Promise<Object>} Extracted flow object with orchestration.json and imports
  * @throws {Error} If file doesn't exist, is not a valid ZIP, or missing orchestration.json
  */
-export async function loadZv1File(filePath) {
+export async function loadFlowArchive(filePath) {
   
   // Validate file exists
   if (!fs.existsSync(filePath)) {
@@ -282,7 +282,7 @@ export async function loadZv1File(filePath) {
         imports = orchestrationData.imports;
       } else if (typeof orchestrationData.imports === 'object') {
         // New format: imports as object { "import-id": "snapshot" }
-        imports = await loadZv1ImportsFromObject(orchestrationData.imports, zipEntries);
+        imports = await loadFlowImportsFromObject(orchestrationData.imports, zipEntries);
       }
     }
 
@@ -368,7 +368,7 @@ export async function loadZv1File(filePath) {
  * @returns {Promise<Array>} Array of loaded import definitions
  * @throws {Error} If import folders cannot be found or loaded
  */
-async function loadZv1ImportsFromObject(importsObject, zipEntries) {
+async function loadFlowImportsFromObject(importsObject, zipEntries) {
   const imports = [];
   
   // Find all import folder entries
@@ -403,7 +403,7 @@ async function loadZv1ImportsFromObject(importsObject, zipEntries) {
       }
 
       const folderEntries = importFolders.get(folderName);
-      const importData = await loadZv1ImportFolder(folderName, folderEntries);
+      const importData = await loadFlowImportFolder(folderName, folderEntries);
       
       // Add the import ID for reference
       importData.importId = importId;
@@ -456,7 +456,7 @@ function findImportFolder(importId, versionRange, importFolders) {
  * @returns {Promise<Object>} Import definition object
  * @throws {Error} If orchestration.json is missing or invalid
  */
-async function loadZv1ImportFolder(folderName, folderEntries) {
+async function loadFlowImportFolder(folderName, folderEntries) {
   // Find orchestration.json in this import folder
   const orchestrationEntry = folderEntries.get('orchestration.json');
   if (!orchestrationEntry) {
@@ -532,7 +532,7 @@ async function loadZv1ImportFolder(folderName, folderEntries) {
     // Load each nested import folder
     for (const [nestedFolderName, nestedFolderEntries] of nestedImportFolders) {
       try {
-        const nestedImportData = await loadZv1ImportFolder(nestedFolderName, nestedFolderEntries);
+        const nestedImportData = await loadFlowImportFolder(nestedFolderName, nestedFolderEntries);
         nestedImports.push(nestedImportData);
       } catch (nestedError) {
         throw new Error(`Failed to load nested import '${nestedFolderName}' in '${folderName}': ${nestedError.message}`);
@@ -626,7 +626,7 @@ export async function detectAndLoadFlow(input) {
 
   // If input is a Buffer, treat it as raw ZIP data (.zv1 file in memory)
   if (Buffer.isBuffer(input)) {
-    return await loadZv1FromBuffer(input);
+    return await loadFlowFromBuffer(input);
   }
 
   // Input is a string - treat as file path
@@ -636,7 +636,7 @@ export async function detectAndLoadFlow(input) {
     // Check file extension to determine format (.zwf current, .zv1 legacy —
     // identical zip archive either way).
     if (filePath.endsWith('.zwf') || filePath.endsWith('.zv1')) {
-      return await loadZv1File(filePath);
+      return await loadFlowArchive(filePath);
     } else if (filePath.endsWith('.json')) {
       // Load legacy JSON file
       const fileContent = fs.readFileSync(filePath, 'utf8');
@@ -664,7 +664,7 @@ export async function detectAndLoadFlow(input) {
  * @returns {Promise<Object>} Extracted flow object with orchestration.json and imports
  * @throws {Error} If buffer is not valid ZIP data or missing orchestration.json
  */
-export async function loadZv1FromBuffer(zipBuffer) {
+export async function loadFlowFromBuffer(zipBuffer) {
   // Validate that we have a Buffer
   if (!Buffer.isBuffer(zipBuffer)) {
     throw new Error('Input must be a Buffer containing ZIP data');
@@ -716,7 +716,7 @@ export async function loadZv1FromBuffer(zipBuffer) {
         imports = orchestrationData.imports;
       } else if (typeof orchestrationData.imports === 'object') {
         // New format: imports as object { "import-id": "snapshot" }
-        imports = await loadZv1ImportsFromObject(orchestrationData.imports, zipEntries);
+        imports = await loadFlowImportsFromObject(orchestrationData.imports, zipEntries);
       }
     }
 

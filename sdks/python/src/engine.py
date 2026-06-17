@@ -89,7 +89,7 @@ class ExecutionResult:
     terminal_nodes: list[dict[str, Any]] | None = None
 
 
-class Zv1:
+class Workbench:
     """
     Core class for executing node-based AI flows.
 

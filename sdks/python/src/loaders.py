@@ -295,7 +295,7 @@ async def detect_and_load_flow(
 
     # If input is bytes, treat as raw ZIP data (.zv1 file in memory)
     if isinstance(input_data, bytes):
-        return await load_zv1_from_buffer(input_data)
+        return await load_flow_from_buffer(input_data)
 
     # Input is a string - treat as file path
     if isinstance(input_data, str):
@@ -307,7 +307,7 @@ async def detect_and_load_flow(
         # .zwf is the current extension; .zv1 is the legacy name for the
         # identical zip format — still accepted.
         if file_path.suffix in (".zwf", ".zv1"):
-            return await load_zv1_file(file_path)
+            return await load_flow_archive(file_path)
         elif file_path.suffix == ".json":
             with open(file_path) as f:
                 flow_data = json.load(f)
@@ -328,7 +328,7 @@ async def detect_and_load_flow(
     )
 
 
-async def load_zv1_file(file_path: Path) -> dict[str, Any]:
+async def load_flow_archive(file_path: Path) -> dict[str, Any]:
     """
     Load a .zv1 file and extract its contents.
 
@@ -358,7 +358,7 @@ async def load_zv1_file(file_path: Path) -> dict[str, Any]:
         raise ValueError(f"Invalid ZIP file: {e}") from e
 
 
-async def load_zv1_from_buffer(zip_buffer: bytes) -> dict[str, Any]:
+async def load_flow_from_buffer(zip_buffer: bytes) -> dict[str, Any]:
     """
     Load a .zv1 file from raw ZIP data in memory.
 

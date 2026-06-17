@@ -20,7 +20,7 @@ import { sanitizeAPICallEvent } from "./utilities/sanitizeAPICall.js";
  * zv1 - Core class for executing node-based flows
  * Handles node loading, input/output validation, and flow execution
  */
-export default class zv1 {
+export default class Workbench {
 
 
 
@@ -150,13 +150,13 @@ export default class zv1 {
    * 
    * @example
    * // Load from .zv1 file
-   * const engine = await zv1.create('./myflow.zv1', { keys: { openrouter: 'sk-...' } });
+   * const engine = await Workbench.create('./myflow.zv1', { keys: { openrouter: 'sk-...' } });
    * 
    * // Load from legacy JSON file
-   * const engine = await zv1.create('./legacy.json', { keys: { openrouter: 'sk-...' } });
+   * const engine = await Workbench.create('./legacy.json', { keys: { openrouter: 'sk-...' } });
    * 
    * // Load from flow object
-   * const engine = await zv1.create(flowObject, { keys: { openrouter: 'sk-...' } });
+   * const engine = await Workbench.create(flowObject, { keys: { openrouter: 'sk-...' } });
    */
   static async create(flow, config = {}) {
     try {
@@ -165,7 +165,7 @@ export default class zv1 {
       const loadedFlow = await detectAndLoadFlow(flow);
       
       // Create engine instance with the loaded flow
-      const engine = new zv1(loadedFlow, config);
+      const engine = new Workbench(loadedFlow, config);
 
       // Initialize the engine (loads nodes, validates flow, etc.)
       await engine.initialize();
@@ -1541,7 +1541,7 @@ export default class zv1 {
       }
     
     // Create internal zv1 instance
-    const internalEngine = new zv1(internalFlow, {
+    const internalEngine = new Workbench(internalFlow, {
       ...this.config,
       // Pass through integrations and other config
       integrations: this.config.integrations,

@@ -29,7 +29,7 @@ You can use type converters in your code:
 ```javascript
 import zv1 from 'zv1';
 
-const engine = await zv1.create('./myflow.zv1', config);
+const engine = await Workbench.create('./myflow.zv1', config);
 
 // Convert a message to string
 const message = {

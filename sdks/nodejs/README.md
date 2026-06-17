@@ -44,7 +44,7 @@ npm install zv1
 import zv1 from 'zv1';
 
 // Create engine instance by passing the location of your configured flow
-const engine = await zv1.create('./path/to/myflow.zv1', {
+const engine = await Workbench.create('./path/to/myflow.zv1', {
   keys: {
     openrouter: process.env.OPENROUTER_API_KEY
   }
@@ -220,7 +220,7 @@ Nodes are the building blocks of your flow, connected by links that define data 
 The engine follows a specific order of operations:
 
 1. **Initialization**
-   - Use `zv1.create()` to asynchronously load node definitions and custom types
+   - Use `Workbench.create()` to asynchronously load node definitions and custom types
    - Validate flow structure
    - Setup execution environment
    - Initialize ErrorManager
@@ -277,7 +277,7 @@ The engine supports secure API key management for nodes that require external se
 ### Configuration
 
 ```javascript
-const engine = await zv1.create(flow, {
+const engine = await Workbench.create(flow, {
   keys: {
     openrouter: "sk-...",  // OpenRouter API key
   }
@@ -305,7 +305,7 @@ The engine validates key availability before execution.
 Monitor and extend flow execution with event handlers:
 
 ```javascript
-const engine = await zv1.create(flow, {
+const engine = await Workbench.create(flow, {
   onNodeStart: async ({ nodeId, nodeType, timestamp, inputs, settings }) => {
     console.log(`Node ${nodeId} starting execution`);
     // Example: Track metrics in your own system
@@ -397,7 +397,7 @@ if (errorType === 'node' && retryCount < maxRetries) {
 When using knowledge databases or complex flows with imports, it's important to clean up resources:
 
 ```javascript
-const engine = await zv1.create('./myflow.zv1', config);
+const engine = await Workbench.create('./myflow.zv1', config);
 
 try {
   const result = await engine.run(inputs);
@@ -446,7 +446,7 @@ Support for LLM plugins and tools:
 Integrate with external tools via MCP:
 
 ```javascript
-const engine = await zv1.create(flow, {
+const engine = await Workbench.create(flow, {
   mcp: {
     tools: [
       {
@@ -562,7 +562,7 @@ The engine includes specialized testing nodes:
 ### zv1 Class
 
 ```javascript
-class zv1 {
+class Workbench {
   
   /**
    * Create a new zv1 instance (recommended)
@@ -596,17 +596,17 @@ class zv1 {
 
 ```javascript
 // Load from .zv1 file (new format)
-const engine = await zv1.create('./myflow.zv1', config);
+const engine = await Workbench.create('./myflow.zv1', config);
 
 // Load from legacy JSON file
-const engine = await zv1.create('./legacy.json', config);
+const engine = await Workbench.create('./legacy.json', config);
 
 // Load from flow object
-const engine = await zv1.create(flowObject, config);
+const engine = await Workbench.create(flowObject, config);
 
 // Load from ZIP data in memory (Buffer)
 const zipBuffer = fs.readFileSync('./myflow.zv1');
-const engine = await zv1.create(zipBuffer, config);
+const engine = await Workbench.create(zipBuffer, config);
 ```
 
 **Important: Clean up resources when done**

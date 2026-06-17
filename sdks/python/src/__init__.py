@@ -6,13 +6,13 @@ automation workflows through a visual node-based interface. Design flows
 on zv1.ai, export as JSON, and execute with precision and control.
 
 Example:
-    >>> from src import Zv1
-    >>> engine = await Zv1.create('./myflow.zv1', keys={'openrouter': 'sk-...'})
+    >>> from src import Workbench
+    >>> engine = await Workbench.create('./myflow.zv1', keys={'openrouter': 'sk-...'})
     >>> result = await engine.run({'chat': [{'role': 'user', 'content': 'Hello!'}]})
     >>> print(result.outputs)
 """
 
-from src.engine import Zv1
+from src.engine import Workbench
 from src.errors import (
     Zv1Error,
     NodeError,

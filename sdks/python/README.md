@@ -50,11 +50,11 @@ pip install -e .
 
 ```python
 import asyncio
-from zv1 import Zv1
+from workbench import Workbench
 
 async def main():
     # Create engine instance by passing the location of your configured flow
-    engine = await Zv1.create('./path/to/myflow.zv1', {
+    engine = await Workbench.create('./path/to/myflow.zv1', {
         'keys': {
             'openrouter': 'your-api-key'
         }
@@ -157,7 +157,7 @@ Nodes are the building blocks of your flow, connected by links that define data 
 The engine follows a specific order of operations:
 
 1. **Initialization**
-   - Use `Zv1.create()` to asynchronously load node definitions and custom types
+   - Use `Workbench.create()` to asynchronously load node definitions and custom types
    - Validate flow structure
    - Setup execution environment
    - Initialize ErrorManager
@@ -214,7 +214,7 @@ The engine supports secure API key management for nodes that require external se
 ### Configuration
 
 ```python
-engine = await Zv1.create(flow, {
+engine = await Workbench.create(flow, {
     'keys': {
         'openrouter': 'sk-...',  # OpenRouter API key
     }
@@ -254,7 +254,7 @@ async def on_node_update(event):
 async def on_error(error_event):
     print('Error occurred:', error_event)
 
-engine = await Zv1.create(flow, {
+engine = await Workbench.create(flow, {
     'on_node_start': on_node_start,
     'on_node_complete': on_node_complete,
     'on_node_update': on_node_update,
@@ -311,7 +311,7 @@ When verbose mode is enabled, errors include rich execution context:
 When using knowledge databases or complex flows with imports, it's important to clean up resources:
 
 ```python
-engine = await Zv1.create('./myflow.zv1', config)
+engine = await Workbench.create('./myflow.zv1', config)
 
 try:
     result = await engine.run(inputs)
@@ -353,7 +353,7 @@ Support for LLM plugins and tools:
 Integrate with external tools via MCP:
 
 ```python
-engine = await Zv1.create(flow, {
+engine = await Workbench.create(flow, {
     'mcp': {
         'tools': [
             {
@@ -405,7 +405,7 @@ python -m pytest tests/test_all_nodes.py -k "test_node_name"
 ### Zv1 Class
 
 ```python
-class Zv1:
+class Workbench:
 
     @classmethod
     async def create(cls, flow, config: dict = None) -> 'Zv1':
@@ -515,7 +515,7 @@ result = await engine.run(inputs)
 
 ```python
 import asyncio
-from zv1 import Zv1
+from workbench import Workbench
 
 async def main():
     flow = {
@@ -547,7 +547,7 @@ async def main():
         ]
     }
 
-    engine = await Zv1.create(flow)
+    engine = await Workbench.create(flow)
     result = await engine.run({'text': 'hello world'})
     print(result['outputs'])  # {'data': 'HELLO WORLD'}
 
@@ -558,10 +558,10 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from zv1 import Zv1
+from workbench import Workbench
 
 async def main():
-    engine = await Zv1.create('./chat-flow.zv1', {
+    engine = await Workbench.create('./chat-flow.zv1', {
         'keys': {
             'openrouter': 'your-api-key'
         }
