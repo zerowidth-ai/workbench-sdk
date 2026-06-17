@@ -17,16 +17,16 @@ import { sanitizeAPICallEvent } from "./utilities/sanitizeAPICall.js";
 
 
 /**
- * zv1 - Core class for executing node-based flows
+ * Workbench - Core class for executing node-based flows
  * Handles node loading, input/output validation, and flow execution
  */
-export default class zv1 {
+export default class Workbench {
 
 
 
   /**
-   * Create a new zv1 instance
-   * @param {Object} flow - The flow definition containing nodes and links  
+   * Create a new Workbench instance
+   * @param {Object} flow - The flow definition containing nodes and links
    * @param {Object} config - Configuration options and context for the engine
    */
   constructor(flow, config = {}) {
@@ -44,6 +44,12 @@ export default class zv1 {
     this.config = {
         ...config
     };
+
+    // The abort signal inherited from an ancestor engine (set once, at
+    // construction — sub-engines receive the parent's via {...config}). Captured
+    // here so a later run() can't mistake a *prior run's own* signal (which run()
+    // writes back into config.signal) for an ancestor and abort instantly.
+    this._inheritedSignal = this.config.signal || null;
 
     // Track knowledge base files that need cleanup
     this.knowledgeFilesToCleanup = new Set();
@@ -144,13 +150,13 @@ export default class zv1 {
    * 
    * @example
    * // Load from .zv1 file
-   * const engine = await zv1.create('./myflow.zv1', { keys: { openrouter: 'sk-...' } });
+   * const engine = await Workbench.create('./myflow.zv1', { keys: { openrouter: 'sk-...' } });
    * 
    * // Load from legacy JSON file
-   * const engine = await zv1.create('./legacy.json', { keys: { openrouter: 'sk-...' } });
+   * const engine = await Workbench.create('./legacy.json', { keys: { openrouter: 'sk-...' } });
    * 
    * // Load from flow object
-   * const engine = await zv1.create(flowObject, { keys: { openrouter: 'sk-...' } });
+   * const engine = await Workbench.create(flowObject, { keys: { openrouter: 'sk-...' } });
    */
   static async create(flow, config = {}) {
     try {
@@ -159,7 +165,7 @@ export default class zv1 {
       const loadedFlow = await detectAndLoadFlow(flow);
       
       // Create engine instance with the loaded flow
-      const engine = new zv1(loadedFlow, config);
+      const engine = new Workbench(loadedFlow, config);
 
       // Initialize the engine (loads nodes, validates flow, etc.)
       await engine.initialize();
@@ -282,7 +288,53 @@ export default class zv1 {
    * Core execution logic shared between processNode and processNodeWithArgs
    * @private
    */
+  /**
+   * Race a node's execution promise against the flow's abort signal so a hung
+   * node (e.g. a stalled LLM/HTTP call) can't park the execution loop past the
+   * flow timeout. The signal is also handed to integrations so the underlying
+   * request is actually cancelled. No-op when there's no abort controller, so
+   * callers outside run() behave exactly as before.
+   */
+  _raceAbort(promise) {
+    const signal = this.abortController?.signal;
+    if (!signal) return promise;
+    const reason = () => (signal.reason instanceof Error ? signal.reason : new Error('Flow aborted'));
+    if (signal.aborted) {
+      // Still attach a handler so the original promise's eventual rejection
+      // isn't unhandled.
+      Promise.resolve(promise).catch(() => {});
+      return Promise.reject(reason());
+    }
+    return new Promise((resolve, reject) => {
+      const onAbort = () => { cleanup(); reject(reason()); };
+      const cleanup = () => signal.removeEventListener('abort', onAbort);
+      signal.addEventListener('abort', onAbort, { once: true });
+      promise.then(
+        (v) => { cleanup(); resolve(v); },
+        (e) => { cleanup(); reject(e); }
+      );
+    });
+  }
+
   async _executeNodeCore(node, inputs, settings, nodeDefinition) {
+    // Warn once per deprecated node type. These still execute (so existing flows
+    // keep working), but the underlying model may be gone or expiring — see
+    // config.deprecation. Tombstoned nodes are kept rather than deleted precisely
+    // so flows referencing them still load.
+    if (nodeDefinition?.config?.deprecated) {
+      this._deprecationWarned = this._deprecationWarned || new Set();
+      if (!this._deprecationWarned.has(node.type)) {
+        this._deprecationWarned.add(node.type);
+        const dep = nodeDefinition.config.deprecation || {};
+        const detail = [
+          dep.reason,
+          dep.expiration_date ? `expires ${dep.expiration_date}` : null,
+          dep.replacement ? `use ${dep.replacement} instead` : null
+        ].filter(Boolean).join('; ');
+        console.warn(`[zv1] Node type "${node.type}" is deprecated${detail ? ': ' + detail : ''}.`);
+      }
+    }
+
     const timelineEntry = {
       nodeId: node.id,
       nodeType: node.type,
@@ -312,7 +364,9 @@ export default class zv1 {
         id: node.id
       };
 
-      const outputs = await nodeDefinition.process({inputs, settings, config: this.config, nodeConfig});
+      const outputs = await this._raceAbort(
+        nodeDefinition.process({inputs, settings, config: this.config, nodeConfig})
+      );
       const endDate = new Date();
       timelineEntry.outputs = JSON.parse(JSON.stringify(outputs));
       timelineEntry.endTime = endDate.toISOString();
@@ -370,7 +424,7 @@ export default class zv1 {
     const nodeDefinition = this.nodes[node.type];
     if (!nodeDefinition) {
       this.logDebug(`Error: Node type "${node.type}" not found`);
-      throw new Error(`Node type "${node.type}" not found.`);
+      throw new Error(`Node type "${node.type}" not found. It may have been removed or renamed (e.g. a model retired from the provider). Check for an updated node type or regenerate the node catalog.`);
     }
 
     // Apply default settings from node configuration
@@ -1082,9 +1136,36 @@ export default class zv1 {
     
     // Set a timeout flag to prevent infinite execution
     this.hasTimedOut = false;
+
+    // Preemptive cancellation: an AbortController whose signal is exposed to
+    // node processes/integrations (via config.signal) and aborted when the flow
+    // times out. This lets in-flight LLM/HTTP calls and sub-engines actually
+    // stop, instead of the loop parking on a hung node until it resolves.
+    this.abortController = new AbortController();
+    this._abortTeardown = () => {};
+    // Cascade: if an ancestor engine passed its signal in (macro / imported-flow
+    // sub-engine), abort when it aborts — so a parent timeout reaches descendants.
+    // Use the construction-time inherited signal, NOT this.config.signal (which a
+    // prior run() of a reused engine may have overwritten with its own signal).
+    const inheritedSignal = this._inheritedSignal;
+    if (inheritedSignal) {
+      if (inheritedSignal.aborted) {
+        this.abortController.abort(inheritedSignal.reason);
+      } else {
+        const onAncestorAbort = () => this.abortController.abort(inheritedSignal.reason);
+        inheritedSignal.addEventListener('abort', onAncestorAbort, { once: true });
+        this._abortTeardown = () => inheritedSignal.removeEventListener('abort', onAncestorAbort);
+      }
+    }
+    // Expose our signal to node processes and integrations.
+    this.config.signal = this.abortController.signal;
+
     this.flowTimeout = setTimeout(() => {
       this.logDebug("Flow execution timed out");
       this.hasTimedOut = true;
+      if (!this.abortController.signal.aborted) {
+        this.abortController.abort(new Error(`Flow execution timed out after ${timeout}ms`));
+      }
     }, timeout);
 
     let inputsMissingValues = [];
@@ -1387,6 +1468,10 @@ export default class zv1 {
       throw error;
     } finally {
       clearTimeout(this.flowTimeout);
+      this._abortTeardown?.();
+      // Restore the inherited signal so a reused engine doesn't treat this run's
+      // (possibly aborted) signal as an ancestor on the next run().
+      this.config.signal = this._inheritedSignal;
     }
   }
 
@@ -1456,7 +1541,7 @@ export default class zv1 {
       }
     
     // Create internal zv1 instance
-    const internalEngine = new zv1(internalFlow, {
+    const internalEngine = new Workbench(internalFlow, {
       ...this.config,
       // Pass through integrations and other config
       integrations: this.config.integrations,
@@ -1664,7 +1749,7 @@ export default class zv1 {
     const nodeDefinition = this.nodes[node.type];
     if (!nodeDefinition) {
       this.logDebug(`Error: Node type "${node.type}" not found`);
-      throw new Error(`Node type "${node.type}" not found.`);
+      throw new Error(`Node type "${node.type}" not found. It may have been removed or renamed (e.g. a model retired from the provider). Check for an updated node type or regenerate the node catalog.`);
     }
 
     // Apply default settings from node configuration (same as processNode)
@@ -2135,6 +2220,23 @@ export default class zv1 {
                 continue;
               }
 
+              // Fire onNodeStart so the consumer's live-trace sink
+              // sees this tool call as it dispatches. Without this,
+              // multi-round tool-calling LLMs look like a single
+              // long "LLM node running…" entry — the waterfall has
+              // no visibility into the tool-call cycles inside.
+              if (toolNodeInfo?.node && this.config.onNodeStart) {
+                try {
+                  await this.config.onNodeStart({
+                    nodeId: toolNodeInfo.node.id,
+                    nodeType: toolNodeInfo.node.type,
+                    inputs: toolArguments,
+                  });
+                } catch (_hookErr) {
+                  // Hook failures must not break the flow — swallow.
+                }
+              }
+
               // Execute the tool runner with error handling
               try {
                 const toolResult = await toolRunners[toolName](toolArguments);
@@ -2146,6 +2248,38 @@ export default class zv1 {
                   name: toolName,
                   result: toolResult
                 });
+
+                // Mirror the error-path instrumentation: record a
+                // timeline entry + onNodeComplete event for the
+                // successful tool call. Consumers' post-run timeline
+                // walk + live trace stream both see the call now.
+                if (toolNodeInfo?.node) {
+                  const endDate = new Date();
+                  const timelineEntry = {
+                    nodeId: toolNodeInfo.node.id,
+                    nodeType: toolNodeInfo.node.type,
+                    inputs: toolArguments,
+                    outputs: { result: toolResult },
+                    startTime: startDate.toISOString(),
+                    endTime: endDate.toISOString(),
+                    durationMs: endDate - startDate,
+                    status: 'success',
+                  };
+                  this.timeline.push(timelineEntry);
+
+                  if (this.config.onNodeComplete) {
+                    try {
+                      await this.config.onNodeComplete({
+                        nodeId: toolNodeInfo.node.id,
+                        nodeType: toolNodeInfo.node.type,
+                        inputs: toolArguments,
+                        outputs: { result: toolResult },
+                      });
+                    } catch (_hookErr) {
+                      // Swallow — hook errors must not break the flow.
+                    }
+                  }
+                }
 
               } catch (executionError) {
                 // Tool execution failed - create error result
@@ -2344,7 +2478,7 @@ export default class zv1 {
     const nodeDefinition = this.nodes[node.type];
     if (!nodeDefinition) {
       this.logDebug(`Error: Node type "${node.type}" not found`);
-      throw new Error(`Node type "${node.type}" not found.`);
+      throw new Error(`Node type "${node.type}" not found. It may have been removed or renamed (e.g. a model retired from the provider). Check for an updated node type or regenerate the node catalog.`);
     }
     for (const inputDef of nodeDefinition.config.inputs || []) {
       if (!inputDef.required) continue;
@@ -2531,8 +2665,7 @@ export default class zv1 {
 
     // Find the imported flow definition to get the actual input-chat nodes
     const importDef = nodeDefinition.config.importDefinition;
-    const inputChatNodes = importDef.nodes.filter(n => n.type === 'input-chat');
-    
+
     // Transform string arguments to message arrays for each chat input
     const transformedArgs = { ...args };
     
@@ -2540,10 +2673,12 @@ export default class zv1 {
       const inputValue = args[chatInput.name];
       if (typeof inputValue === 'string') {
         
-        // Find the corresponding input-chat node to get its key
-        const inputChatNode = inputChatNodes.find(n => n.id === chatInput.name);
-        const chatKey = inputChatNode?.settings?.key || 'chat';
-        
+        // The input's name IS the input-chat node's settings.key (set in
+        // convertImportToNodeType), so use it directly. The previous lookup
+        // compared the key against node ids, always missed, and fell back to
+        // 'chat' — collapsing every chat stream into one and ignoring custom keys.
+        const chatKey = chatInput.name;
+
         // Create conversation key: nodeId + chatKey for this specific chat stream
         const conversationKey = `${node.id}_${chatKey}`;
         
@@ -2574,8 +2709,10 @@ export default class zv1 {
       const chatKey = outputChatNode.settings?.key || 'chat';
       const conversationKey = `${node.id}_${chatKey}`;
       
-      // Look for this output-chat node's result by its ID (not chat key)
-      const chatOutput = outputs[outputChatNode.id];
+      // The import's process emits the response under the output-chat's key,
+      // not the bare node id. Read by key (fall back to node id for safety) so
+      // the assistant's replies actually get appended to the conversation.
+      const chatOutput = outputs[chatKey] ?? outputs[outputChatNode.id];
       
       this.logDebug(`Looking for output from node ${outputChatNode.id} with chat key ${chatKey}:`, chatOutput);
       
@@ -2629,7 +2766,7 @@ export default class zv1 {
     const nodeDefinition = this.nodes[node.type];
     if (!nodeDefinition) {
       this.logDebug(`Error: Node type "${node.type}" not found`);
-      throw new Error(`Node type "${node.type}" not found.`);
+      throw new Error(`Node type "${node.type}" not found. It may have been removed or renamed (e.g. a model retired from the provider). Check for an updated node type or regenerate the node catalog.`);
     }
 
     // For import nodes, their process function expects (inputs, settings, config)
@@ -2652,7 +2789,7 @@ export default class zv1 {
     const nodeDefinition = this.nodes[node.type];
     if (!nodeDefinition) {
       this.logDebug(`Error: Node type "${node.type}" not found`);
-      throw new Error(`Node type "${node.type}" not found.`);
+      throw new Error(`Node type "${node.type}" not found. It may have been removed or renamed (e.g. a model retired from the provider). Check for an updated node type or regenerate the node catalog.`);
     }
 
     // Use the inputs passed from processLLMNode instead of re-collecting them

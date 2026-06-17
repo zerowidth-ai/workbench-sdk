@@ -1,0 +1,81 @@
+{
+  "display_name": "Embedding",
+  "tagline": "Generate embeddings (any model)",
+  "description": "Generate vector embeddings using any OpenRouter embedding model. The model is an input, so it can be specified or swapped from outside the flow rather than baked into the node.",
+  "category": "embedding",
+  "provider": "openrouter",
+  "inputs": [
+    {
+      "name": "input",
+      "display_name": "Input",
+      "type": "string or array of strings",
+      "description": "Text, or an array of texts, to convert into embedding vectors",
+      "required": true
+    },
+    {
+      "name": "model",
+      "display_name": "Model",
+      "type": "string",
+      "description": "OpenRouter embedding model id (e.g. openai/text-embedding-3-small, google/gemini-embedding-001, qwen/qwen3-embedding-8b). Wire this from a flow input to swap models externally.",
+      "default": "openai/text-embedding-3-small"
+    },
+    {
+      "name": "dimensions",
+      "display_name": "Dimensions",
+      "type": "number",
+      "description": "Optional: reduce the output vector size. Only some models support this (e.g. OpenAI text-embedding-3-*, Gemini, Qwen3). Leave null for the model default.",
+      "default": null
+    },
+    {
+      "name": "encoding_format",
+      "display_name": "Encoding Format",
+      "type": "string",
+      "description": "Optional: \"float\" (default) or \"base64\"",
+      "default": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "embedding",
+      "display_name": "Embedding",
+      "type": "array",
+      "description": "The embedding vector for the first (or only) input"
+    },
+    {
+      "name": "embeddings",
+      "display_name": "Embeddings",
+      "type": "array",
+      "description": "Array of embedding vectors, one per input (in input order)"
+    },
+    {
+      "name": "dimensions",
+      "display_name": "Dimensions",
+      "type": "number",
+      "description": "Length of each embedding vector"
+    },
+    {
+      "name": "model",
+      "display_name": "Model Used",
+      "type": "string",
+      "description": "The embedding model that actually produced the vectors"
+    },
+    {
+      "name": "usage",
+      "display_name": "Token Usage",
+      "type": "object",
+      "description": "Token usage statistics"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost (USD), reported by OpenRouter usage accounting for the chosen model."
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array",
+      "description": "Detailed cost breakdown (input/output line items)"
+    }
+  ]
+}

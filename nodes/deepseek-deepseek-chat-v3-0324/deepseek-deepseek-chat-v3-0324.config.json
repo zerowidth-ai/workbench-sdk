@@ -1,7 +1,7 @@
 {
   "display_name": "DeepSeek: DeepSeek V3 0324",
   "tagline": "Generate text",
-  "description": "DeepSeek V3, a 685B-parameter, mixture-of-experts model, is the latest iteration of the flagship chat model family from the DeepSeek team.\n\nIt succeeds the [DeepSeek V3](/deepseek/deepseek-chat-v3) model and performs really well on a variety of tasks.",
+  "description": "DeepSeek V3, a 685B-parameter, mixture-of-experts model, is the latest iteration of the flagship chat model family from the DeepSeek team. It succeeds the [DeepSeek V3](/deepseek/deepseek-chat-v3) model and performs really well...",
   "category": "llm",
   "provider": "deepseek",
   "accepts_plugins": true,
@@ -10,11 +10,9 @@
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",
-    "logprobs",
     "max_tokens",
     "min_p",
     "presence_penalty",
-    "reasoning",
     "repetition_penalty",
     "response_format",
     "seed",
@@ -24,7 +22,6 @@
     "tool_choice",
     "tools",
     "top_k",
-    "top_logprobs",
     "top_p"
   ],
   "inputs": [
@@ -55,13 +52,6 @@
       "display_name": "Tool Choice",
       "type": "string",
       "description": "Tool selection control",
-      "default": null
-    },
-    {
-      "name": "reasoning",
-      "display_name": "Reasoning",
-      "type": "boolean",
-      "description": "Enable reasoning mode",
       "default": null
     },
     {
@@ -179,25 +169,6 @@
       "display_name": "Finish Reason",
       "type": "string",
       "description": "Why the completion finished"
-    },
-    {
-      "name": "logprobs",
-      "display_name": "Log Probabilities",
-      "type": "object",
-      "description": "Token probabilities and logprobs from the model"
-    },
-    {
-      "name": "reasoning",
-      "display_name": "Reasoning",
-      "type": "string",
-      "can_stream": true,
-      "description": "The detailed reasoning chain from the model"
-    },
-    {
-      "name": "refusal",
-      "display_name": "Refusal",
-      "type": "string",
-      "description": "Model refusal response (if any)"
     }
   ],
   "pricing": {

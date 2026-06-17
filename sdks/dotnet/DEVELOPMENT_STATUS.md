@@ -9,34 +9,34 @@ The .NET SDK has been scaffolded with the core architecture in place, mirroring 
 
 ## What's Been Implemented
 
-### Core Engine (`src/ZeroWidth.Zv1/`)
+### Core Engine (`src/ZeroWidth.Workbench/`)
 
 | File | Status | Description |
 |------|--------|-------------|
-| `Zv1.cs` | Complete | Main engine class with `CreateAsync()` and `RunAsync()` |
+| `WorkbenchEngine.cs` | Complete | Main engine class with `CreateAsync()` and `RunAsync()` |
 | `Cache/CacheManager.cs` | Complete | In-memory cache for node outputs |
 | `Errors/ErrorManager.cs` | Complete | Centralized error handling |
-| `Errors/Zv1Exception.cs` | Complete | Custom exception types |
+| `Errors/WorkbenchEngineException.cs` | Complete | Custom exception types |
 | `Loaders/Loaders.cs` | Complete | Flow and node config loading (.json and .zv1) |
 | `Validators/Validators.cs` | Complete | Input/output validation |
 | `Types/TypeSystem.cs` | Complete | Custom type definitions |
 | `Helpers/Helpers.cs` | Complete | Utility functions |
 
-### Node Processor System (`src/ZeroWidth.Zv1/NodeProcessors/`)
+### Node Processor System (`src/ZeroWidth.Workbench/NodeProcessors/`)
 
 | File | Status | Description |
 |------|--------|-------------|
 | `NodeProcessorRegistry.cs` | **New** | Registry mapping node types to C# process functions |
 | `BasicNodes.cs` | **New** | Implementations for `add`, `input-data`, `output-data` |
 
-### Testing (`src/ZeroWidth.Zv1/Testing/`)
+### Testing (`src/ZeroWidth.Workbench/Testing/`)
 
 | File | Status | Description |
 |------|--------|-------------|
 | `NodeTestRunner.cs` | Complete | Unit test runner for individual nodes |
 | `FlowTestRunner.cs` | **New** | Integration test runner for flow tests |
 
-### Test Project (`tests/ZeroWidth.Zv1.Tests/`)
+### Test Project (`tests/ZeroWidth.Workbench.Tests/`)
 
 | File | Status | Description |
 |------|--------|-------------|
@@ -45,7 +45,7 @@ The .NET SDK has been scaffolded with the core architecture in place, mirroring 
 | `HelpersTests.cs` | Existing | Unit tests for helpers |
 | `TypeSystemTests.cs` | Existing | Unit tests for type system |
 
-### Integrations (`src/ZeroWidth.Zv1/Integrations/`)
+### Integrations (`src/ZeroWidth.Workbench/Integrations/`)
 
 | File | Status | Description |
 |------|--------|-------------|
@@ -68,7 +68,7 @@ Similar to Python, we use a registry pattern instead of dynamic script loading:
 // Registration (in BasicNodes.cs)
 NodeProcessorRegistry.Register("add", AddProcessor);
 
-// Usage (in Zv1.cs)
+// Usage (in WorkbenchEngine.cs)
 var processFunc = NodeProcessorRegistry.GetProcessor(nodeType);
 var outputs = await processFunc(context);
 ```
@@ -183,10 +183,10 @@ If everything works correctly:
 
 ```
 sdks/dotnet/
-├── ZeroWidth.Zv1.sln              # Solution file
-├── src/ZeroWidth.Zv1/
-│   ├── ZeroWidth.Zv1.csproj       # Main project
-│   ├── Zv1.cs                     # Engine entry point
+├── ZeroWidth.Workbench.sln              # Solution file
+├── src/ZeroWidth.Workbench/
+│   ├── ZeroWidth.Workbench.csproj       # Main project
+│   ├── WorkbenchEngine.cs                     # Engine entry point
 │   ├── NodeProcessors/
 │   │   ├── NodeProcessorRegistry.cs
 │   │   └── BasicNodes.cs          # add, input-data, output-data
@@ -198,8 +198,8 @@ sdks/dotnet/
 │   │   ├── flow.addition.json
 │   │   ├── flow.addition.zv1
 │   │   └── flow.addition.test.json
-│   └── ZeroWidth.Zv1.Tests/
-│       ├── ZeroWidth.Zv1.Tests.csproj
+│   └── ZeroWidth.Workbench.Tests/
+│       ├── ZeroWidth.Workbench.Tests.csproj
 │       └── FlowTests.cs           # xUnit test cases
 └── nodes/                         # Synced node configs
 ```

@@ -1,7 +1,7 @@
 {
   "display_name": "OpenAI: GPT-4o (2024-08-06)",
   "tagline": "Generate text",
-  "description": "The 2024-08-06 version of GPT-4o offers improved performance in structured outputs, with the ability to supply a JSON schema in the respone_format. Read more [here](https://openai.com/index/introducing-structured-outputs-in-the-api/).\n\nGPT-4o (\"o\" for \"omni\") is OpenAI's latest AI model, supporting both text and image inputs with text outputs. It maintains the intelligence level of [GPT-4 Turbo](/models/openai/gpt-4-turbo) while being twice as fast and 50% more cost-effective. GPT-4o also offers improved performance in processing non-English languages and enhanced visual capabilities.\n\nFor benchmarking against other models, it was briefly called [\"im-also-a-good-gpt2-chatbot\"](https://twitter.com/LiamFedus/status/1790064963966370209)",
+  "description": "The 2024-08-06 version of GPT-4o offers improved performance in structured outputs, with the ability to supply a JSON schema in the respone_format. Read more [here](https://openai.com/index/introducing-structured-outputs-in-the-api/). GPT-4o (\"o\" for \"omni\") is...",
   "category": "llm",
   "provider": "openai",
   "accepts_plugins": true,
@@ -11,6 +11,7 @@
     "frequency_penalty",
     "logit_bias",
     "logprobs",
+    "max_completion_tokens",
     "max_tokens",
     "presence_penalty",
     "response_format",
@@ -108,6 +109,20 @@
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
+      "default": null
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Logprobs",
+      "type": "boolean",
+      "description": "Return log probabilities of the output tokens",
+      "default": null
+    },
+    {
+      "name": "top_logprobs",
+      "display_name": "Top Logprobs",
+      "type": "number",
+      "description": "Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.",
       "default": null
     }
   ],

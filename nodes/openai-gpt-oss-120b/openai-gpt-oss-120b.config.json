@@ -1,7 +1,7 @@
 {
   "display_name": "OpenAI: gpt-oss-120b",
   "tagline": "Generate text",
-  "description": "gpt-oss-120b is an open-weight, 117B-parameter Mixture-of-Experts (MoE) language model from OpenAI designed for high-reasoning, agentic, and general-purpose production use cases. It activates 5.1B parameters per forward pass and is optimized to run on a single H100 GPU with native MXFP4 quantization. The model supports configurable reasoning depth, full chain-of-thought access, and native tool use, including function calling, browsing, and structured output generation.",
+  "description": "gpt-oss-120b is an open-weight, 117B-parameter Mixture-of-Experts (MoE) language model from OpenAI designed for high-reasoning, agentic, and general-purpose production use cases. It activates 5.1B parameters per forward pass and is optimized...",
   "category": "llm",
   "provider": "openai",
   "accepts_plugins": true,
@@ -16,7 +16,6 @@
     "min_p",
     "presence_penalty",
     "reasoning",
-    "reasoning_effort",
     "repetition_penalty",
     "response_format",
     "seed",
@@ -121,6 +120,20 @@
       "type": "number",
       "description": "Deterministic outputs",
       "default": null
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Logprobs",
+      "type": "boolean",
+      "description": "Return log probabilities of the output tokens",
+      "default": null
+    },
+    {
+      "name": "top_logprobs",
+      "display_name": "Top Logprobs",
+      "type": "number",
+      "description": "Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.",
+      "default": null
     }
   ],
   "outputs": [
@@ -214,7 +227,7 @@
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.19,
+        "cost": 0.18,
         "currency": "USD"
       }
     ]

@@ -1,0 +1,25 @@
+{
+  "providers": {
+    "_all": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    }
+  },
+  "generation": {
+    "category": "embedding",
+    "include_tests": true,
+    "include_python": true,
+    "include_cost_calculation": true,
+    "exclude_free": false,
+    "exclude_deprecated": true,
+    "dry_run": false
+  },
+  "output": {
+    "overwrite_existing": true,
+    "backup_existing": false,
+    "create_provider_folders": false,
+    "cleanup_old_nodes": true
+  }
+}

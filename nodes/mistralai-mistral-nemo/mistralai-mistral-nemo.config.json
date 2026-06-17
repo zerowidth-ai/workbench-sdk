@@ -1,7 +1,7 @@
 {
   "display_name": "Mistral: Mistral Nemo",
   "tagline": "Generate text",
-  "description": "A 12B parameter model with a 128k token context length built by Mistral in collaboration with NVIDIA.\n\nThe model is multilingual, supporting English, French, German, Spanish, Italian, Portuguese, Chinese, Japanese, Korean, Arabic, and Hindi.\n\nIt supports function calling and is released under the Apache 2.0 license.",
+  "description": "A 12B parameter model with a 128k token context length built by Mistral in collaboration with NVIDIA. The model is multilingual, supporting English, French, German, Spanish, Italian, Portuguese, Chinese, Japanese,...",
   "category": "llm",
   "provider": "mistralai",
   "accepts_plugins": true,
@@ -9,6 +9,7 @@
   "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
+    "logit_bias",
     "max_tokens",
     "min_p",
     "presence_penalty",
@@ -182,7 +183,7 @@
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.04,
+        "cost": 0.03,
         "currency": "USD"
       }
     ]

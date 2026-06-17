@@ -1,13 +1,14 @@
 {
   "display_name": "OpenAI: GPT-4.1 Nano",
   "tagline": "Generate text",
-  "description": "For tasks that demand low latency, GPT‑4.1 nano is the fastest and cheapest model in the GPT-4.1 series. It delivers exceptional performance at a small size with its 1 million token context window, and scores 80.1% on MMLU, 50.3% on GPQA, and 9.8% on Aider polyglot coding – even higher than GPT‑4o mini. It’s ideal for tasks like classification or autocompletion.",
+  "description": "For tasks that demand low latency, GPT‑4.1 nano is the fastest and cheapest model in the GPT-4.1 series. It delivers exceptional performance at a small size with its 1 million...",
   "category": "llm",
   "provider": "openai",
   "accepts_plugins": true,
   "model_id": "openai/gpt-4.1-nano",
   "context_length": 1047576,
   "supported_parameters": [
+    "max_completion_tokens",
     "max_tokens",
     "response_format",
     "seed",

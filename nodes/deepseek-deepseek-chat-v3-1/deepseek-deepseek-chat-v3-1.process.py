@@ -155,7 +155,6 @@ async def process(
         "tool_calls": response.get("tool_calls"),
         "reasoning": response.get("reasoning"),
         "refusal": response.get("refusal"),
-        "logprobs": response.get("logprobs"),
         "finish_reason": response.get("finish_reason"),
         "usage": response.get("usage"),
         "cost_total": response.get("cost_total"),

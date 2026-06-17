@@ -1,12 +1,12 @@
 {
   "display_name": "Qwen: Qwen3 30B A3B Instruct 2507",
   "tagline": "Generate text",
-  "description": "Qwen3-30B-A3B-Instruct-2507 is a 30.5B-parameter mixture-of-experts language model from Qwen, with 3.3B active parameters per inference. It operates in non-thinking mode and is designed for high-quality instruction following, multilingual understanding, and agentic tool use. Post-trained on instruction data, it demonstrates competitive performance across reasoning (AIME, ZebraLogic), coding (MultiPL-E, LiveCodeBench), and alignment (IFEval, WritingBench) benchmarks. It outperforms its non-instruct variant on subjective and open-ended tasks while retaining strong factual and coding performance.",
+  "description": "Qwen3-30B-A3B-Instruct-2507 is a 30.5B-parameter mixture-of-experts language model from Qwen, with 3.3B active parameters per inference. It operates in non-thinking mode and is designed for high-quality instruction following, multilingual understanding, and...",
   "category": "llm",
   "provider": "qwen",
   "accepts_plugins": true,
   "model_id": "qwen/qwen3-30b-a3b-instruct-2507",
-  "context_length": 262144,
+  "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",
@@ -177,13 +177,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.09,
+        "cost": 0.04815,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.3,
+        "cost": 0.19305,
         "currency": "USD"
       }
     ]

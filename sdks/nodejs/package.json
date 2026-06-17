@@ -1,6 +1,6 @@
 {
-  "name": "zv1",
-  "version": "1.0.0",
+  "name": "@zerowidth/workbench-sdk",
+  "version": "2.0.0-pre.1",
   "dependencies": {
     "adm-zip": "^0.5.16",
     "ajv": "^8.17.1",
@@ -12,8 +12,8 @@
     "tiktoken": "^1.0.22",
     "uuid": "^11.1.0"
   },
-  "repository": "https://github.com/zerowidth-ai/zv1",
-  "description": "The zv1 SDK for making processing flows created via zv1.ai, by ZeroWidth",
+  "repository": "https://github.com/zerowidth-ai/workbench-sdk",
+  "description": "Workbench SDK — execute Workbench-authored flows in production. Successor to the zv1 package; see https://zerowidth.ai for the design surface.",
   "main": "./src/index.js",
   "files": ["src/", "nodes/", "types/", "LICENSE", "README.md"],
   "engines": {

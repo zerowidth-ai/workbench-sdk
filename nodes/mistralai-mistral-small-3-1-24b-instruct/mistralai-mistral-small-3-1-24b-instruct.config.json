@@ -1,7 +1,7 @@
 {
   "display_name": "Mistral: Mistral Small 3.1 24B",
   "tagline": "Generate text",
-  "description": "Mistral Small 3.1 24B Instruct is an upgraded variant of Mistral Small 3 (2501), featuring 24 billion parameters with advanced multimodal capabilities. It provides state-of-the-art performance in text-based reasoning and vision tasks, including image analysis, programming, mathematical reasoning, and multilingual support across dozens of languages. Equipped with an extensive 128k token context window and optimized for efficient local inference, it supports use cases such as conversational agents, function calling, long-document comprehension, and privacy-sensitive deployments. The updated version is [Mistral Small 3.2](mistralai/mistral-small-3.2-24b-instruct)",
+  "description": "Mistral Small 3.1 24B Instruct is an upgraded variant of Mistral Small 3 (2501), featuring 24 billion parameters with advanced multimodal capabilities. It provides state-of-the-art performance in text-based reasoning and...",
   "category": "llm",
   "provider": "mistralai",
   "accepts_plugins": false,
@@ -9,10 +9,13 @@
   "context_length": 128000,
   "supported_parameters": [
     "frequency_penalty",
+    "logit_bias",
     "max_tokens",
+    "min_p",
     "presence_penalty",
     "repetition_penalty",
     "seed",
+    "stop",
     "temperature",
     "top_k",
     "top_p"
@@ -24,6 +27,13 @@
       "type": "string",
       "description": "Text prompt for completion",
       "required": true
+    },
+    {
+      "name": "stop",
+      "display_name": "Stop",
+      "type": "string or array",
+      "description": "Custom stop sequences",
+      "default": null
     },
     {
       "name": "temperature",
@@ -107,13 +117,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.35,
+        "cost": 0.351,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.56,
+        "cost": 0.5549999999999999,
         "currency": "USD"
       }
     ]

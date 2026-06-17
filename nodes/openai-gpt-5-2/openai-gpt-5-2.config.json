@@ -1,7 +1,7 @@
 {
   "display_name": "OpenAI: GPT-5.2",
   "tagline": "Generate text",
-  "description": "GPT-5.2 is the latest frontier-grade model in the GPT-5 series, offering stronger agentic and long context perfomance compared to GPT-5.1. It uses adaptive reasoning to allocate computation dynamically, responding quickly to simple queries while spending more depth on complex tasks.\n\nBuilt for broad task coverage, GPT-5.2 delivers consistent gains across math, coding, sciende, and tool calling workloads, with more coherent long-form answers and improved tool-use reliability.",
+  "description": "GPT-5.2 is the latest frontier-grade model in the GPT-5 series, offering stronger agentic and long context perfomance compared to GPT-5.1. It uses adaptive reasoning to allocate computation dynamically, responding quickly...",
   "category": "llm",
   "provider": "openai",
   "accepts_plugins": true,
@@ -9,6 +9,7 @@
   "context_length": 400000,
   "supported_parameters": [
     "include_reasoning",
+    "max_completion_tokens",
     "max_tokens",
     "reasoning",
     "response_format",

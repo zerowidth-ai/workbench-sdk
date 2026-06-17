@@ -9,8 +9,8 @@ export default class OpenRouterIntegration {
             apiKey: apiKey,
             defaultHeaders: {
                 'Content-Type': 'application/json',
-                'HTTP-Referer': options.referer || 'https://zv1.ai',
-                'X-Title': options.title || 'zv1 by ZeroWidth'
+                'HTTP-Referer': options.referer || 'https://workbench.zerowidth.ai',
+                'X-Title': options.title || 'Workbench by ZeroWidth'
             }
         });
     }
@@ -29,7 +29,10 @@ export default class OpenRouterIntegration {
             provider: {
                 data_collection: "deny",
                 require_parameters: true,
-            }
+            },
+            // Request OpenRouter usage accounting so the response carries the
+            // authoritative cost (usage.cost). buildCostData prefers it.
+            usage: { include: true }
         };
 
         // Add messages or prompt (required)
@@ -103,7 +106,12 @@ export default class OpenRouterIntegration {
 
             payload.stream = true;
 
-            const stream = await this.client.chat.completions.create(JSON.parse(JSON.stringify(payload)));
+            // Pass the flow's abort signal so a flow timeout cancels the stream.
+            const signal = engineConfig?.signal || this._engineConfig?.signal;
+            const stream = await this.client.chat.completions.create(
+                JSON.parse(JSON.stringify(payload)),
+                signal ? { signal } : undefined
+            );
 
             let content = "";
             let role = "";
@@ -114,12 +122,17 @@ export default class OpenRouterIntegration {
             let annotations = [];
             let images = [];
             let tool_calls = [];
+            let logprobsContent = []; // accumulated per-token logprobs across chunks
 
             let usage = {
               prompt_tokens: 0,
               completion_tokens: 0,
               total_tokens: 0
             }
+
+            // Authoritative cost from OpenRouter usage accounting (final usage chunk)
+            let apiCost = undefined;
+            let apiCostDetails = undefined;
 
             let count = 0;
             for await (const chunk of stream) {
@@ -190,6 +203,11 @@ export default class OpenRouterIntegration {
                     images.push(...chunk.choices[0].delta.images);
                   }
 
+                  // Accumulate logprobs (per-token, arrives in choices[].logprobs.content)
+                  if(chunk.choices[0]?.logprobs?.content && Array.isArray(chunk.choices[0].logprobs.content)){
+                    logprobsContent.push(...chunk.choices[0].logprobs.content);
+                  }
+
                   if(event.data.finish_reason){
                     finish_reason = event.data.finish_reason;
                   }
@@ -198,6 +216,8 @@ export default class OpenRouterIntegration {
                     usage.prompt_tokens += chunk.usage.prompt_tokens || 0;
                     usage.completion_tokens += chunk.usage.completion_tokens || 0;
                     usage.total_tokens += chunk.usage.total_tokens || 0;
+                    if (typeof chunk.usage.cost === 'number') apiCost = chunk.usage.cost;
+                    if (chunk.usage.cost_details) apiCostDetails = chunk.usage.cost_details;
                   }
 
                   if(engineConfig?.onNodeUpdate){
@@ -211,11 +231,14 @@ export default class OpenRouterIntegration {
               }
             }
 
-            // Calculate costs if nodeConfig is provided
+            // Calculate costs if nodeConfig is provided. buildCostData prefers the
+            // API-reported cost (usage accounting) and falls back to baked pricing.
             let costData = null;
-            
-            if (nodeConfig && nodeConfig.pricing) {
-                costData = this.calculateCosts(usage, nodeConfig.pricing);
+            if (nodeConfig) {
+                costData = this.buildCostData(
+                    { ...usage, cost: apiCost, cost_details: apiCostDetails },
+                    nodeConfig.pricing
+                );
             }
 
             const result = {
@@ -229,6 +252,7 @@ export default class OpenRouterIntegration {
                 reasoning,
                 annotations,
                 images: images.length > 0 ? images : undefined,
+                logprobs: logprobsContent.length > 0 ? { content: logprobsContent } : undefined,
                 ...(costData && {
                     cost_total: costData.totalCost,
                     cost_itemized: costData.itemizedCosts
@@ -247,8 +271,8 @@ export default class OpenRouterIntegration {
                     url: `${this.client.baseURL}/chat/completions`,
                     headers: {
                         'Content-Type': 'application/json',
-                        'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
-                        'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
+                        'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+                        'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
                         'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
                     },
                     body: payload
@@ -277,6 +301,25 @@ export default class OpenRouterIntegration {
                 || error.message;
             if (specificMessage) errorMessage += `: ${specificMessage}`;
 
+            // OpenRouter wraps the actual upstream provider error in metadata.raw.
+            // Surface it — that's where the useful detail lives (e.g. "logprobs are
+            // not supported with reasoning models"), otherwise callers only see the
+            // generic "Provider returned error".
+            const meta = errorBody?.error?.metadata || errorBody?.metadata;
+            if (meta?.raw) {
+                let upstream = null;
+                if (typeof meta.raw === 'object') {
+                    // Already-parsed shape: { error: { message } }
+                    upstream = meta.raw?.error?.message || null;
+                } else if (typeof meta.raw === 'string') {
+                    try { upstream = JSON.parse(meta.raw)?.error?.message; } catch { /* raw may be plain text */ }
+                    if (!upstream) upstream = meta.raw;
+                }
+                if (upstream && upstream !== specificMessage) {
+                    errorMessage += ` — ${meta.provider_name ? meta.provider_name + ': ' : ''}${upstream}`;
+                }
+            }
+
             // Emit API call event with full error detail
             await emitAPICallEvent(engineConfig || this._engineConfig, {
                 timestamp: apiCallStartTime,
@@ -288,8 +331,8 @@ export default class OpenRouterIntegration {
                     url: `${this.client.baseURL}/chat/completions`,
                     headers: {
                         'Content-Type': 'application/json',
-                        'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
-                        'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
+                        'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+                        'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
                         'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
                     },
                     body: payload
@@ -325,8 +368,8 @@ export default class OpenRouterIntegration {
         const url = `${this.client.baseURL}/chat/completions`;
         const headers = {
             'Content-Type': 'application/json',
-            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://zv1.ai',
-            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'zv1 by ZeroWidth',
+            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
             'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
         };
 
@@ -334,6 +377,7 @@ export default class OpenRouterIntegration {
             method: 'POST',
             headers,
             body: JSON.stringify(payload),
+            signal: engineConfig?.signal || this._engineConfig?.signal,
         });
 
         if (!res.ok) {
@@ -348,8 +392,8 @@ export default class OpenRouterIntegration {
         const usage = data.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
 
         let costData = null;
-        if (nodeConfig?.pricing) {
-            costData = this.calculateCosts(usage, nodeConfig.pricing);
+        if (nodeConfig) {
+            costData = this.buildCostData(usage, nodeConfig.pricing);
         }
 
         // Image models return data on choice directly (text, images, reasoning)
@@ -365,6 +409,7 @@ export default class OpenRouterIntegration {
             reasoning: message.reasoning || choice?.reasoning || '',
             annotations: message.annotations || [],
             images: message.images || choice?.images || undefined,
+            logprobs: choice?.logprobs || undefined,
             ...(costData && {
                 cost_total: costData.totalCost,
                 cost_itemized: costData.itemizedCosts
@@ -422,5 +467,285 @@ export default class OpenRouterIntegration {
                 { label: "Output Tokens", cost: outputCost, tokens: completionTokens }
             ]
         };
+    }
+
+    /**
+     * Build cost data preserving the { totalCost, itemizedCosts } shape.
+     *
+     * Prefers OpenRouter usage accounting (`usage.cost`, requested via
+     * `usage: { include: true }`) as the authoritative total. Falls back to baked
+     * per-model pricing when the API doesn't report a cost — so existing per-model
+     * nodes keep their previous output when accounting is unavailable, while
+     * dynamic-model nodes (no baked pricing) still get real costs.
+     *
+     * `itemizedCosts` always sums to `totalCost`. The input/output split uses the
+     * baked pricing rates when available, otherwise it's apportioned by token count.
+     */
+    buildCostData(usage = {}, pricing = null) {
+        const promptTokens = usage.prompt_tokens || 0;
+        const completionTokens = usage.completion_tokens || 0;
+        const hasApiCost = typeof usage.cost === 'number';
+
+        if (!hasApiCost && !pricing) {
+            return null;
+        }
+
+        // Relative weights for splitting the total into input vs output line items
+        let inputWeight, outputWeight;
+        if (pricing) {
+            const items = pricing.items || [];
+            const inRate = (items.find(p => p.key === 'input_cost_per_million')?.cost || 0) / 1_000_000;
+            const outRate = (items.find(p => p.key === 'output_cost_per_million')?.cost || 0) / 1_000_000;
+            inputWeight = promptTokens * inRate;
+            outputWeight = completionTokens * outRate;
+        } else {
+            inputWeight = promptTokens;
+            outputWeight = completionTokens;
+        }
+
+        const totalWeight = inputWeight + outputWeight;
+
+        // Authoritative total: API cost when present, otherwise the pricing-derived total
+        const totalCost = hasApiCost ? usage.cost : totalWeight;
+
+        let inputCost, outputCost;
+        if (totalWeight > 0) {
+            inputCost = totalCost * (inputWeight / totalWeight);
+            outputCost = totalCost * (outputWeight / totalWeight);
+        } else {
+            // No token-weighted basis (e.g. rerank): attribute everything to one line
+            inputCost = totalCost;
+            outputCost = 0;
+        }
+
+        return {
+            totalCost: Number(totalCost.toFixed(8)),
+            itemizedCosts: [
+                { label: "Input Tokens", cost: Number(inputCost.toFixed(8)), tokens: promptTokens },
+                { label: "Output Tokens", cost: Number(outputCost.toFixed(8)), tokens: completionTokens }
+            ]
+        };
+    }
+
+    /**
+     * Create embeddings via OpenRouter's OpenAI-compatible /embeddings endpoint.
+     *
+     * Uses raw fetch (like image completions) so OpenRouter-specific response
+     * fields are preserved and we control the exact request body.
+     *
+     * @param {Object} params - { model, input, dimensions?, encoding_format? }
+     *   `input` may be a single string or an array of strings.
+     * @param {Object} nodeConfig - node config (provides `pricing` for cost calc)
+     * @param {Object} engineConfig - engine config (for API call events)
+     * @returns {Promise<Object>} { embeddings, embedding, dimensions, model, usage, cost_total, cost_itemized }
+     */
+    async createEmbedding(params, nodeConfig = null, engineConfig = null) {
+        const { model, input, ...otherParams } = params;
+
+        if (input === null || input === undefined) {
+            throw new Error('input is required to create embeddings');
+        }
+
+        const payload = { model, input, usage: { include: true } };
+        for (const [key, value] of Object.entries(otherParams)) {
+            if (value !== null && value !== undefined) {
+                payload[key] = value;
+            }
+        }
+
+        const url = `${this.client.baseURL}/embeddings`;
+        const headers = {
+            'Content-Type': 'application/json',
+            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
+            'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
+        };
+
+        const apiCallStartTime = Date.now();
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(payload),
+                signal: engineConfig?.signal || this._engineConfig?.signal,
+            });
+
+            if (!res.ok) {
+                const errorBody = await res.json().catch(() => null);
+                const errorMessage = errorBody?.error?.message || `HTTP ${res.status}`;
+                throw new Error(`OpenRouter API Error (${res.status}): ${errorMessage}`);
+            }
+
+            const data = await res.json();
+
+            // OpenAI-compatible shape: { data: [{ embedding: [...], index }], model, usage }
+            const items = Array.isArray(data.data) ? data.data : [];
+            const embeddings = items.map(item => item.embedding);
+            const embedding = embeddings.length > 0 ? embeddings[0] : null;
+            const dimensions = Array.isArray(embedding) ? embedding.length : 0;
+
+            const usage = {
+                prompt_tokens: data.usage?.prompt_tokens || 0,
+                completion_tokens: data.usage?.completion_tokens || 0,
+                total_tokens: data.usage?.total_tokens || data.usage?.prompt_tokens || 0
+            };
+
+            let costData = null;
+            if (nodeConfig) {
+                costData = this.buildCostData(
+                    { ...usage, cost: data.usage?.cost, cost_details: data.usage?.cost_details },
+                    nodeConfig.pricing
+                );
+            }
+
+            const result = {
+                embeddings,
+                embedding,
+                dimensions,
+                model: data.model || model,
+                usage,
+                ...(costData && {
+                    cost_total: costData.totalCost,
+                    cost_itemized: costData.itemizedCosts
+                }),
+            };
+
+            await emitAPICallEvent(engineConfig || this._engineConfig, {
+                timestamp: apiCallStartTime,
+                integration: 'openrouter',
+                nodeId: nodeConfig?.id || null,
+                nodeType: nodeConfig?.type || null,
+                request: { method: 'POST', url, headers, body: payload },
+                response: { status: res.status, statusText: res.statusText, body: result },
+                duration: Date.now() - apiCallStartTime,
+                error: null
+            });
+
+            return result;
+        } catch (error) {
+            await emitAPICallEvent(engineConfig || this._engineConfig, {
+                timestamp: apiCallStartTime,
+                integration: 'openrouter',
+                nodeId: nodeConfig?.id || null,
+                nodeType: nodeConfig?.type || null,
+                request: { method: 'POST', url, headers, body: payload },
+                response: { status: error.status || 0, statusText: 'Error', body: null },
+                duration: Date.now() - apiCallStartTime,
+                error: { message: error.message }
+            });
+
+            console.error('OpenRouter Embedding Error:', error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    /**
+     * Rerank documents against a query via OpenRouter's Cohere-compatible
+     * /rerank endpoint. Returns raw relevance results ({ index, relevance_score });
+     * callers are responsible for reattaching original documents by index.
+     *
+     * @param {Object} params - { model, query, documents, top_n? }
+     *   `documents` must be an array of strings.
+     * @param {Object} nodeConfig - node config (provides `pricing` for cost calc)
+     * @param {Object} engineConfig - engine config (for API call events)
+     * @returns {Promise<Object>} { results, usage, model, cost_total, cost_itemized }
+     */
+    async rerank(params, nodeConfig = null, engineConfig = null) {
+        const { model, query, documents, ...otherParams } = params;
+
+        if (query === null || query === undefined) {
+            throw new Error('query is required for rerank');
+        }
+        if (!Array.isArray(documents)) {
+            throw new Error('documents (array of strings) is required for rerank');
+        }
+
+        const payload = { model, query, documents, usage: { include: true } };
+        for (const [key, value] of Object.entries(otherParams)) {
+            if (value !== null && value !== undefined) {
+                payload[key] = value;
+            }
+        }
+
+        const url = `${this.client.baseURL}/rerank`;
+        const headers = {
+            'Content-Type': 'application/json',
+            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
+            'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
+        };
+
+        const apiCallStartTime = Date.now();
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(payload),
+                signal: engineConfig?.signal || this._engineConfig?.signal,
+            });
+
+            if (!res.ok) {
+                const errorBody = await res.json().catch(() => null);
+                const errorMessage = errorBody?.error?.message || `HTTP ${res.status}`;
+                throw new Error(`OpenRouter API Error (${res.status}): ${errorMessage}`);
+            }
+
+            const data = await res.json();
+
+            // Cohere-compatible shape: { results: [{ index, relevance_score }], usage|meta }
+            const results = Array.isArray(data.results)
+                ? data.results.map(r => ({
+                    index: r.index,
+                    relevance_score: r.relevance_score ?? r.score ?? null
+                }))
+                : [];
+
+            // Rerank isn't token-metered on OpenRouter, but surface usage if present.
+            const usage = data.usage || data.meta?.billed_units || {};
+
+            let costData = null;
+            if (nodeConfig) {
+                costData = this.buildCostData(usage, nodeConfig.pricing);
+            }
+
+            const result = {
+                results,
+                usage,
+                model: data.model || model,
+                ...(costData && {
+                    cost_total: costData.totalCost,
+                    cost_itemized: costData.itemizedCosts
+                }),
+            };
+
+            await emitAPICallEvent(engineConfig || this._engineConfig, {
+                timestamp: apiCallStartTime,
+                integration: 'openrouter',
+                nodeId: nodeConfig?.id || null,
+                nodeType: nodeConfig?.type || null,
+                request: { method: 'POST', url, headers, body: payload },
+                response: { status: res.status, statusText: res.statusText, body: result },
+                duration: Date.now() - apiCallStartTime,
+                error: null
+            });
+
+            return result;
+        } catch (error) {
+            await emitAPICallEvent(engineConfig || this._engineConfig, {
+                timestamp: apiCallStartTime,
+                integration: 'openrouter',
+                nodeId: nodeConfig?.id || null,
+                nodeType: nodeConfig?.type || null,
+                request: { method: 'POST', url, headers, body: payload },
+                response: { status: error.status || 0, statusText: 'Error', body: null },
+                duration: Date.now() - apiCallStartTime,
+                error: { message: error.message }
+            });
+
+            console.error('OpenRouter Rerank Error:', error.message);
+            throw new Error(error.message);
+        }
     }
 }

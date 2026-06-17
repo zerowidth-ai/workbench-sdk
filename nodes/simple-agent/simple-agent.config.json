@@ -1,65 +1,121 @@
 {
-  "display_name": "Simple Agent (beta)",
-  "tagline": "Run a simple agent",
-  "description": "A simple AI agent that accepts tools and processes messages. Perfect template for creating starter agents.",
+  "display_name": "Simple Agent",
+  "tagline": "Run an agent with any model",
+  "description": "A configurable AI agent: pick the model via input, give it a system prompt, and attach tools as plugins. The engine runs the full tool-calling loop. Use it as a flow node or attach it to another LLM as a sub-agent tool.",
   "category": "ai",
-  "is_macro": true,
   "is_plugin": true,
   "accepts_plugins": true,
-  "macro_flow": {
-    "nodes": [
-      {
-        "id": "input_messages",
-        "type": "input-data",
-        "settings": {
-          "key": "messages"
-        }
-      },
-      {
-        "id": "llm",
-        "type": "openai-gpt-4-1-nano"
-      },
-      {
-        "id": "output_message",
-        "type": "output-data",
-        "settings": {
-          "key": "message"
-        }
-      }
-    ],
-    "links": [
-      {
-        "from": { "node_id": "input_messages", "port_name": "value" },
-        "to": { "node_id": "llm", "port_name": "messages" }
-      },
-      {
-        "from": { "node_id": "llm", "port_name": "message" },
-        "to": { "node_id": "output_message", "port_name": "value" }
-      }
-    ]
-  },
   "inputs": [
     {
       "name": "messages",
       "display_name": "Messages",
-      "type": "array of messages or message or string",
+      "type": "conversation or message or string",
       "description": "Chat messages to process",
       "required": true
+    },
+    {
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt that defines the agent's behavior",
+      "default": null
+    },
+    {
+      "name": "model",
+      "display_name": "Model",
+      "type": "string",
+      "description": "OpenRouter chat model id (e.g. openai/gpt-4.1-nano, anthropic/claude-opus-4.5, google/gemini-3-pro). Wire this from a flow input to swap models externally.",
+      "default": "openai/gpt-4.1-nano"
+    },
+    {
+      "name": "tools",
+      "display_name": "Tools",
+      "type": "tool or array of tools",
+      "description": "Tools the agent may call. Plugins attached to this node are added automatically by the engine.",
+      "default": null,
+      "allow_multiple": true
+    },
+    {
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
+      "default": null
+    },
+    {
+      "name": "temperature",
+      "display_name": "Temperature",
+      "type": "number",
+      "description": "Controls randomness (0-2)",
+      "default": null
+    },
+    {
+      "name": "max_tokens",
+      "display_name": "Max Tokens",
+      "type": "number",
+      "description": "Maximum tokens to generate",
+      "default": null
     }
   ],
   "outputs": [
     {
-      "name": "message",
-      "display_name": "Message",
-      "type": "message",
-      "description": "The agent's response message"
-    }
-  ],
-  "plugins": [
+      "name": "conversation",
+      "display_name": "Conversation",
+      "type": "conversation",
+      "can_stream": true,
+      "description": "An array of messages including any tool call & response messages as well as the final generated output."
+    },
     {
-      "connects_to": "llm"
+      "name": "message",
+      "display_name": "Final Message",
+      "type": "message",
+      "can_stream": true,
+      "description": "The final generated response message."
+    },
+    {
+      "name": "content",
+      "display_name": "Content",
+      "type": "string",
+      "can_stream": true,
+      "description": "The content portion of the final generated response message."
+    },
+    {
+      "name": "role",
+      "display_name": "Role",
+      "type": "string",
+      "can_stream": true,
+      "description": "Role of the response (usually 'assistant')"
+    },
+    {
+      "name": "tool_calls",
+      "display_name": "Tool Calls",
+      "type": "array of tools",
+      "description": "Tool calls made by the model"
+    },
+    {
+      "name": "finish_reason",
+      "display_name": "Finish Reason",
+      "type": "string",
+      "description": "Why the completion finished"
+    },
+    {
+      "name": "usage",
+      "display_name": "Token Usage",
+      "type": "object",
+      "description": "Token usage statistics"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost (USD), reported by OpenRouter usage accounting for the chosen model."
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array",
+      "description": "Detailed cost breakdown (input/output line items)"
     }
   ],
   "settings": []
 }
-

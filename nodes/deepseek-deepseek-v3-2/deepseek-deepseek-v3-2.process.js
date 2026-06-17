@@ -126,7 +126,6 @@ export default async ({inputs, settings, config, nodeConfig}) => {
             tool_calls: response.tool_calls,
             reasoning: response.reasoning,
             refusal: response.refusal,
-            logprobs: response.logprobs,
             finish_reason: response.finish_reason,
             usage: response.usage,
             cost_total: response.cost_total,

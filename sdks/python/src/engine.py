@@ -89,7 +89,7 @@ class ExecutionResult:
     terminal_nodes: list[dict[str, Any]] | None = None
 
 
-class Zv1:
+class Workbench:
     """
     Core class for executing node-based AI flows.
 
@@ -129,6 +129,13 @@ class Zv1:
         # Timeout handling
         self.has_timed_out = False
         self._timeout_task: asyncio.Task[None] | None = None
+        self._abort_event: asyncio.Event | None = None
+        self._abort_link_task: asyncio.Task[None] | None = None
+        # Signal inherited from an ancestor engine, captured once at construction
+        # (sub-engines receive the parent's via {**config}). A later run() must not
+        # treat a prior run's own signal — which run() writes into config["signal"]
+        # — as an ancestor, so we snapshot it here rather than re-reading config.
+        self._inherited_signal: asyncio.Event | None = self.config.get("signal")
 
         # Will be set during initialization
         self.nodes: dict[str, dict[str, Any]] = {}
@@ -906,10 +913,6 @@ class Zv1:
 
         # Find the imported flow definition to get the actual input-chat nodes
         import_def = config.get("importDefinition", {})
-        input_chat_nodes = [
-            n for n in import_def.get("nodes", [])
-            if n.get("type") == "input-chat"
-        ]
 
         # Transform string arguments to message arrays for each chat input
         transformed_args = {**args}
@@ -923,15 +926,11 @@ class Zv1:
             if not isinstance(input_value, str):
                 continue
 
-            # Find the corresponding input-chat node to get its key
-            input_chat_node = next(
-                (n for n in input_chat_nodes if n["id"] == chat_input["name"]),
-                None
-            )
-            chat_key = (
-                input_chat_node.get("settings", {}).get("key", "chat")
-                if input_chat_node else "chat"
-            )
+            # The input's name IS the input-chat node's settings.key, so use it
+            # directly. The previous lookup compared the key against node ids,
+            # always missed, and fell back to "chat" — collapsing every chat
+            # stream into one and ignoring custom keys.
+            chat_key = chat_input["name"]
 
             # Create conversation key: nodeId + chatKey for this specific chat stream
             conversation_key = f"{node['id']}_{chat_key}"
@@ -968,8 +967,10 @@ class Zv1:
             chat_key = output_chat_node.get("settings", {}).get("key", "chat")
             conversation_key = f"{node['id']}_{chat_key}"
 
-            # Look for this output-chat node's result by its ID
-            chat_output = outputs.get(output_chat_node["id"])
+            # The import's process emits the response under the output-chat's
+            # key, not the bare node id. Read by key (fall back to id for safety)
+            # so the assistant's replies actually get appended to the conversation.
+            chat_output = outputs.get(chat_key, outputs.get(output_chat_node["id"]))
 
             self._log_debug(
                 f"Looking for output from node {output_chat_node['id']} "
@@ -1543,6 +1544,40 @@ class Zv1:
 
         return inputs
 
+    async def _race_abort(self, coro: Any) -> Any:
+        """Race a node's process coroutine against the flow's abort signal.
+
+        On abort (flow timeout, or an ancestor engine aborting), the inner task
+        is cancelled — which propagates CancelledError into any in-flight
+        httpx/SDK call, actually stopping it — and a TimeoutError is raised so
+        the execution loop doesn't park on a hung node. No-op when there's no
+        signal, so callers outside run() behave exactly as before.
+        """
+        signal = self.config.get("signal")
+        if signal is None:
+            return await coro
+        task = asyncio.ensure_future(coro)
+        waiter = asyncio.ensure_future(signal.wait())
+        try:
+            await asyncio.wait({task, waiter}, return_when=asyncio.FIRST_COMPLETED)
+            if task.done():
+                return task.result()
+            # Aborted before the node finished — cancel the in-flight work.
+            task.cancel()
+            try:
+                await task
+            except BaseException:
+                pass
+            raise TimeoutError("Flow execution timed out")
+        finally:
+            if not waiter.done():
+                waiter.cancel()
+            # If _race_abort itself was cancelled externally before handling the
+            # abort, cancel the node task too — asyncio.wait does not cancel its
+            # awaited tasks, so it would otherwise leak (and keep its httpx call).
+            if not task.done():
+                task.cancel()
+
     async def _execute_node_core(
         self,
         node: dict[str, Any],
@@ -1588,11 +1623,13 @@ class Zv1:
                     node_type=node["type"],
                 )
 
-            outputs = await process_func(
-                inputs=inputs,
-                settings=settings,
-                config=self.config,
-                node_config=config,
+            outputs = await self._race_abort(
+                process_func(
+                    inputs=inputs,
+                    settings=settings,
+                    config=self.config,
+                    node_config=config,
+                )
             )
 
             end_time = time.time()
@@ -1849,15 +1886,42 @@ class Zv1:
         self.timeline.clear()
         self.has_timed_out = False
 
+        # Preemptive cancellation: an asyncio.Event exposed as config["signal"]
+        # and set when the flow times out. _race_abort() then cancels the
+        # in-flight node task (cancellation propagates into httpx/SDK calls and
+        # actually stops them) instead of the launch loop parking on a hung node.
+        self._abort_event = asyncio.Event()
+        self._abort_link_task = None
+        # Cascade: if an ancestor engine passed its signal in (macro / imported
+        # sub-engine via {**config}), abort when it aborts. Use the construction-
+        # time inherited signal, not config["signal"] (a prior run() may have
+        # overwritten it with that run's own, now-stale, Event).
+        inherited_signal = self._inherited_signal
+        if inherited_signal is not None:
+            if inherited_signal.is_set():
+                self._abort_event.set()
+            else:
+                async def _link_abort() -> None:
+                    await inherited_signal.wait()
+                    if self._abort_event:
+                        self._abort_event.set()
+
+                self._abort_link_task = asyncio.create_task(_link_abort())
+        # Expose our signal to node processes and sub-engines.
+        self.config["signal"] = self._abort_event
+
         if self.error_manager:
             self.error_manager.update_execution_context(
                 {"timeout": timeout, "start_time": time.time()}
             )
 
         # Set timeout
+        abort_event = self._abort_event
+
         async def timeout_handler() -> None:
             await asyncio.sleep(timeout / 1000)
             self.has_timed_out = True
+            abort_event.set()
             self._log_debug("Flow execution timed out")
 
         self._timeout_task = asyncio.create_task(timeout_handler())
@@ -1944,6 +2008,17 @@ class Zv1:
                     node = self.execution_queue.pop(0)
                     await self._launch_node(node)
 
+                    # _launch_node awaits serially, so running_nodes is usually
+                    # empty by here — surface any error/timeout now, otherwise the
+                    # loop can drain and return having swallowed it (e.g. a node
+                    # aborted by the flow timeout via _race_abort).
+                    if self.last_error:
+                        error = self.last_error
+                        self.last_error = None
+                        raise error
+                    if self.has_timed_out:
+                        raise TimeoutError("Flow execution timed out.")
+
                 # Wait for completion
                 if self.running_nodes:
                     await asyncio.sleep(0.01)  # Small delay to allow task switching
@@ -1998,6 +2073,11 @@ class Zv1:
         finally:
             if self._timeout_task:
                 self._timeout_task.cancel()
+            if self._abort_link_task:
+                self._abort_link_task.cancel()
+            # Restore the inherited signal so a reused engine doesn't treat this
+            # run's (possibly set) Event as an ancestor on the next run().
+            self.config["signal"] = self._inherited_signal
 
     async def _launch_node(self, node: dict[str, Any]) -> None:
         """Launch a node for execution."""

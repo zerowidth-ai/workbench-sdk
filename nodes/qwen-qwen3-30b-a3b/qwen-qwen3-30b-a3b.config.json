@@ -1,15 +1,16 @@
 {
   "display_name": "Qwen: Qwen3 30B A3B",
   "tagline": "Generate text",
-  "description": "Qwen3, the latest generation in the Qwen large language model series, features both dense and mixture-of-experts (MoE) architectures to excel in reasoning, multilingual support, and advanced agent tasks. Its unique ability to switch seamlessly between a thinking mode for complex reasoning and a non-thinking mode for efficient dialogue ensures versatile, high-quality performance.\n\nSignificantly outperforming prior models like QwQ and Qwen2.5, Qwen3 delivers superior mathematics, coding, commonsense reasoning, creative writing, and interactive dialogue capabilities. The Qwen3-30B-A3B variant includes 30.5 billion parameters (3.3 billion activated), 48 layers, 128 experts (8 activated per task), and supports up to 131K token contexts with YaRN, setting a new standard among open-source models.",
+  "description": "Qwen3, the latest generation in the Qwen large language model series, features both dense and mixture-of-experts (MoE) architectures to excel in reasoning, multilingual support, and advanced agent tasks. Its unique...",
   "category": "llm",
   "provider": "qwen",
   "accepts_plugins": true,
   "model_id": "qwen/qwen3-30b-a3b",
-  "context_length": 40960,
+  "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
+    "logit_bias",
     "logprobs",
     "max_tokens",
     "min_p",
@@ -119,6 +120,20 @@
       "type": "number",
       "description": "Deterministic outputs",
       "default": null
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Logprobs",
+      "type": "boolean",
+      "description": "Return log probabilities of the output tokens",
+      "default": null
+    },
+    {
+      "name": "top_logprobs",
+      "display_name": "Top Logprobs",
+      "type": "number",
+      "description": "Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.",
+      "default": null
     }
   ],
   "outputs": [
@@ -206,13 +221,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.08,
+        "cost": 0.09,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.28,
+        "cost": 0.44999999999999996,
         "currency": "USD"
       }
     ]

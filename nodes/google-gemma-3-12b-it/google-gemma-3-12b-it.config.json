@@ -1,10 +1,10 @@
 {
   "display_name": "Google: Gemma 3 12B",
   "tagline": "Generate text",
-  "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities, including structured outputs and function calling. Gemma 3 12B is the second largest in the family of Gemma 3 models after [Gemma 3 27B](google/gemma-3-27b-it)",
+  "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities,...",
   "category": "llm",
   "provider": "google",
-  "accepts_plugins": false,
+  "accepts_plugins": true,
   "model_id": "google/gemma-3-12b-it",
   "context_length": 131072,
   "supported_parameters": [
@@ -19,6 +19,8 @@
     "stop",
     "structured_outputs",
     "temperature",
+    "tool_choice",
+    "tools",
     "top_k",
     "top_p"
   ],
@@ -35,6 +37,21 @@
       "display_name": "System Message",
       "type": "message or string",
       "description": "System prompt to instruct the model",
+      "default": null
+    },
+    {
+      "name": "tools",
+      "display_name": "Tools",
+      "type": "tool or array of tools",
+      "description": "Array of tools to use",
+      "default": null,
+      "allow_multiple": true
+    },
+    {
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
       "default": null
     },
     {
@@ -122,6 +139,12 @@
       "can_stream": true,
       "type": "string",
       "description": "Role of the response (usually 'assistant')"
+    },
+    {
+      "name": "tool_calls",
+      "display_name": "Tool Calls",
+      "type": "array of tools",
+      "description": "Tool calls made by the model"
     },
     {
       "name": "usage",

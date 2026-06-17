@@ -1,15 +1,16 @@
 {
   "display_name": "Qwen: Qwen3 32B",
   "tagline": "Generate text",
-  "description": "Qwen3-32B is a dense 32.8B parameter causal language model from the Qwen3 series, optimized for both complex reasoning and efficient dialogue. It supports seamless switching between a \"thinking\" mode for tasks like math, coding, and logical inference, and a \"non-thinking\" mode for faster, general-purpose conversation. The model demonstrates strong performance in instruction-following, agent tool use, creative writing, and multilingual tasks across 100+ languages and dialects. It natively handles 32K token contexts and can extend to 131K tokens using YaRN-based scaling. ",
+  "description": "Qwen3-32B is a dense 32.8B parameter causal language model from the Qwen3 series, optimized for both complex reasoning and efficient dialogue. It supports seamless switching between a \"thinking\" mode for...",
   "category": "llm",
   "provider": "qwen",
   "accepts_plugins": true,
   "model_id": "qwen/qwen3-32b",
-  "context_length": 40960,
+  "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
+    "logit_bias",
     "max_tokens",
     "min_p",
     "presence_penalty",
@@ -204,7 +205,7 @@
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.24,
+        "cost": 0.28,
         "currency": "USD"
       }
     ]

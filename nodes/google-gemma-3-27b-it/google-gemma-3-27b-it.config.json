@@ -1,12 +1,12 @@
 {
   "display_name": "Google: Gemma 3 27B",
   "tagline": "Generate text",
-  "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities, including structured outputs and function calling. Gemma 3 27B is Google's latest open source model, successor to [Gemma 2](google/gemma-2-27b-it)",
+  "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities,...",
   "category": "llm",
   "provider": "google",
   "accepts_plugins": true,
   "model_id": "google/gemma-3-27b-it",
-  "context_length": 128000,
+  "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",
@@ -177,13 +177,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.03,
+        "cost": 0.08,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.11,
+        "cost": 0.16,
         "currency": "USD"
       }
     ]

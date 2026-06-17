@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+
+    <!-- Package metadata. Published package identity is "Workbench" (the
+         ZeroWidth tool's SDK); the engine namespace stays ZeroWidth.Workbench
+         (the orchestration engine), matching the nodejs/python SDKs. -->
+    <PackageId>ZeroWidth.Workbench</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>ZeroWidth</Authors>
+    <Company>ZeroWidth</Company>
+    <Description>The Workbench SDK — a node and link style AI agent processing engine for .NET</Description>
+    <PackageTags>ai;agents;llm;workflow;nodes</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/zerowidth-ai/workbench-sdk</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <!-- Enable XML documentation -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- HTTP client for API calls -->
+    <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
+
+    <!-- JSON handling -->
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+
+    <!-- Logging abstractions -->
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+
+    <!-- For dynamic script loading (optional, for .cs node files) -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.9.2" />
+
+    <!-- SQLite database support -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.10" />
+  </ItemGroup>
+
+</Project>

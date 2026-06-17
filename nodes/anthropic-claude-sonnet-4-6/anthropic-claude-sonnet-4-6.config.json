@@ -1,7 +1,7 @@
 {
   "display_name": "Anthropic: Claude Sonnet 4.6",
   "tagline": "Generate text",
-  "description": "Sonnet 4.6 is Anthropic's most capable Sonnet-class model yet, with frontier performance across coding, agents, and professional work. It excels at iterative development, complex codebase navigation, end-to-end project management with memory, polished document creation, and confident computer use for web QA and workflow automation.",
+  "description": "Sonnet 4.6 is Anthropic's most capable Sonnet-class model yet, with frontier performance across coding, agents, and professional work. It excels at iterative development, complex codebase navigation, end-to-end project management with...",
   "category": "llm",
   "provider": "anthropic",
   "accepts_plugins": true,
@@ -9,6 +9,7 @@
   "context_length": 1000000,
   "supported_parameters": [
     "include_reasoning",
+    "max_completion_tokens",
     "max_tokens",
     "reasoning",
     "response_format",

@@ -1,7 +1,7 @@
 {
   "display_name": "Perplexity: Sonar",
   "tagline": "Generate text",
-  "description": "Sonar is lightweight, affordable, fast, and simple to use — now featuring citations and the ability to customize sources. It is designed for companies seeking to integrate lightweight question-and-answer features optimized for speed.",
+  "description": "Sonar is lightweight, affordable, fast, and simple to use — now featuring citations and the ability to customize sources. It is designed for companies seeking to integrate lightweight question-and-answer features...",
   "category": "llm",
   "provider": "perplexity",
   "accepts_plugins": false,

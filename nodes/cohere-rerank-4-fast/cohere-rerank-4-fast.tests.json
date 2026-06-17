@@ -1,0 +1,47 @@
+[
+  {
+    "description": "Rerank an array of strings",
+    "inputs": {
+      "query": "What is the capital of France?",
+      "documents": [
+        "The Eiffel Tower is in Paris.",
+        "Paris is the capital of France.",
+        "Bananas are a good source of potassium."
+      ]
+    },
+    "expectedSchema": {
+      "results": {
+        "type": "array"
+      },
+      "ranked_documents": {
+        "type": "array"
+      },
+      "usage": {
+        "type": "object"
+      }
+    }
+  },
+  {
+    "description": "Rerank objects and keep top N",
+    "inputs": {
+      "query": "database indexing",
+      "documents": [
+        {
+          "content": "B-tree indexes speed up range queries."
+        },
+        {
+          "content": "The mitochondria is the powerhouse of the cell."
+        }
+      ],
+      "top_n": 1
+    },
+    "expectedSchema": {
+      "results": {
+        "type": "array"
+      },
+      "top_document": {
+        "type": "object"
+      }
+    }
+  }
+]

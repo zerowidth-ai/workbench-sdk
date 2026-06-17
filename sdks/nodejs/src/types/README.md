@@ -1,6 +1,6 @@
 # Custom Type Conversions
 
-This directory contains type definitions (`.json` files) and optional type converters (`.converters.js` files) for custom types in the zv1 SDK.
+This directory contains type definitions (`.json` files) and optional type converters (`.converters.js` files) for custom types in the Workbench SDK.
 
 ## Type Definitions
 
@@ -27,9 +27,9 @@ You can override any of these by modifying the corresponding `.converters.js` fi
 You can use type converters in your code:
 
 ```javascript
-import zv1 from 'zv1';
+import Workbench from '@zerowidth/workbench-sdk';
 
-const engine = await zv1.create('./myflow.zv1', config);
+const engine = await Workbench.create('./myflow.zwf', config);
 
 // Convert a message to string
 const message = {

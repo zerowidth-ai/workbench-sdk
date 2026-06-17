@@ -1,7 +1,7 @@
 {
   "display_name": "Mistral: Ministral 3 14B 2512",
   "tagline": "Generate text",
-  "description": "The largest model in the Ministral 3 family, Ministral 3 14B offers frontier capabilities and performance comparable to its larger Mistral Small 3.2 24B counterpart. A powerful and efficient language model with vision capabilities.",
+  "description": "The largest model in the Ministral 3 family, Ministral 3 14B offers frontier capabilities and performance comparable to its larger Mistral Small 3.2 24B counterpart. A powerful and efficient language...",
   "category": "llm",
   "provider": "mistralai",
   "accepts_plugins": true,
@@ -107,6 +107,20 @@
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
+      "default": null
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Logprobs",
+      "type": "boolean",
+      "description": "Return log probabilities of the output tokens",
+      "default": null
+    },
+    {
+      "name": "top_logprobs",
+      "display_name": "Top Logprobs",
+      "type": "number",
+      "description": "Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.",
       "default": null
     }
   ],

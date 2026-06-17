@@ -62,7 +62,7 @@ class ErrorEvent:
     context: dict[str, Any] = field(default_factory=dict)
 
 
-class Zv1Error(Exception):
+class WorkbenchError(Exception):
     """Base exception for all zv1 errors."""
 
     def __init__(

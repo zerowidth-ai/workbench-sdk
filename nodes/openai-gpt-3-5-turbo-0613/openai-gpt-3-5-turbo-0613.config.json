@@ -11,7 +11,7 @@
     "frequency_penalty",
     "logit_bias",
     "logprobs",
-    "max_tokens",
+    "max_completion_tokens",
     "presence_penalty",
     "response_format",
     "seed",
@@ -82,13 +82,6 @@
       "default": null
     },
     {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
       "name": "frequency_penalty",
       "display_name": "Frequency Penalty",
       "type": "number",
@@ -107,6 +100,20 @@
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
+      "default": null
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Logprobs",
+      "type": "boolean",
+      "description": "Return log probabilities of the output tokens",
+      "default": null
+    },
+    {
+      "name": "top_logprobs",
+      "display_name": "Top Logprobs",
+      "type": "number",
+      "description": "Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.",
       "default": null
     }
   ],

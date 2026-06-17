@@ -1,7 +1,7 @@
 {
   "display_name": "OpenAI: GPT-4 Turbo Preview",
   "tagline": "Generate text",
-  "description": "The preview GPT-4 model with improved instruction following, JSON mode, reproducible outputs, parallel function calling, and more. Training data: up to Dec 2023.\n\n**Note:** heavily rate limited by OpenAI while in preview.",
+  "description": "The preview GPT-4 model with improved instruction following, JSON mode, reproducible outputs, parallel function calling, and more. Training data: up to Dec 2023. **Note:** heavily rate limited by OpenAI while...",
   "category": "llm",
   "provider": "openai",
   "accepts_plugins": true,
@@ -107,6 +107,20 @@
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
+      "default": null
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Logprobs",
+      "type": "boolean",
+      "description": "Return log probabilities of the output tokens",
+      "default": null
+    },
+    {
+      "name": "top_logprobs",
+      "display_name": "Top Logprobs",
+      "type": "number",
+      "description": "Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.",
       "default": null
     }
   ],

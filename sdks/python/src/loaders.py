@@ -175,8 +175,8 @@ async def load_integrations(
             integrations["openrouter"] = OpenRouterIntegration(
                 api_key=keys["openrouter"],
                 base_url=config.get("openrouter_base_url", "https://openrouter.ai/api/v1"),
-                referer="https://zv1.ai",
-                title="zv1 by ZeroWidth",
+                referer="https://workbench.zerowidth.ai",
+                title="Workbench by ZeroWidth",
             )
             if debug:
                 logger.debug("Loaded OpenRouter integration")
@@ -295,7 +295,7 @@ async def detect_and_load_flow(
 
     # If input is bytes, treat as raw ZIP data (.zv1 file in memory)
     if isinstance(input_data, bytes):
-        return await load_zv1_from_buffer(input_data)
+        return await load_flow_from_buffer(input_data)
 
     # Input is a string - treat as file path
     if isinstance(input_data, str):
@@ -304,8 +304,10 @@ async def detect_and_load_flow(
         if not file_path.exists():
             raise FileNotFoundError(f"Flow file not found: {file_path}")
 
-        if file_path.suffix == ".zv1":
-            return await load_zv1_file(file_path)
+        # .zwf is the current extension; .zv1 is the legacy name for the
+        # identical zip format — still accepted.
+        if file_path.suffix in (".zwf", ".zv1"):
+            return await load_flow_archive(file_path)
         elif file_path.suffix == ".json":
             with open(file_path) as f:
                 flow_data = json.load(f)
@@ -317,7 +319,7 @@ async def detect_and_load_flow(
             return flow_data
         else:
             raise ValueError(
-                f"Unsupported file format. Expected .zv1 or .json, got: {file_path.suffix}"
+                f"Unsupported file format. Expected .zwf, .zv1, or .json, got: {file_path.suffix}"
             )
 
     raise ValueError(
@@ -326,7 +328,7 @@ async def detect_and_load_flow(
     )
 
 
-async def load_zv1_file(file_path: Path) -> dict[str, Any]:
+async def load_flow_archive(file_path: Path) -> dict[str, Any]:
     """
     Load a .zv1 file and extract its contents.
 
@@ -346,8 +348,8 @@ async def load_zv1_file(file_path: Path) -> dict[str, Any]:
     if not file_path.exists():
         raise FileNotFoundError(f"Zv1 file not found: {file_path}")
 
-    if file_path.suffix != ".zv1":
-        raise ValueError(f"Invalid file extension. Expected .zv1, got: {file_path.suffix}")
+    if file_path.suffix not in (".zwf", ".zv1"):
+        raise ValueError(f"Invalid file extension. Expected .zwf or .zv1, got: {file_path.suffix}")
 
     try:
         with zipfile.ZipFile(file_path, "r") as zf:
@@ -356,7 +358,7 @@ async def load_zv1_file(file_path: Path) -> dict[str, Any]:
         raise ValueError(f"Invalid ZIP file: {e}") from e
 
 
-async def load_zv1_from_buffer(zip_buffer: bytes) -> dict[str, Any]:
+async def load_flow_from_buffer(zip_buffer: bytes) -> dict[str, Any]:
     """
     Load a .zv1 file from raw ZIP data in memory.
 

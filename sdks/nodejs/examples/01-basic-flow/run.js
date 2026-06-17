@@ -1,4 +1,4 @@
-import zv1 from '../../src/index.js';
+import Workbench from '../../src/index.js';
 
 async function runBasicFlow() {
   try {
@@ -6,7 +6,7 @@ async function runBasicFlow() {
     console.log('================================');
     
     // Create engine instance by passing the flow file path
-    const engine = await zv1.create('./flow.json');
+    const engine = await Workbench.create('./flow.json');
     
     // Input data to transform
     const inputData = {

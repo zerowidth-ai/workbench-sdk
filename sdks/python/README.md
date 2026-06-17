@@ -1,6 +1,8 @@
-# zv1
+# workbench-sdk
 
-A Python implementation of ZeroWidth's zv1 framework for executing AI and automation workflows through a visual node-based interface. Design flows on zv1.ai, export as JSON, and execute with precision and control.
+A Python implementation of ZeroWidth's Workbench framework for executing AI and automation workflows through a visual node-based interface. Design flows on [zerowidth.ai](https://zerowidth.ai), export them, and execute with precision and control.
+
+> **Migrating from `zv1`?** This package is the drop-in successor to the legacy `zv1` package. Run `pip uninstall zv1 && pip install workbench-sdk`, then `from workbench import Workbench`. The public API is unchanged.
 
 [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
@@ -23,7 +25,7 @@ A Python implementation of ZeroWidth's zv1 framework for executing AI and automa
 
 ## Overview
 
-The zv1 Flow Engine enables you to:
+The Workbench Flow Engine enables you to:
 - Execute complex AI and automation workflows
 - Connect various node types (data processing, AI models, tools, testing utilities)
 - Handle asynchronous operations with precision
@@ -35,14 +37,14 @@ The zv1 Flow Engine enables you to:
 ## Installation
 
 ```bash
-pip install zv1
+pip install workbench-sdk
 ```
 
 Or install from source:
 
 ```bash
-git clone https://github.com/zerowidth/zv1.git
-cd zv1/sdks/python
+git clone https://github.com/zerowidth-ai/workbench-sdk.git
+cd workbench-sdk/sdks/python
 pip install -e .
 ```
 
@@ -50,11 +52,11 @@ pip install -e .
 
 ```python
 import asyncio
-from zv1 import Zv1
+from workbench import Workbench
 
 async def main():
     # Create engine instance by passing the location of your configured flow
-    engine = await Zv1.create('./path/to/myflow.zv1', {
+    engine = await Workbench.create('./path/to/myflow.zwf', {
         'keys': {
             'openrouter': 'your-api-key'
         }
@@ -80,14 +82,14 @@ asyncio.run(main())
 
 ## Flow File Formats
 
-The zv1 engine supports two flow file formats:
+The Workbench engine supports two flow file formats:
 
-### New .zv1 Format (Recommended)
+### Workbench Flow Archive — `.zwf` (Recommended)
 
-The new `.zv1` format is a ZIP-based archive that supports hierarchical imports and modular flow design:
+The `.zwf` format is a ZIP-based archive that supports hierarchical imports and modular flow design. (`.zwf` is the current extension; the legacy `.zv1` extension refers to the same archive format and is still accepted.)
 
 ```
-myflow.zv1
+myflow.zwf
 ├── orchestration.json          # Main flow definition
 ├── imports/                    # Optional imports folder
 │   └── a1b2c3d4-e5f6-7890-abcd-ef1234567890/   # Import folder (importId only)
@@ -157,7 +159,7 @@ Nodes are the building blocks of your flow, connected by links that define data 
 The engine follows a specific order of operations:
 
 1. **Initialization**
-   - Use `Zv1.create()` to asynchronously load node definitions and custom types
+   - Use `Workbench.create()` to asynchronously load node definitions and custom types
    - Validate flow structure
    - Setup execution environment
    - Initialize ErrorManager
@@ -214,7 +216,7 @@ The engine supports secure API key management for nodes that require external se
 ### Configuration
 
 ```python
-engine = await Zv1.create(flow, {
+engine = await Workbench.create(flow, {
     'keys': {
         'openrouter': 'sk-...',  # OpenRouter API key
     }
@@ -254,7 +256,7 @@ async def on_node_update(event):
 async def on_error(error_event):
     print('Error occurred:', error_event)
 
-engine = await Zv1.create(flow, {
+engine = await Workbench.create(flow, {
     'on_node_start': on_node_start,
     'on_node_complete': on_node_complete,
     'on_node_update': on_node_update,
@@ -311,7 +313,7 @@ When verbose mode is enabled, errors include rich execution context:
 When using knowledge databases or complex flows with imports, it's important to clean up resources:
 
 ```python
-engine = await Zv1.create('./myflow.zv1', config)
+engine = await Workbench.create('./myflow.zwf', config)
 
 try:
     result = await engine.run(inputs)
@@ -353,7 +355,7 @@ Support for LLM plugins and tools:
 Integrate with external tools via MCP:
 
 ```python
-engine = await Zv1.create(flow, {
+engine = await Workbench.create(flow, {
     'mcp': {
         'tools': [
             {
@@ -402,22 +404,22 @@ python -m pytest tests/test_all_nodes.py -k "test_node_name"
 
 ## API Reference
 
-### Zv1 Class
+### Workbench Class
 
 ```python
-class Zv1:
+class Workbench:
 
     @classmethod
-    async def create(cls, flow, config: dict = None) -> 'Zv1':
+    async def create(cls, flow, config: dict = None) -> 'Workbench':
         """
-        Create a new Zv1 instance (recommended).
+        Create a new Workbench instance (recommended).
 
         Args:
-            flow: File path (.zv1 or .json), flow definition dict, or bytes
+            flow: File path (.zwf, .zv1, or .json), flow definition dict, or bytes
             config: Configuration options and context for the engine
 
         Returns:
-            Fully initialized Zv1 instance
+            Fully initialized Workbench instance
         """
 
     async def run(self, inputs: dict, timeout: int = 60000) -> dict:
@@ -515,7 +517,7 @@ result = await engine.run(inputs)
 
 ```python
 import asyncio
-from zv1 import Zv1
+from workbench import Workbench
 
 async def main():
     flow = {
@@ -547,7 +549,7 @@ async def main():
         ]
     }
 
-    engine = await Zv1.create(flow)
+    engine = await Workbench.create(flow)
     result = await engine.run({'text': 'hello world'})
     print(result['outputs'])  # {'data': 'HELLO WORLD'}
 
@@ -558,10 +560,10 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from zv1 import Zv1
+from workbench import Workbench
 
 async def main():
-    engine = await Zv1.create('./chat-flow.zv1', {
+    engine = await Workbench.create('./chat-flow.zwf', {
         'keys': {
             'openrouter': 'your-api-key'
         }
@@ -585,4 +587,4 @@ Apache 2.0 © ZeroWidth
 
 ---
 
-This engine is part of the zv1 platform. Visit our [documentation](https://zv1.ai/docs) for more information about the visual Workbench and other platform features.
+This engine is part of the Workbench platform. Visit our [documentation](https://zerowidth.ai/docs) for more information about the visual Workbench designer and other platform features.

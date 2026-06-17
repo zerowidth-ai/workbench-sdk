@@ -6,27 +6,11 @@ export default async ({inputs, settings, config, nodeConfig}) => {
             throw new Error("OpenRouter integration not found");
         }
 
-        let messages = inputs.messages;
-
-        if(typeof messages === 'string') {
-            messages = [{ role: 'user', content: messages }];
-        }
-
-        if(typeof messages === 'object' && !Array.isArray(messages)) {
-            messages = [messages];
-        }
-
-        if(inputs.system_prompt) {  
-            let systemPrompt = inputs.system_prompt;
-            if(typeof systemPrompt === 'string') {
-                systemPrompt = { role: 'system', content: systemPrompt };
-            }
-            messages = [systemPrompt, ...messages];
-        }
+        // No message processing needed for completion models
 
         // Build parameters object from config inputs
         const params = {};
-        const configInputs = [{"name":"messages","display_name":"Conversation","type":"conversation or message or string","description":"Array of chat messages that make up the conversation","required":true},{"name":"system_prompt","display_name":"System Message","type":"message or string","description":"System prompt to instruct the model","default":null},{"name":"modalities","display_name":"Modalities","type":"array","description":"Output modalities to request (e.g., [\"image\", \"text\"])","default":["image","text"]},{"name":"tools","display_name":"Tools","type":"tool or array of tools","description":"Array of tools to use","default":null,"allow_multiple":true},{"name":"tool_choice","display_name":"Tool Choice","type":"string","description":"Tool selection control","default":null},{"name":"reasoning","display_name":"Reasoning","type":"boolean","description":"Enable reasoning mode","default":null},{"name":"response_format","display_name":"Response Format","type":"object","description":"Output format specification","default":null},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":null},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null}];
+        const configInputs = [{"name":"prompt","display_name":"Prompt","type":"string","description":"Text prompt for completion","required":true},{"name":"modalities","display_name":"Modalities","type":"array","description":"Output modalities to request (e.g., [\"image\", \"text\"])","default":["image","text"]},{"name":"reasoning","display_name":"Reasoning","type":"boolean","description":"Enable reasoning mode","default":null},{"name":"response_format","display_name":"Response Format","type":"object","description":"Output format specification","default":null},{"name":"temperature","display_name":"Temperature","type":"number","description":"Controls randomness (0-2)","default":null},{"name":"top_p","display_name":"Top P","type":"number","description":"Controls diversity via nucleus sampling","default":null},{"name":"seed","display_name":"Seed","type":"number","description":"Deterministic outputs","default":null},{"name":"logprobs","display_name":"Logprobs","type":"boolean","description":"Return log probabilities of the output tokens","default":null},{"name":"top_logprobs","display_name":"Top Logprobs","type":"number","description":"Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.","default":null}];
         
         for (const input of configInputs) {
 
@@ -50,83 +34,14 @@ export default async ({inputs, settings, config, nodeConfig}) => {
 
         const response = await openrouter.chatCompletion({
             model: "openai/gpt-5-image",
-            messages: messages,
+            prompt: inputs.prompt,
             ...params
         }, nodeConfig, config);
 
-        // Get the set of internal tool names (tools handled by engine plugins)
-        // If internal_tool_names is undefined, we're in backward-compatible mode (include all)
-        // If it's an empty array, there are no internal tools (include none from history)
-        const hasInternalToolTracking = config.internal_tool_names !== undefined;
-        const internalToolNames = new Set(config.internal_tool_names || []);
-
-        // Build conversation output: only include messages related to internal tools
-        let conversationMessages = [];
-
-        if (Array.isArray(messages) && messages.length > 0) {
-            // Work backwards from the end
-            for (let i = messages.length - 1; i >= 0; i--) {
-                const msg = messages[i];
-                if (!msg || typeof msg !== 'object') continue;
-
-                const isTool = msg.role === 'tool';
-                const hasToolCalls = msg.tool_calls && Array.isArray(msg.tool_calls) && msg.tool_calls.length > 0;
-
-                if (isTool) {
-                    // Only include tool result if it's for an internal tool
-                    const toolName = msg.name;
-                    if (!hasInternalToolTracking || internalToolNames.has(toolName)) {
-                        conversationMessages.unshift(msg);
-                    }
-                    // Skip external tool results
-                } else if (hasToolCalls) {
-                    // Filter to only internal tool calls
-                    const internalCalls = !hasInternalToolTracking
-                        ? msg.tool_calls
-                        : msg.tool_calls.filter(tc => internalToolNames.has(tc.function?.name));
-
-                    if (internalCalls.length > 0) {
-                        conversationMessages.unshift({
-                            ...msg,
-                            tool_calls: internalCalls
-                        });
-                    }
-                    // External tool calls from history are dropped
-                } else {
-                    // Stop when we hit a message that is not tool and has no tool_calls
-                    break;
-                }
-            }
-        }
-
-        // Append the final output message — always include all tool_calls on the response
-        // The internal/external split only applies to historical messages above, not the fresh response
-        const finalMessage = {
-            content: response.content,
-            role: response.role
-        };
-
-        if (response.tool_calls && Array.isArray(response.tool_calls) && response.tool_calls.length > 0) {
-            finalMessage.tool_calls = response.tool_calls;
-        }
-
-        if (response.images) {
-            finalMessage.images = response.images;
-        }
-        conversationMessages.push(finalMessage);
-
-        const conversation = conversationMessages;
+        
 
         return {
-            conversation: conversation,
-            message: {
-                content: response.content,
-                role: response.role,
-                tool_calls: response.tool_calls
-            },
             content: response.content,
-            role: response.role,
-            tool_calls: response.tool_calls,
             images: response.images,
             reasoning: response.reasoning,
             refusal: response.refusal,

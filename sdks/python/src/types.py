@@ -465,7 +465,7 @@ def convert_import_to_node_type(
     ) -> dict[str, Any]:
         """Process function for imported flow - runs the sub-flow as a child engine."""
         # Lazy import to avoid circular dependency
-        from src.engine import Zv1
+        from src.engine import Workbench
 
         logger.debug(f"Processing import node with inputs: {list(inputs.keys())}")
 

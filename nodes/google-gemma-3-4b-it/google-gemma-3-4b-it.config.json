@@ -1,7 +1,7 @@
 {
   "display_name": "Google: Gemma 3 4B",
   "tagline": "Generate text",
-  "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities, including structured outputs and function calling.",
+  "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities,...",
   "category": "llm",
   "provider": "google",
   "accepts_plugins": false,
@@ -9,6 +9,7 @@
   "context_length": 131072,
   "supported_parameters": [
     "frequency_penalty",
+    "logit_bias",
     "max_tokens",
     "min_p",
     "presence_penalty",
@@ -16,6 +17,7 @@
     "response_format",
     "seed",
     "stop",
+    "structured_outputs",
     "temperature",
     "top_k",
     "top_p"

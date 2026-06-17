@@ -29,7 +29,8 @@ export default class OpenAIIntegration {
                 method: 'POST',
                 headers: requestHeaders,
                 data: requestBody,
-                timeout: this.options.timeout
+                timeout: this.options.timeout,
+                signal: this._engineConfig?.signal
             });
 
             await emitAPICallEvent(this._engineConfig, {
@@ -112,6 +113,7 @@ export default class OpenAIIntegration {
                 headers: modRequestHeaders,
                 data: modRequestBody,
                 timeout: this.options.timeout,
+                signal: this._engineConfig?.signal,
                 validateStatus: () => true // Always resolve, never throw for HTTP errors
             });
 

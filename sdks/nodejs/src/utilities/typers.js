@@ -364,7 +364,7 @@ export function convertImportToNodeType(importDef) {
         importConfig.tools = tools;
       }
       
-      const importEngine = await zv1.create(processedImportDef, importConfig);
+      const importEngine = await Workbench.create(processedImportDef, importConfig);
       
       // Share executed states with import engine to prevent duplicate execution
       importEngine.executedNodeStates = this.executedNodeStates;

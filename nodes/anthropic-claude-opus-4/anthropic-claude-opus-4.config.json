@@ -1,7 +1,7 @@
 {
   "display_name": "Anthropic: Claude Opus 4",
   "tagline": "Generate text",
-  "description": "Claude Opus 4 is benchmarked as the world’s best coding model, at time of release, bringing sustained performance on complex, long-running tasks and agent workflows. It sets new benchmarks in software engineering, achieving leading results on SWE-bench (72.5%) and Terminal-bench (43.2%). Opus 4 supports extended, agentic workflows, handling thousands of task steps continuously for hours without degradation. \n\nRead more at the [blog post here](https://www.anthropic.com/news/claude-4)",
+  "description": "Claude Opus 4 is benchmarked as the world’s best coding model, at time of release, bringing sustained performance on complex, long-running tasks and agent workflows. It sets new benchmarks in...",
   "category": "llm",
   "provider": "anthropic",
   "accepts_plugins": true,
@@ -15,7 +15,6 @@
     "temperature",
     "tool_choice",
     "tools",
-    "top_k",
     "top_p"
   ],
   "inputs": [

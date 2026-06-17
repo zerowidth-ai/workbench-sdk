@@ -1,0 +1,28 @@
+[
+  {
+    "description": "Basic agent response with default model",
+    "inputs": {
+      "messages": [{ "role": "user", "content": "Say hello in one word." }]
+    },
+    "expectedSchema": {
+      "content": { "type": "string" },
+      "role": { "type": "string" },
+      "conversation": { "type": "array" },
+      "finish_reason": { "type": "string" },
+      "usage": { "type": "object" }
+    }
+  },
+  {
+    "description": "Agent with system prompt and a model swapped via input",
+    "inputs": {
+      "model": "openai/gpt-4.1-mini",
+      "system_prompt": "You are a terse assistant. Answer in one sentence.",
+      "messages": [{ "role": "user", "content": "What is 2+2?" }]
+    },
+    "expectedSchema": {
+      "content": { "type": "string" },
+      "message": { "type": "object" },
+      "usage": { "type": "object" }
+    }
+  }
+]
