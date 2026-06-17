@@ -1,5 +1,5 @@
 {
-  "name": "@zerowidth/lathe-sdk",
+  "name": "@zerowidth/workbench-sdk",
   "version": "2.0.0-pre.1",
   "dependencies": {
     "adm-zip": "^0.5.16",
@@ -13,7 +13,7 @@
     "uuid": "^11.1.0"
   },
   "repository": "https://github.com/zerowidth-ai/zv1",
-  "description": "Lathe SDK — execute Lathe-authored flows in production. Successor to the zv1 package; see https://zerowidth.ai for the design surface.",
+  "description": "Workbench SDK — execute Workbench-authored flows in production. Successor to the zv1 package; see https://zerowidth.ai for the design surface.",
   "main": "./src/index.js",
   "files": ["src/", "nodes/", "types/", "LICENSE", "README.md"],
   "engines": {
