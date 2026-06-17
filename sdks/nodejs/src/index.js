@@ -45,6 +45,12 @@ export default class zv1 {
         ...config
     };
 
+    // The abort signal inherited from an ancestor engine (set once, at
+    // construction — sub-engines receive the parent's via {...config}). Captured
+    // here so a later run() can't mistake a *prior run's own* signal (which run()
+    // writes back into config.signal) for an ancestor and abort instantly.
+    this._inheritedSignal = this.config.signal || null;
+
     // Track knowledge base files that need cleanup
     this.knowledgeFilesToCleanup = new Set();
     
@@ -1139,7 +1145,9 @@ export default class zv1 {
     this._abortTeardown = () => {};
     // Cascade: if an ancestor engine passed its signal in (macro / imported-flow
     // sub-engine), abort when it aborts — so a parent timeout reaches descendants.
-    const inheritedSignal = this.config.signal;
+    // Use the construction-time inherited signal, NOT this.config.signal (which a
+    // prior run() of a reused engine may have overwritten with its own signal).
+    const inheritedSignal = this._inheritedSignal;
     if (inheritedSignal) {
       if (inheritedSignal.aborted) {
         this.abortController.abort(inheritedSignal.reason);
@@ -1461,6 +1469,9 @@ export default class zv1 {
     } finally {
       clearTimeout(this.flowTimeout);
       this._abortTeardown?.();
+      // Restore the inherited signal so a reused engine doesn't treat this run's
+      // (possibly aborted) signal as an ancestor on the next run().
+      this.config.signal = this._inheritedSignal;
     }
   }
 

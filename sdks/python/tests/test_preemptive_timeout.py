@@ -68,6 +68,14 @@ async def test_hung_node_is_preempted() -> None:
     assert raised, "run should raise when a node hangs past the timeout"
     assert elapsed < 3000, f"run should abort near the timeout, took {elapsed:.0f}ms"
     assert engine._abort_event.is_set(), "abort signal should have fired"
+
+    # #1 regression: after a timed-out run the inherited signal must be restored,
+    # so a reused engine doesn't treat this run's set Event as an ancestor (and
+    # instantly abort) on the next run().
+    assert engine._inherited_signal is None, "top-level engine has no inherited signal"
+    assert engine.config.get("signal") is engine._inherited_signal, \
+        "config['signal'] must be restored to the inherited signal after a run"
+
     print(f"  ok aborted in {elapsed:.0f}ms (timeout {timeout_ms}ms): {message!r}")
 
 

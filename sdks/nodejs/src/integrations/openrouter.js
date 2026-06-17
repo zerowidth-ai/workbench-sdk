@@ -308,8 +308,13 @@ export default class OpenRouterIntegration {
             const meta = errorBody?.error?.metadata || errorBody?.metadata;
             if (meta?.raw) {
                 let upstream = null;
-                try { upstream = JSON.parse(meta.raw)?.error?.message; } catch { /* raw may be plain text */ }
-                if (!upstream && typeof meta.raw === 'string') upstream = meta.raw;
+                if (typeof meta.raw === 'object') {
+                    // Already-parsed shape: { error: { message } }
+                    upstream = meta.raw?.error?.message || null;
+                } else if (typeof meta.raw === 'string') {
+                    try { upstream = JSON.parse(meta.raw)?.error?.message; } catch { /* raw may be plain text */ }
+                    if (!upstream) upstream = meta.raw;
+                }
                 if (upstream && upstream !== specificMessage) {
                     errorMessage += ` — ${meta.provider_name ? meta.provider_name + ': ' : ''}${upstream}`;
                 }

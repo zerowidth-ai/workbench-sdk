@@ -1,5 +1,5 @@
 """
-Cohere: Rerank v3.5 - Rerank node for the zv1 engine.
+NVIDIA: Llama Nemotron Rerank VL 1B V2 (free) - Rerank node for the zv1 engine.
 """
 
 from typing import Any, Optional
@@ -28,7 +28,7 @@ async def process(
     node_config: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Process function for the Cohere: Rerank v3.5 rerank node.
+    Process function for the NVIDIA: Llama Nemotron Rerank VL 1B V2 (free) rerank node.
 
     Args:
         inputs: Node inputs containing query and documents to rerank.
@@ -56,7 +56,7 @@ async def process(
         params["top_n"] = inputs.get("top_n")
 
     response = await openrouter.rerank(
-        model="cohere/rerank-v3.5",
+        model="nvidia/llama-nemotron-rerank-vl-1b-v2:free",
         query=inputs.get("query"),
         documents=texts,
         node_config=node_config,

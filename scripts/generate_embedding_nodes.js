@@ -138,10 +138,9 @@ class EmbeddingNodeGenerator {
         return false;
       }
 
-      // Optionally skip deprecated models
-      if (this.config.generation?.exclude_deprecated !== false && model.deprecated) {
-        return false;
-      }
+      // Deprecated-but-still-live models are kept (not excluded): generateNode
+      // stamps them deprecated via modelDeprecationFields so they're flagged
+      // rather than silently dropped or left stale.
 
       return true;
     });

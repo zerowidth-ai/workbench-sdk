@@ -131,6 +131,11 @@ class Zv1:
         self._timeout_task: asyncio.Task[None] | None = None
         self._abort_event: asyncio.Event | None = None
         self._abort_link_task: asyncio.Task[None] | None = None
+        # Signal inherited from an ancestor engine, captured once at construction
+        # (sub-engines receive the parent's via {**config}). A later run() must not
+        # treat a prior run's own signal — which run() writes into config["signal"]
+        # — as an ancestor, so we snapshot it here rather than re-reading config.
+        self._inherited_signal: asyncio.Event | None = self.config.get("signal")
 
         # Will be set during initialization
         self.nodes: dict[str, dict[str, Any]] = {}
@@ -1567,6 +1572,11 @@ class Zv1:
         finally:
             if not waiter.done():
                 waiter.cancel()
+            # If _race_abort itself was cancelled externally before handling the
+            # abort, cancel the node task too — asyncio.wait does not cancel its
+            # awaited tasks, so it would otherwise leak (and keep its httpx call).
+            if not task.done():
+                task.cancel()
 
     async def _execute_node_core(
         self,
@@ -1883,8 +1893,10 @@ class Zv1:
         self._abort_event = asyncio.Event()
         self._abort_link_task = None
         # Cascade: if an ancestor engine passed its signal in (macro / imported
-        # sub-engine via {**config}), abort when it aborts.
-        inherited_signal = self.config.get("signal")
+        # sub-engine via {**config}), abort when it aborts. Use the construction-
+        # time inherited signal, not config["signal"] (a prior run() may have
+        # overwritten it with that run's own, now-stale, Event).
+        inherited_signal = self._inherited_signal
         if inherited_signal is not None:
             if inherited_signal.is_set():
                 self._abort_event.set()
@@ -2063,6 +2075,9 @@ class Zv1:
                 self._timeout_task.cancel()
             if self._abort_link_task:
                 self._abort_link_task.cancel()
+            # Restore the inherited signal so a reused engine doesn't treat this
+            # run's (possibly set) Event as an ancestor on the next run().
+            self.config["signal"] = self._inherited_signal
 
     async def _launch_node(self, node: dict[str, Any]) -> None:
         """Launch a node for execution."""

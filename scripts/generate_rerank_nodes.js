@@ -95,7 +95,8 @@ class RerankNodeGenerator {
       }
 
       if (this.config.generation?.exclude_free && model.id.includes(':free')) return false;
-      if (this.config.generation?.exclude_deprecated !== false && model.deprecated) return false;
+      // Deprecated-but-still-live models are kept (not excluded): generateNode
+      // stamps them deprecated via modelDeprecationFields so they're flagged.
 
       return true;
     });
@@ -298,10 +299,10 @@ class RerankNodeGenerator {
 ${model.name} - Rerank node for the zv1 engine.
 """
 
-from typing import Any
+from typing import Any, Optional
 
 
-def _to_text(doc: Any, text_field: str | None) -> str:
+def _to_text(doc: Any, text_field: Optional[str]) -> str:
     """Extract the text to rank from a document (string or object)."""
     if isinstance(doc, str):
         return doc

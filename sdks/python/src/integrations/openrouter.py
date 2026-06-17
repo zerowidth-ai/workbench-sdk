@@ -226,12 +226,17 @@ class OpenRouterIntegration:
                     error_body.get("error"), dict
                 ) else error_body.get("metadata")
                 if isinstance(meta, dict) and meta.get("raw"):
+                    raw = meta["raw"]
                     upstream = None
-                    try:
-                        import json as _json
-                        upstream = (_json.loads(meta["raw"]).get("error") or {}).get("message")
-                    except Exception:
-                        upstream = meta["raw"] if isinstance(meta["raw"], str) else None
+                    if isinstance(raw, dict):
+                        # Already-parsed shape: {"error": {"message": ...}}
+                        upstream = (raw.get("error") or {}).get("message")
+                    elif isinstance(raw, str):
+                        try:
+                            import json as _json
+                            upstream = (_json.loads(raw).get("error") or {}).get("message")
+                        except Exception:
+                            upstream = raw
                     if upstream and upstream != specific_msg:
                         prov = meta.get("provider_name")
                         error_message += f" — {prov + ': ' if prov else ''}{upstream}"
@@ -635,7 +640,8 @@ class OpenRouterIntegration:
         prompt_tokens = usage.get("prompt_tokens", 0) or 0
         completion_tokens = usage.get("completion_tokens", 0) or 0
         api_cost = usage.get("cost")
-        has_api_cost = isinstance(api_cost, (int, float))
+        # bool is a subclass of int — exclude it so a stray cost=True isn't $1.00.
+        has_api_cost = isinstance(api_cost, (int, float)) and not isinstance(api_cost, bool)
 
         if not has_api_cost and not pricing:
             return None

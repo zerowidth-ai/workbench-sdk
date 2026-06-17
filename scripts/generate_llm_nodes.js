@@ -250,24 +250,24 @@ class LLMNodeGenerator {
       const excludeModeration = filtering.exclude_moderation !== undefined ? filtering.exclude_moderation : true;
       const excludeEmbedding = filtering.exclude_embedding !== undefined ? filtering.exclude_embedding : true;
       const excludeVisionOnly = filtering.exclude_vision_only !== undefined ? filtering.exclude_vision_only : false;
-      const excludeDeprecated = filtering.exclude_deprecated !== undefined ? filtering.exclude_deprecated : true;
-      
+
       if (excludeModeration && modelId.includes('moderation')) {
         return false;
       }
-      
+
       if (excludeEmbedding && modelId.includes('embedding')) {
         return false;
       }
-      
+
       if (excludeVisionOnly && modelId.includes('vision')) {
         return false;
       }
-      
-      if (excludeDeprecated && model.deprecated) {
-        return false;
-      }
-      
+
+      // NOTE: deprecated-but-still-live models are intentionally NOT excluded.
+      // They flow through to generateNode where modelDeprecationFields stamps
+      // them `deprecated: true`, so the node is kept and flagged (the UI hides
+      // deprecated nodes from the palette) rather than silently dropped/stale.
+
       // Context length filtering within provider
       if (filtering.min_context_length > 0 && 
           model.context_length < filtering.min_context_length) {

@@ -223,6 +223,7 @@ notion-update-page,Notion Update Page,Update properties of an existing Notion pa
 null-bomb,Null Bomb,Randomly returns null/undefined based on probability, useful for testing null handling in flows.
 number,Number,A simple number node that outputs a constant numeric value
 nvidia-llama-nemotron-embed-vl-1b-v2-free,NVIDIA: Llama Nemotron Embed VL 1B V2 (free),The Llama Nemotron Embed VL 1B V2 embedding model is optimized for multimodal question-answering retrieval. The model can embed 'documents' in the form of image, text, or image and text...
+nvidia-llama-nemotron-rerank-vl-1b-v2-free,NVIDIA: Llama Nemotron Rerank VL 1B V2 (free),Llama Nemotron Rerank VL 1B V2 is a 1.7B multimodal reranking model from NVIDIA. It evaluates the relevance of document images and text against user queries, designed for vision RAG...
 object-merge,Object Merge,Deep merges multiple objects into one. Later objects override earlier ones. Nested objects are recursively merged.
 openai-gpt-3-5-turbo,OpenAI: GPT-3.5 Turbo,GPT-3.5 Turbo is OpenAI's fastest model. It can understand and generate natural language or code, and is optimized for chat and traditional completion tasks.
 

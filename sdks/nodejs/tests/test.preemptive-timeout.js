@@ -57,6 +57,14 @@ async function testHungNodeIsPreempted() {
   assert.ok(threw, 'run should reject when a node hangs past the timeout');
   assert.ok(elapsed < 3000, `run should abort near the timeout, but took ${elapsed}ms (was it parked?)`);
   assert.strictEqual(engine.abortController.signal.aborted, true, 'abort signal should have fired');
+
+  // #1 regression: after a timed-out run the inherited signal must be restored,
+  // so a reused engine doesn't treat this run's aborted signal as an ancestor
+  // (and instantly abort) on the next run().
+  assert.strictEqual(engine._inheritedSignal, null, 'top-level engine has no inherited signal');
+  assert.strictEqual(engine.config.signal, engine._inheritedSignal,
+    'config.signal must be restored to the inherited signal after a run');
+
   console.log(`  ✓ aborted in ${elapsed}ms (timeout ${timeout}ms), error: "${message}"`);
 }
 
