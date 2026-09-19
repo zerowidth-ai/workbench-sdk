@@ -40,6 +40,8 @@ The Workbench Flow Engine enables you to:
 npm install @zerowidth/workbench-sdk
 ```
 
+Requires Node.js 20 or later. Flows that use knowledge bases (SQLite) need Node.js 22.5 or later.
+
 ## Quick Start
 
 ```javascript
