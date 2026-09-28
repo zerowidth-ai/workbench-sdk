@@ -5,7 +5,7 @@
   "category": "embedding",
   "provider": "sentence-transformers",
   "model_id": "sentence-transformers/paraphrase-minilm-l6-v2",
-  "context_length": 8192,
+  "context_length": 512,
   "input_modalities": [
     "text"
   ],

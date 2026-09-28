@@ -5,7 +5,7 @@
   "category": "embedding",
   "provider": "thenlper",
   "model_id": "thenlper/gte-large",
-  "context_length": 8192,
+  "context_length": 512,
   "input_modalities": [
     "text"
   ],

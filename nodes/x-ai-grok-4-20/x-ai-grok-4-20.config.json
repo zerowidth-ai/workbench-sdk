@@ -1,7 +1,7 @@
 {
-  "display_name": "xAI: Grok 4.20",
+  "display_name": "SpaceXAI: Grok 4.20",
   "tagline": "Generate text",
-  "description": "Grok 4.20 is a reasoning model from xAI with industry-leading speed and agentic tool calling capabilities. It combines the lowest hallucination rate on the market with strict prompt adherance, delivering...",
+  "description": "Grok 4.20 is a reasoning model from SpaceXAI with industry-leading speed and agentic tool calling capabilities. It combines the lowest hallucination rate on the market with strict prompt adherance, delivering...",
   "category": "llm",
   "provider": "x-ai",
   "accepts_plugins": true,

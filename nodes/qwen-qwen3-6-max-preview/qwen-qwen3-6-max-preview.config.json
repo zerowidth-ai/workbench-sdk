@@ -8,6 +8,7 @@
   "model_id": "qwen/qwen3.6-max-preview",
   "context_length": 262144,
   "supported_parameters": [
+    "frequency_penalty",
     "include_reasoning",
     "logprobs",
     "max_tokens",
@@ -15,10 +16,12 @@
     "reasoning",
     "response_format",
     "seed",
+    "stop",
     "structured_outputs",
     "temperature",
     "tool_choice",
     "tools",
+    "top_k",
     "top_logprobs",
     "top_p"
   ],
@@ -67,6 +70,13 @@
       "default": null
     },
     {
+      "name": "stop",
+      "display_name": "Stop",
+      "type": "string or array",
+      "description": "Custom stop sequences",
+      "default": null
+    },
+    {
       "name": "temperature",
       "display_name": "Temperature",
       "type": "number",
@@ -85,6 +95,13 @@
       "display_name": "Max Tokens",
       "type": "number",
       "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
       "default": null
     },
     {
@@ -201,15 +218,23 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 1.04,
+        "cost": 1.0270000000000001,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 6.24,
+        "cost": 6.162,
         "currency": "USD"
       }
     ]
+  },
+  "deprecated": true,
+  "deprecation": {
+    "reason": "Scheduled for removal by the provider",
+    "since": "2026-09-28",
+    "expiration_date": "2026-10-09",
+    "replacement": null,
+    "source": "openrouter"
   }
 }

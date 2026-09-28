@@ -6,7 +6,7 @@
   "provider": "anthropic",
   "accepts_plugins": true,
   "model_id": "anthropic/claude-sonnet-4",
-  "context_length": 1000000,
+  "context_length": 200000,
   "supported_parameters": [
     "include_reasoning",
     "max_tokens",

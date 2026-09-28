@@ -1,0 +1,99 @@
+[
+  {
+    "description": "Noul question on a text state",
+    "inputs": {
+      "state": "Help! My payouts have been failing for 3 days.",
+      "questions": {
+        "is_urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        }
+      }
+    },
+    "expectedSchema": {
+      "answers": {
+        "type": "object"
+      },
+      "values": {
+        "type": "object"
+      },
+      "model": {
+        "type": "string"
+      },
+      "usage": {
+        "type": "object"
+      }
+    }
+  },
+  {
+    "description": "Noul question on a conversation state",
+    "inputs": {
+      "state": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "I was charged twice for my subscription."
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I am sorry about that, I have issued a refund for the duplicate charge."
+        }
+      ],
+      "questions": {
+        "refund_issued": {
+          "type": "noul",
+          "instructions": "Did the assistant issue a refund?"
+        }
+      }
+    },
+    "expectedSchema": {
+      "answers": {
+        "type": "object"
+      },
+      "values": {
+        "type": "object"
+      }
+    }
+  },
+  {
+    "description": "Choice and score questions on a structured state",
+    "inputs": {
+      "state": {
+        "channel": "email",
+        "message": "I was charged twice for my subscription and I am furious."
+      },
+      "questions": {
+        "department": {
+          "type": "choice",
+          "instructions": "Which team should handle `message`?",
+          "criteria": {
+            "billing": "Payments, invoicing, refunds",
+            "technical": "Bugs, outages, integrations",
+            "sales": null
+          }
+        },
+        "frustration": {
+          "type": "score",
+          "instructions": "How frustrated is the customer?",
+          "criteria": [
+            "Calm",
+            "Frustrated",
+            "Very angry"
+          ]
+        }
+      }
+    },
+    "expectedSchema": {
+      "answers": {
+        "type": "object"
+      },
+      "values": {
+        "type": "object"
+      }
+    }
+  }
+]

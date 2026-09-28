@@ -1,22 +1,19 @@
 {
-  "display_name": "xAI: Grok Build 0.1",
+  "display_name": "SpaceXAI: Grok Build 0.1",
   "tagline": "Generate text",
-  "description": "Grok Build 0.1 is xAI’s fast coding model trained specifically for agentic software engineering workflows. It supports text and image inputs with text output, and is optimized for interactive coding...",
+  "description": "Grok Build 0.1 is SpaceXAI’s fast coding model trained specifically for agentic software engineering workflows. It supports text and image inputs with text output, and is optimized for interactive coding...",
   "category": "llm",
   "provider": "x-ai",
   "accepts_plugins": true,
   "model_id": "x-ai/grok-build-0.1",
   "context_length": 256000,
   "supported_parameters": [
-    "frequency_penalty",
     "include_reasoning",
     "logprobs",
     "max_tokens",
-    "presence_penalty",
     "reasoning",
     "response_format",
     "seed",
-    "stop",
     "structured_outputs",
     "temperature",
     "tool_choice",
@@ -69,13 +66,6 @@
       "default": null
     },
     {
-      "name": "stop",
-      "display_name": "Stop",
-      "type": "string or array",
-      "description": "Custom stop sequences",
-      "default": null
-    },
-    {
       "name": "temperature",
       "display_name": "Temperature",
       "type": "number",
@@ -94,20 +84,6 @@
       "display_name": "Max Tokens",
       "type": "number",
       "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
       "default": null
     },
     {

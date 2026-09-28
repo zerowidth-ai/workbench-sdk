@@ -8,13 +8,19 @@
   "model_id": "qwen/qwen3-max",
   "context_length": 262144,
   "supported_parameters": [
+    "frequency_penalty",
+    "logprobs",
     "max_tokens",
     "presence_penalty",
     "response_format",
     "seed",
+    "stop",
+    "structured_outputs",
     "temperature",
     "tool_choice",
     "tools",
+    "top_k",
+    "top_logprobs",
     "top_p"
   ],
   "inputs": [
@@ -55,6 +61,13 @@
       "default": null
     },
     {
+      "name": "stop",
+      "display_name": "Stop",
+      "type": "string or array",
+      "description": "Custom stop sequences",
+      "default": null
+    },
+    {
       "name": "temperature",
       "display_name": "Temperature",
       "type": "number",
@@ -76,6 +89,13 @@
       "default": null
     },
     {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
+      "default": null
+    },
+    {
       "name": "presence_penalty",
       "display_name": "Presence Penalty",
       "type": "number",
@@ -87,6 +107,20 @@
       "display_name": "Seed",
       "type": "number",
       "description": "Deterministic outputs",
+      "default": null
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Logprobs",
+      "type": "boolean",
+      "description": "Return log probabilities of the output tokens",
+      "default": null
+    },
+    {
+      "name": "top_logprobs",
+      "display_name": "Top Logprobs",
+      "type": "number",
+      "description": "Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.",
       "default": null
     }
   ],
@@ -148,6 +182,12 @@
       "display_name": "Finish Reason",
       "type": "string",
       "description": "Why the completion finished"
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Log Probabilities",
+      "type": "object",
+      "description": "Token probabilities and logprobs from the model"
     }
   ],
   "pricing": {
@@ -166,5 +206,13 @@
         "currency": "USD"
       }
     ]
+  },
+  "deprecated": true,
+  "deprecation": {
+    "reason": "Scheduled for removal by the provider",
+    "since": "2026-09-28",
+    "expiration_date": "2026-10-09",
+    "replacement": null,
+    "source": "openrouter"
   }
 }

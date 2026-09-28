@@ -134,6 +134,6 @@ export default async ({inputs, settings, config, nodeConfig}) => {
         };
     } catch (error) {
         console.log('error', error);
-        throw new Error(`DeepSeek: DeepSeek V4 Flash node error: ${error.message}`);
+        throw new Error(`DeepSeek: DeepSeek V4 Flash 0423 node error: ${error.message}`);
     }
 };

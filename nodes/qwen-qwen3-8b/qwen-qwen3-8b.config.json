@@ -10,16 +10,12 @@
   "supported_parameters": [
     "frequency_penalty",
     "include_reasoning",
-    "logit_bias",
     "max_tokens",
-    "min_p",
     "presence_penalty",
     "reasoning",
-    "repetition_penalty",
     "response_format",
     "seed",
     "stop",
-    "structured_outputs",
     "temperature",
     "tool_choice",
     "tools",
@@ -199,15 +195,23 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.049999999999999996,
+        "cost": 0.117,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.39999999999999997,
+        "cost": 0.45499999999999996,
         "currency": "USD"
       }
     ]
+  },
+  "deprecated": true,
+  "deprecation": {
+    "reason": "Scheduled for removal by the provider",
+    "since": "2026-09-28",
+    "expiration_date": "2026-10-09",
+    "replacement": null,
+    "source": "openrouter"
   }
 }

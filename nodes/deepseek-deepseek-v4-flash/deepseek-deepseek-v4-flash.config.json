@@ -1,5 +1,5 @@
 {
-  "display_name": "DeepSeek: DeepSeek V4 Flash",
+  "display_name": "DeepSeek: DeepSeek V4 Flash 0423",
   "tagline": "Generate text",
   "description": "DeepSeek V4 Flash is an efficiency-optimized Mixture-of-Experts model from DeepSeek with 284B total parameters and 13B activated parameters, supporting a 1M-token context window. It is designed for fast inference and...",
   "category": "llm",
@@ -12,10 +12,12 @@
     "include_reasoning",
     "logit_bias",
     "logprobs",
+    "max_completion_tokens",
     "max_tokens",
     "min_p",
     "presence_penalty",
     "reasoning",
+    "reasoning_effort",
     "repetition_penalty",
     "response_format",
     "seed",
@@ -24,6 +26,7 @@
     "temperature",
     "tool_choice",
     "tools",
+    "top_a",
     "top_k",
     "top_logprobs",
     "top_p"
@@ -221,13 +224,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.0983,
+        "cost": 0.060759999999999995,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.1966,
+        "cost": 0.12151999999999999,
         "currency": "USD"
       }
     ]

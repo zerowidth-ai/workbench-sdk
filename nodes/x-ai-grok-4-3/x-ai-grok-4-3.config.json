@@ -1,22 +1,20 @@
 {
-  "display_name": "xAI: Grok 4.3",
+  "display_name": "SpaceXAI: Grok 4.3",
   "tagline": "Generate text",
-  "description": "Grok 4.3 is a reasoning model from xAI. It accepts text and image inputs with text output, and is suited for agentic workflows, instruction-following tasks, and applications requiring high factual...",
+  "description": "Grok 4.3 is a reasoning model from SpaceXAI. It accepts text and image inputs with text output, and is suited for agentic workflows, instruction-following tasks, and applications requiring high factual...",
   "category": "llm",
   "provider": "x-ai",
   "accepts_plugins": true,
   "model_id": "x-ai/grok-4.3",
   "context_length": 1000000,
   "supported_parameters": [
-    "frequency_penalty",
     "include_reasoning",
     "logprobs",
     "max_tokens",
-    "presence_penalty",
     "reasoning",
+    "reasoning_effort",
     "response_format",
     "seed",
-    "stop",
     "structured_outputs",
     "temperature",
     "tool_choice",
@@ -69,13 +67,6 @@
       "default": null
     },
     {
-      "name": "stop",
-      "display_name": "Stop",
-      "type": "string or array",
-      "description": "Custom stop sequences",
-      "default": null
-    },
-    {
       "name": "temperature",
       "display_name": "Temperature",
       "type": "number",
@@ -94,20 +85,6 @@
       "display_name": "Max Tokens",
       "type": "number",
       "description": "Maximum tokens to generate",
-      "default": null
-    },
-    {
-      "name": "frequency_penalty",
-      "display_name": "Frequency Penalty",
-      "type": "number",
-      "description": "Reduces repetition (-2 to 2)",
-      "default": null
-    },
-    {
-      "name": "presence_penalty",
-      "display_name": "Presence Penalty",
-      "type": "number",
-      "description": "Encourages new topics (-2 to 2)",
       "default": null
     },
     {

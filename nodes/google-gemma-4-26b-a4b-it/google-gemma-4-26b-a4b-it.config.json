@@ -221,13 +221,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.06,
+        "cost": 0.09,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.33,
+        "cost": 0.3,
         "currency": "USD"
       }
     ]

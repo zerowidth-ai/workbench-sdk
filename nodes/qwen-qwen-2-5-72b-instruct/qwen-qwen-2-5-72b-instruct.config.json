@@ -6,7 +6,7 @@
   "provider": "qwen",
   "accepts_plugins": true,
   "model_id": "qwen/qwen-2.5-72b-instruct",
-  "context_length": 131072,
+  "context_length": 32768,
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",

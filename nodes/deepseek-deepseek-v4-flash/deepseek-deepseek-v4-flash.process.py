@@ -1,5 +1,5 @@
 """
-DeepSeek: DeepSeek V4 Flash - LLM node for the zv1 engine.
+DeepSeek: DeepSeek V4 Flash 0423 - LLM node for the zv1 engine.
 """
 
 from typing import Any
@@ -13,7 +13,7 @@ async def process(
     node_config: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Process function for the DeepSeek: DeepSeek V4 Flash node.
+    Process function for the DeepSeek: DeepSeek V4 Flash 0423 node.
 
     Args:
         inputs: Node inputs containing messages/prompt and parameters.
