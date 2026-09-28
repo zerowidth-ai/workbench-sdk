@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const { tombstoneMissingNodes, modelDeprecationFields, readConfig } = require('./lib/node-deprecation');
+const { isBatchVariant } = require('./lib/model-filters');
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -206,6 +207,9 @@ class LLMNodeGenerator {
     }
     
     const filtered = this.models.filter(model => {
+      // Batch-only variants can't be called synchronously
+      if (isBatchVariant(model)) return false;
+
       const modelId = model.id.toLowerCase();
       const provider = model.id.split('/')[0].toLowerCase();
       
@@ -339,9 +343,36 @@ class LLMNodeGenerator {
   }
 
   /**
+   * Router models (e.g. typesafe/jev-router, openrouter/auto) pick an
+   * underlying model per request. OpenRouter lists them with pricing of "-1"
+   * (price depends on the model picked) and usually no supported_parameters.
+   */
+  isRouterModel(model) {
+    return model.pricing?.prompt === '-1' || model.pricing?.completion === '-1';
+  }
+
+  /**
+   * Apply per-model overrides from generator.config.json `model_overrides`,
+   * e.g. to declare the parameters a router accepts when OpenRouter lists none.
+   */
+  applyModelOverrides(model) {
+    const override = this.config.model_overrides?.[model.id];
+    if (!override) return model;
+    return {
+      ...model,
+      ...(override.supported_parameters && { supported_parameters: override.supported_parameters })
+    };
+  }
+
+  /**
    * Determine if model supports chat (messages) or completion (prompt)
    */
   isChatModel(model) {
+    // Routers forward chat requests to chat models
+    if (this.isRouterModel(model)) {
+      return true;
+    }
+
     // For image generation models, be more conservative
     // Many image models are completion-based (prompt) rather than chat-based (messages)
     if (this.hasImageGenerationCapability(model)) {
@@ -704,7 +735,21 @@ class LLMNodeGenerator {
    */
   generatePricing(model) {
     const pricing = model.pricing || {};
-    
+
+    if (this.isRouterModel(model)) {
+      // Price depends on the model the router picks; the runtime uses the
+      // cost OpenRouter reports for each request.
+      return {
+        reference: "https://openrouter.ai/models",
+        variable: true,
+        note: "Router model: price depends on the underlying model chosen per request. Costs come from OpenRouter's reported usage.",
+        items: [
+          { key: "input_cost_per_million", label: "Input Tokens (per 1M)", cost: null, currency: "USD" },
+          { key: "output_cost_per_million", label: "Output Tokens (per 1M)", cost: null, currency: "USD" }
+        ]
+      };
+    }
+
     return {
       reference: "https://openrouter.ai/models",
       items: [
@@ -1532,7 +1577,7 @@ ${returnValues}
     // Generate nodes for each current model (overwrites their dirs in place)
     for (const model of filteredModels) {
       try {
-        this.generateNode(model);
+        this.generateNode(this.applyModelOverrides(model));
       } catch (error) {
         console.error(`Error generating node for ${model.id}:`, error.message);
       }

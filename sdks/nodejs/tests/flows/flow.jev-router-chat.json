@@ -1,0 +1,120 @@
+{
+  "description": "Jev Router (a model picker) behaves like a standard chat LLM node.",
+  "flow": {
+    "id": "testJevRouterChat",
+    "metadata": {
+      "display_name": "Test: Jev Router chat"
+    },
+    "nodes": [
+      {
+        "id": "inChat",
+        "type": "input-chat",
+        "settings": {
+          "key": "chat"
+        }
+      },
+      {
+        "id": "router",
+        "type": "typesafe-jev-router",
+        "settings": {}
+      },
+      {
+        "id": "outChat",
+        "type": "output-chat",
+        "settings": {
+          "key": "chat"
+        }
+      },
+      {
+        "id": "outCost",
+        "type": "output-data",
+        "settings": {
+          "key": "cost"
+        }
+      }
+    ],
+    "links": [
+      {
+        "from": {
+          "node_id": "inChat",
+          "port_name": "messages"
+        },
+        "to": {
+          "node_id": "router",
+          "port_name": "messages"
+        }
+      },
+      {
+        "from": {
+          "node_id": "router",
+          "port_name": "message"
+        },
+        "to": {
+          "node_id": "outChat",
+          "port_name": "message"
+        }
+      },
+      {
+        "from": {
+          "node_id": "router",
+          "port_name": "cost_total"
+        },
+        "to": {
+          "node_id": "outCost",
+          "port_name": "value"
+        }
+      }
+    ],
+    "groups": []
+  },
+  "inputs": {
+    "chat": [
+      {
+        "role": "user",
+        "content": "What is 12 times 12? Reply with only the number."
+      }
+    ]
+  },
+  "expectedSchema": {
+    "type": "object",
+    "required": [
+      "outputs"
+    ],
+    "properties": {
+      "outputs": {
+        "type": "object",
+        "required": [
+          "chat",
+          "cost"
+        ],
+        "properties": {
+          "chat": {
+            "type": "array",
+            "minItems": 1,
+            "contains": {
+              "type": "object",
+              "required": [
+                "role",
+                "content"
+              ],
+              "properties": {
+                "role": {
+                  "const": "assistant"
+                },
+                "content": {
+                  "type": "string",
+                  "pattern": "144"
+                }
+              }
+            }
+          },
+          "cost": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    }
+  },
+  "retries": 2
+}

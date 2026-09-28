@@ -1,0 +1,259 @@
+{
+  "description": "Jev (System One) answers noul, choice and score questions about a text state; typed values and the versioned model flow out.",
+  "flow": {
+    "id": "testDecisionJevTyped",
+    "metadata": {
+      "display_name": "Test: Jev typed answers"
+    },
+    "nodes": [
+      {
+        "id": "inState",
+        "type": "input-data",
+        "settings": {
+          "key": "ticket",
+          "type": "string"
+        }
+      },
+      {
+        "id": "inQuestions",
+        "type": "input-data",
+        "settings": {
+          "key": "questions",
+          "type": "object"
+        }
+      },
+      {
+        "id": "jev",
+        "type": "typesafe-jev-latest",
+        "settings": {}
+      },
+      {
+        "id": "outValues",
+        "type": "output-data",
+        "settings": {
+          "key": "values"
+        }
+      },
+      {
+        "id": "outAnswers",
+        "type": "output-data",
+        "settings": {
+          "key": "answers"
+        }
+      },
+      {
+        "id": "outModel",
+        "type": "output-data",
+        "settings": {
+          "key": "model"
+        }
+      },
+      {
+        "id": "outCost",
+        "type": "output-data",
+        "settings": {
+          "key": "cost"
+        }
+      }
+    ],
+    "links": [
+      {
+        "from": {
+          "node_id": "inState",
+          "port_name": "value"
+        },
+        "to": {
+          "node_id": "jev",
+          "port_name": "state"
+        }
+      },
+      {
+        "from": {
+          "node_id": "inQuestions",
+          "port_name": "value"
+        },
+        "to": {
+          "node_id": "jev",
+          "port_name": "questions"
+        }
+      },
+      {
+        "from": {
+          "node_id": "jev",
+          "port_name": "values"
+        },
+        "to": {
+          "node_id": "outValues",
+          "port_name": "value"
+        }
+      },
+      {
+        "from": {
+          "node_id": "jev",
+          "port_name": "answers"
+        },
+        "to": {
+          "node_id": "outAnswers",
+          "port_name": "value"
+        }
+      },
+      {
+        "from": {
+          "node_id": "jev",
+          "port_name": "model"
+        },
+        "to": {
+          "node_id": "outModel",
+          "port_name": "value"
+        }
+      },
+      {
+        "from": {
+          "node_id": "jev",
+          "port_name": "cost_total"
+        },
+        "to": {
+          "node_id": "outCost",
+          "port_name": "value"
+        }
+      }
+    ],
+    "groups": []
+  },
+  "inputs": {
+    "ticket": "Help! My payouts have been failing for 3 days and I was double charged on my invoice.",
+    "questions": {
+      "is_urgent": {
+        "type": "noul",
+        "instructions": "Does this convey urgency?",
+        "criteria": {
+          "true": "Explicitly time-sensitive",
+          "false": "No urgency expressed"
+        }
+      },
+      "department": {
+        "type": "choice",
+        "instructions": "Which team should handle this?",
+        "criteria": {
+          "billing": "Payments, invoicing, refunds, payouts",
+          "technical": "Bugs, outages, integrations",
+          "sales": "Pricing, upgrades, new accounts"
+        }
+      },
+      "frustration": {
+        "type": "score",
+        "instructions": "How frustrated is the customer?",
+        "criteria": [
+          "Calm",
+          "Frustrated",
+          "Very angry"
+        ]
+      }
+    }
+  },
+  "expectedSchema": {
+    "type": "object",
+    "required": [
+      "outputs"
+    ],
+    "properties": {
+      "outputs": {
+        "type": "object",
+        "required": [
+          "values",
+          "answers",
+          "model",
+          "cost"
+        ],
+        "properties": {
+          "values": {
+            "type": "object",
+            "required": [
+              "is_urgent",
+              "department",
+              "frustration"
+            ],
+            "properties": {
+              "is_urgent": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 1
+              },
+              "department": {
+                "enum": [
+                  "billing",
+                  "technical"
+                ]
+              },
+              "frustration": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 2
+              }
+            }
+          },
+          "answers": {
+            "type": "object",
+            "required": [
+              "is_urgent",
+              "department",
+              "frustration"
+            ],
+            "properties": {
+              "is_urgent": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "noul"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "noul"
+                  }
+                }
+              },
+              "department": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "choice",
+                  "probabilities",
+                  "confidence"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "choice"
+                  }
+                }
+              },
+              "frustration": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "score",
+                  "legend",
+                  "probabilities",
+                  "confidence"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "score"
+                  }
+                }
+              }
+            }
+          },
+          "model": {
+            "type": "string",
+            "pattern": "^typesafe/jev-"
+          },
+          "cost": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    }
+  },
+  "retries": 2
+}

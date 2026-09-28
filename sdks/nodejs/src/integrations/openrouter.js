@@ -536,6 +536,11 @@ export default class OpenRouterIntegration {
         if (totalWeight > 0) {
             inputCost = totalCost * (inputWeight / totalWeight);
             outputCost = totalCost * (outputWeight / totalWeight);
+        } else if (promptTokens + completionTokens > 0) {
+            // Baked pricing has no usable rates (e.g. router models, whose price
+            // depends on the model they pick): apportion by token count instead
+            inputCost = totalCost * (promptTokens / (promptTokens + completionTokens));
+            outputCost = totalCost - inputCost;
         } else {
             // No token-weighted basis (e.g. rerank): attribute everything to one line
             inputCost = totalCost;
@@ -769,6 +774,114 @@ export default class OpenRouterIntegration {
             });
 
             console.error('OpenRouter Rerank Error:', error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    /**
+     * Ask typed questions about a state via OpenRouter's System One endpoint
+     * (/systemone) — the "decisions" output modality used by TypeSafe's Jev and
+     * other System One-compatible models (Upstage Solar Decide, Respan Span-01,
+     * Kev, ...). Not a chat endpoint: the request is { model, state, questions }
+     * and the response is { model, answers, usage }, one typed answer per
+     * question id (noul / choice / score).
+     *
+     * @param {Object} params - { model, state, questions }
+     *   `state` may be a string, object, or array. `questions` is a map of
+     *   question id -> { type: 'noul'|'choice'|'score', instructions, criteria? }.
+     * @param {Object} nodeConfig - node config (provides `pricing` for cost calc)
+     * @param {Object} engineConfig - engine config (for API call events)
+     * @returns {Promise<Object>} { answers, model, usage, cost_total, cost_itemized }
+     */
+    async systemOne(params, nodeConfig = null, engineConfig = null) {
+        const { model, state, questions } = params;
+
+        if (state === null || state === undefined) {
+            throw new Error('state is required for System One requests');
+        }
+        if (!questions || typeof questions !== 'object' || Array.isArray(questions) || Object.keys(questions).length === 0) {
+            throw new Error('questions must be a non-empty object mapping question ids to { type, instructions, criteria }');
+        }
+
+        const payload = { model, state, questions };
+
+        const url = `${this.client.baseURL}/systemone`;
+        const headers = {
+            'Content-Type': 'application/json',
+            'HTTP-Referer': this.client._options?.defaultHeaders?.['HTTP-Referer'] || 'https://workbench.zerowidth.ai',
+            'X-Title': this.client._options?.defaultHeaders?.['X-Title'] || 'Workbench by ZeroWidth',
+            'Authorization': `Bearer ${this.client._options?.apiKey || ''}`
+        };
+
+        const apiCallStartTime = Date.now();
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(payload),
+                signal: engineConfig?.signal || this._engineConfig?.signal,
+            });
+
+            if (!res.ok) {
+                const errorBody = await res.json().catch(() => null);
+                const detail = errorBody?.error?.message || errorBody?.detail;
+                const errorMessage = typeof detail === 'string' ? detail : (detail ? JSON.stringify(detail) : `HTTP ${res.status}`);
+                throw new Error(`OpenRouter API Error (${res.status}): ${errorMessage}`);
+            }
+
+            const data = await res.json();
+
+            // System One usage is { input_tokens, output_tokens, cost }; normalize
+            // to the chat-style token names used across workbench.
+            const promptTokens = data.usage?.input_tokens || 0;
+            const completionTokens = data.usage?.output_tokens || 0;
+            const usage = {
+                prompt_tokens: promptTokens,
+                completion_tokens: completionTokens,
+                total_tokens: promptTokens + completionTokens
+            };
+
+            let costData = null;
+            if (nodeConfig) {
+                costData = this.buildCostData({ ...usage, cost: data.usage?.cost }, nodeConfig.pricing);
+            }
+
+            const result = {
+                answers: data.answers || {},
+                model: data.model || model,
+                usage,
+                ...(costData && {
+                    cost_total: costData.totalCost,
+                    cost_itemized: costData.itemizedCosts
+                }),
+            };
+
+            await emitAPICallEvent(engineConfig || this._engineConfig, {
+                timestamp: apiCallStartTime,
+                integration: 'openrouter',
+                nodeId: nodeConfig?.id || null,
+                nodeType: nodeConfig?.type || null,
+                request: { method: 'POST', url, headers, body: payload },
+                response: { status: res.status, statusText: res.statusText, body: result },
+                duration: Date.now() - apiCallStartTime,
+                error: null
+            });
+
+            return result;
+        } catch (error) {
+            await emitAPICallEvent(engineConfig || this._engineConfig, {
+                timestamp: apiCallStartTime,
+                integration: 'openrouter',
+                nodeId: nodeConfig?.id || null,
+                nodeType: nodeConfig?.type || null,
+                request: { method: 'POST', url, headers, body: payload },
+                response: { status: error.status || 0, statusText: 'Error', body: null },
+                duration: Date.now() - apiCallStartTime,
+                error: { message: error.message }
+            });
+
+            console.error('OpenRouter System One Error:', error.message);
             throw new Error(error.message);
         }
     }

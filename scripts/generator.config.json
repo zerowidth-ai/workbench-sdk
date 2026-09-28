@@ -59,6 +59,12 @@
       "models": {
         "filter": "all_current"
       }
+    },
+    "typesafe": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
     }
   },
   "generation": {
@@ -74,5 +80,16 @@
     "backup_existing": false,
     "create_provider_folders": false,
     "cleanup_old_nodes": true
+  },
+  "model_overrides": {
+    "typesafe/jev-router": {
+      "supported_parameters": [
+        "tools",
+        "tool_choice",
+        "temperature",
+        "max_tokens",
+        "include_reasoning"
+      ]
+    }
   }
-} 
+}

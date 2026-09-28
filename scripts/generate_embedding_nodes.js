@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const { tombstoneMissingNodes, modelDeprecationFields, readConfig } = require('./lib/node-deprecation');
+const { isBatchVariant } = require('./lib/model-filters');
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -102,6 +103,9 @@ class EmbeddingNodeGenerator {
     console.log('Filtering models...');
 
     const filtered = this.models.filter(model => {
+      // Batch-only variants can't be called synchronously
+      if (isBatchVariant(model)) return false;
+
       const provider = model.id.split('/')[0].toLowerCase();
 
       // Must actually be an embeddings model (defensive — the API query already filters)
