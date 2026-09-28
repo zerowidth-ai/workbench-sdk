@@ -11,6 +11,7 @@
     "include_reasoning",
     "max_tokens",
     "reasoning",
+    "reasoning_effort",
     "response_format",
     "seed",
     "structured_outputs",

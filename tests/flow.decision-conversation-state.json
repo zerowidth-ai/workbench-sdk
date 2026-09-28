@@ -1,0 +1,287 @@
+{
+  "description": "A chat conversation (the SDK's conversation type) wired straight into every decision provider's state. Respan's node converts it to its { input, output } span shape.",
+  "flow": {
+    "id": "testDecisionConversation",
+    "metadata": {
+      "display_name": "Test: decision nodes on a conversation"
+    },
+    "nodes": [
+      {
+        "id": "inChat",
+        "type": "input-chat",
+        "settings": {
+          "key": "chat"
+        }
+      },
+      {
+        "id": "inQuestions",
+        "type": "input-data",
+        "settings": {
+          "key": "questions",
+          "type": "object"
+        }
+      },
+      {
+        "id": "jev",
+        "type": "typesafe-jev-latest",
+        "settings": {}
+      },
+      {
+        "id": "out_jev",
+        "type": "output-data",
+        "settings": {
+          "key": "jev_values"
+        }
+      },
+      {
+        "id": "solar",
+        "type": "upstage-solar-decide",
+        "settings": {}
+      },
+      {
+        "id": "out_solar",
+        "type": "output-data",
+        "settings": {
+          "key": "solar_values"
+        }
+      },
+      {
+        "id": "kev",
+        "type": "jaredpalmer-kev-4b",
+        "settings": {}
+      },
+      {
+        "id": "out_kev",
+        "type": "output-data",
+        "settings": {
+          "key": "kev_values"
+        }
+      },
+      {
+        "id": "span",
+        "type": "respan-span-01-lite-free",
+        "settings": {}
+      },
+      {
+        "id": "out_span",
+        "type": "output-data",
+        "settings": {
+          "key": "span_values"
+        }
+      }
+    ],
+    "links": [
+      {
+        "from": {
+          "node_id": "inChat",
+          "port_name": "messages"
+        },
+        "to": {
+          "node_id": "jev",
+          "port_name": "state"
+        }
+      },
+      {
+        "from": {
+          "node_id": "inQuestions",
+          "port_name": "value"
+        },
+        "to": {
+          "node_id": "jev",
+          "port_name": "questions"
+        }
+      },
+      {
+        "from": {
+          "node_id": "jev",
+          "port_name": "values"
+        },
+        "to": {
+          "node_id": "out_jev",
+          "port_name": "value"
+        }
+      },
+      {
+        "from": {
+          "node_id": "inChat",
+          "port_name": "messages"
+        },
+        "to": {
+          "node_id": "solar",
+          "port_name": "state"
+        }
+      },
+      {
+        "from": {
+          "node_id": "inQuestions",
+          "port_name": "value"
+        },
+        "to": {
+          "node_id": "solar",
+          "port_name": "questions"
+        }
+      },
+      {
+        "from": {
+          "node_id": "solar",
+          "port_name": "values"
+        },
+        "to": {
+          "node_id": "out_solar",
+          "port_name": "value"
+        }
+      },
+      {
+        "from": {
+          "node_id": "inChat",
+          "port_name": "messages"
+        },
+        "to": {
+          "node_id": "kev",
+          "port_name": "state"
+        }
+      },
+      {
+        "from": {
+          "node_id": "inQuestions",
+          "port_name": "value"
+        },
+        "to": {
+          "node_id": "kev",
+          "port_name": "questions"
+        }
+      },
+      {
+        "from": {
+          "node_id": "kev",
+          "port_name": "values"
+        },
+        "to": {
+          "node_id": "out_kev",
+          "port_name": "value"
+        }
+      },
+      {
+        "from": {
+          "node_id": "inChat",
+          "port_name": "messages"
+        },
+        "to": {
+          "node_id": "span",
+          "port_name": "state"
+        }
+      },
+      {
+        "from": {
+          "node_id": "inQuestions",
+          "port_name": "value"
+        },
+        "to": {
+          "node_id": "span",
+          "port_name": "questions"
+        }
+      },
+      {
+        "from": {
+          "node_id": "span",
+          "port_name": "values"
+        },
+        "to": {
+          "node_id": "out_span",
+          "port_name": "value"
+        }
+      }
+    ],
+    "groups": []
+  },
+  "inputs": {
+    "chat": [
+      {
+        "role": "user",
+        "content": "I was charged twice for my subscription this month. Can I get the duplicate charge back?"
+      },
+      {
+        "role": "assistant",
+        "content": "I am sorry about that. I have refunded the duplicate charge; it will reach your card in 3-5 business days."
+      }
+    ],
+    "questions": {
+      "refund_issued": {
+        "type": "noul",
+        "instructions": "Did the assistant issue a refund to the customer?"
+      }
+    }
+  },
+  "expectedSchema": {
+    "type": "object",
+    "required": [
+      "outputs"
+    ],
+    "properties": {
+      "outputs": {
+        "type": "object",
+        "required": [
+          "jev_values",
+          "solar_values",
+          "kev_values",
+          "span_values"
+        ],
+        "properties": {
+          "jev_values": {
+            "type": "object",
+            "required": [
+              "refund_issued"
+            ],
+            "properties": {
+              "refund_issued": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 1
+              }
+            }
+          },
+          "solar_values": {
+            "type": "object",
+            "required": [
+              "refund_issued"
+            ],
+            "properties": {
+              "refund_issued": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 1
+              }
+            }
+          },
+          "kev_values": {
+            "type": "object",
+            "required": [
+              "refund_issued"
+            ],
+            "properties": {
+              "refund_issued": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 1
+              }
+            }
+          },
+          "span_values": {
+            "type": "object",
+            "required": [
+              "refund_issued"
+            ],
+            "properties": {
+              "refund_issued": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "retries": 2
+}

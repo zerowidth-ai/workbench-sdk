@@ -16,6 +16,7 @@
     "min_p",
     "presence_penalty",
     "reasoning",
+    "reasoning_effort",
     "repetition_penalty",
     "response_format",
     "seed",
@@ -24,6 +25,7 @@
     "temperature",
     "tool_choice",
     "tools",
+    "top_a",
     "top_k",
     "top_logprobs",
     "top_p"
@@ -221,13 +223,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.039,
+        "cost": 0.15,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.18,
+        "cost": 0.6,
         "currency": "USD"
       }
     ]

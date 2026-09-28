@@ -5,7 +5,7 @@
   "category": "embedding",
   "provider": "intfloat",
   "model_id": "intfloat/e5-base-v2",
-  "context_length": 8192,
+  "context_length": 512,
   "input_modalities": [
     "text"
   ],

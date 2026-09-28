@@ -1,0 +1,32 @@
+{
+  "providers": {
+    "_all": {
+      "enabled": true,
+      "models": {
+        "filter": "all_current"
+      }
+    }
+  },
+  "provider_overrides": {
+    "respan": {
+      "supported_question_types": [
+        "noul"
+      ],
+      "state_format": "conversation_span",
+      "note": "Only accepts noul questions whose instructions and criteria are plain strings. Scores a conversation span: connect a conversation that ends with an assistant reply (converted automatically), or a string."
+    }
+  },
+  "generation": {
+    "category": "decision",
+    "include_tests": true,
+    "include_python": true,
+    "exclude_free": false,
+    "dry_run": false
+  },
+  "output": {
+    "overwrite_existing": true,
+    "backup_existing": false,
+    "create_provider_folders": false,
+    "cleanup_old_nodes": true
+  }
+}

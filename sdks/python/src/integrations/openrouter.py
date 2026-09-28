@@ -668,6 +668,11 @@ class OpenRouterIntegration:
         if total_weight > 0:
             input_cost = total_cost * (input_weight / total_weight)
             output_cost = total_cost * (output_weight / total_weight)
+        elif prompt_tokens + completion_tokens > 0:
+            # Baked pricing has no usable rates (e.g. router models, whose price
+            # depends on the model they pick): apportion by token count instead
+            input_cost = total_cost * (prompt_tokens / (prompt_tokens + completion_tokens))
+            output_cost = total_cost - input_cost
         else:
             # No token-weighted basis (e.g. rerank): attribute everything to one line
             input_cost = total_cost
@@ -929,4 +934,132 @@ class OpenRouterIntegration:
                 "error": {"message": str(e)},
             })
             logger.error(f"OpenRouter Rerank Error: {e}")
+            raise
+
+    async def system_one(
+        self,
+        *,
+        model: str,
+        state: Any,
+        questions: dict[str, Any],
+        node_config: dict[str, Any] | None = None,
+        engine_config: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """
+        Ask typed questions about a state via OpenRouter's System One endpoint
+        (/systemone), the "decisions" output modality used by TypeSafe's Jev and
+        other System One-compatible models. Not a chat endpoint: the request is
+        {model, state, questions} and the response is {model, answers, usage},
+        one typed answer (noul / choice / score) per question id.
+
+        Args:
+            model: Decision model identifier (e.g., "~typesafe/jev-latest").
+            state: The content to evaluate (string, object, or list).
+            questions: Map of question id -> {type, instructions, criteria?}.
+            node_config: Node configuration (provides `pricing`).
+            engine_config: Engine configuration (for API call events).
+
+        Returns:
+            Dict with answers, model (versioned id that answered), usage, costs.
+        """
+        import httpx
+
+        if state is None:
+            raise ValueError("state is required for System One requests")
+        if not isinstance(questions, dict) or not questions:
+            raise ValueError(
+                "questions must be a non-empty object mapping question ids to "
+                "{ type, instructions, criteria }"
+            )
+
+        payload: dict[str, Any] = {"model": model, "state": state, "questions": questions}
+
+        url = f"{self.base_url}/systemone"
+        headers = {
+            "Content-Type": "application/json",
+            "HTTP-Referer": self.referer,
+            "X-Title": self.title,
+            "Authorization": f"Bearer {self.api_key}",
+        }
+
+        api_call_start_time = int(time.time() * 1000)
+
+        try:
+            async with httpx.AsyncClient(timeout=300) as client:
+                res = await client.post(url, headers=headers, json=payload)
+
+            if res.status_code >= 400:
+                error_body = (
+                    res.json()
+                    if res.headers.get("content-type", "").startswith("application/json")
+                    else None
+                ) or {}
+                detail = (error_body.get("error") or {}).get("message") or error_body.get("detail")
+                if detail is None:
+                    error_msg = f"HTTP {res.status_code}"
+                elif isinstance(detail, str):
+                    error_msg = detail
+                else:
+                    import json as _json
+                    error_msg = _json.dumps(detail)
+                raise Exception(f"OpenRouter API Error ({res.status_code}): {error_msg}")
+
+            data = res.json()
+
+            # System One usage is {input_tokens, output_tokens, cost}; normalize to
+            # the chat-style token names used across workbench.
+            usage_raw = data.get("usage", {}) or {}
+            prompt_tokens = usage_raw.get("input_tokens", 0) or 0
+            completion_tokens = usage_raw.get("output_tokens", 0) or 0
+            usage = UsageStats(
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+                total_tokens=prompt_tokens + completion_tokens,
+            )
+
+            cost_data = None
+            if node_config:
+                cost_data = self.build_cost_data(
+                    {**usage.to_dict(), "cost": usage_raw.get("cost")}, node_config.get("pricing")
+                )
+
+            result: dict[str, Any] = {
+                "answers": data.get("answers") or {},
+                "model": data.get("model", model),
+                "usage": usage.to_dict(),
+            }
+            if cost_data:
+                result["cost_total"] = cost_data.total_cost
+                result["cost_itemized"] = cost_data.itemized_costs
+
+            _cfg = engine_config or getattr(self, "_engine_config", None)
+            await emit_api_call_event(_cfg, {
+                "timestamp": api_call_start_time,
+                "integration": "openrouter",
+                "nodeId": node_config.get("id") if node_config else None,
+                "nodeType": node_config.get("type") if node_config else None,
+                "request": {"method": "POST", "url": url, "headers": headers, "body": payload},
+                "response": {
+                    "status": res.status_code,
+                    "statusText": res.reason_phrase,
+                    "body": result,
+                },
+                "duration": int(time.time() * 1000) - api_call_start_time,
+                "error": None,
+            })
+
+            return result
+        except Exception as e:
+            _cfg = engine_config or getattr(self, "_engine_config", None)
+            await emit_api_call_event(_cfg, {
+                "timestamp": api_call_start_time,
+                "integration": "openrouter",
+                "nodeId": node_config.get("id") if node_config else None,
+                "nodeType": node_config.get("type") if node_config else None,
+                "request": {"method": "POST", "url": url, "headers": headers, "body": payload},
+                "response": {"status": 0, "statusText": "Error", "body": None},
+                "duration": int(time.time() * 1000) - api_call_start_time,
+                "error": {"message": str(e)},
+            })
+            logger.error(f"OpenRouter System One Error: {e}")
             raise

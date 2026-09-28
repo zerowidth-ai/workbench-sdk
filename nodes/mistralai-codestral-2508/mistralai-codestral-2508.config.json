@@ -10,6 +10,7 @@
   "supported_parameters": [
     "frequency_penalty",
     "max_tokens",
+    "prediction",
     "presence_penalty",
     "response_format",
     "seed",

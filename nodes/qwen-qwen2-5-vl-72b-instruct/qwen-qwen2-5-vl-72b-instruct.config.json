@@ -6,10 +6,11 @@
   "provider": "qwen",
   "accepts_plugins": false,
   "model_id": "qwen/qwen2.5-vl-72b-instruct",
-  "context_length": 131072,
+  "context_length": 128000,
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",
+    "logprobs",
     "max_tokens",
     "presence_penalty",
     "repetition_penalty",
@@ -19,6 +20,7 @@
     "structured_outputs",
     "temperature",
     "top_k",
+    "top_logprobs",
     "top_p"
   ],
   "inputs": [
@@ -84,6 +86,20 @@
       "type": "number",
       "description": "Deterministic outputs",
       "default": null
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Logprobs",
+      "type": "boolean",
+      "description": "Return log probabilities of the output tokens",
+      "default": null
+    },
+    {
+      "name": "top_logprobs",
+      "display_name": "Top Logprobs",
+      "type": "number",
+      "description": "Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.",
+      "default": null
     }
   ],
   "outputs": [
@@ -117,6 +133,12 @@
       "display_name": "Finish Reason",
       "type": "string",
       "description": "Why the completion finished"
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Log Probabilities",
+      "type": "object",
+      "description": "Token probabilities and logprobs from the model"
     }
   ],
   "pricing": {
@@ -125,13 +147,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 0.25,
+        "cost": 0.7999999999999999,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 0.75,
+        "cost": 1,
         "currency": "USD"
       }
     ]

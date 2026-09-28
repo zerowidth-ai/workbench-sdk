@@ -1,6 +1,6 @@
 {
   "name": "@zerowidth/workbench-sdk",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "dependencies": {
     "adm-zip": "^0.5.16",
     "ajv": "^8.17.1",
@@ -16,11 +16,17 @@
     "url": "https://github.com/zerowidth-ai/workbench-sdk.git",
     "directory": "sdks/nodejs"
   },
-  "description": "Workbench SDK \u2014 execute Workbench-authored flows in production. Successor to the zv1 package; see https://zerowidth.ai for the design surface.",
+  "homepage": "https://github.com/zerowidth-ai/workbench-sdk#readme",
+  "bugs": "https://github.com/zerowidth-ai/workbench-sdk/issues",
+  "description": "Workbench SDK — execute Workbench-authored flows in production. Successor to the zv1 package; see https://zerowidth.ai for the design surface.",
   "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
   "files": [
     "src/",
     "nodes/",
+    "!nodes/**/*.tests.json",
     "types/",
     "LICENSE",
     "README.md"
@@ -35,6 +41,7 @@
     "dotenv": "^17.2.2"
   },
   "scripts": {
+    "test": "node tests/test.all-nodes.js",
     "test-nodes": "node tests/test.all-nodes.js",
     "test-flows": "node tests/test.flows.js",
     "test-flow": "node tests/test.flows.js",

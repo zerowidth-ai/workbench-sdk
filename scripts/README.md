@@ -7,6 +7,14 @@ This directory contains scripts for generating LLM nodes and synchronizing share
 ### generate_llm_nodes.js
 Generates LLM node definitions by fetching available models from OpenRouter. Creates config, JavaScript process, Python process, and test files for each model.
 
+### generate_embedding_nodes.js / generate_rerank_nodes.js
+Generate embedding and rerank nodes from OpenRouter's `embeddings` and `rerank` output modalities.
+
+### generate_decision_nodes.js
+Generates `decision` nodes for System One models (OpenRouter's `decisions` output modality, e.g. TypeSafe Jev). These are not chat models: each node takes a `state` and a map of typed `questions` (`noul`, `choice`, `score`) and returns typed `answers` via OpenRouter's `/systemone` endpoint. Per-provider restrictions go in `decision-generator.config.json` under `provider_overrides`.
+
+All generators skip OpenRouter `:batch` model variants, which only work through the asynchronous batch API.
+
 ### sync_sdks.py
 Python script for one-time synchronization of nodes, types, and test flows to all SDKs.
 
@@ -57,6 +65,29 @@ Edit `generator.config.json` to control which providers/models are generated:
 ```
 
 See `generator.config.example.json` for all available options.
+
+Router models (e.g. `typesafe/jev-router`, listed by OpenRouter with pricing `-1`) are generated as chat nodes with variable pricing. OpenRouter lists no supported parameters for routers, so declare the ones they accept under `model_overrides`:
+
+```json
+{
+  "model_overrides": {
+    "typesafe/jev-router": {
+      "supported_parameters": ["tools", "tool_choice", "temperature", "max_tokens", "include_reasoning"]
+    }
+  }
+}
+```
+
+### Regenerating everything
+
+```bash
+cd scripts
+node generate_llm_nodes.js
+node generate_embedding_nodes.js
+node generate_rerank_nodes.js
+node generate_decision_nodes.js
+python sync_sdks.py
+```
 
 ## Usage
 

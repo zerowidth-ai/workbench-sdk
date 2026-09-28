@@ -10,8 +10,8 @@
   "supported_parameters": [
     "include_reasoning",
     "max_completion_tokens",
-    "max_tokens",
     "reasoning",
+    "reasoning_effort",
     "response_format",
     "seed",
     "structured_outputs",
@@ -60,13 +60,6 @@
       "display_name": "Response Format",
       "type": "object",
       "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "max_tokens",
-      "display_name": "Max Tokens",
-      "type": "number",
-      "description": "Maximum tokens to generate",
       "default": null
     },
     {

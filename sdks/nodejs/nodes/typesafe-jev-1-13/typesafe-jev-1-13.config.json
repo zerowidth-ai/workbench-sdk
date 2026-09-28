@@ -1,0 +1,85 @@
+{
+  "display_name": "TypeSafe: Jev 1.13",
+  "tagline": "Answer typed questions about a state",
+  "description": "Jev is a structured decision model from TypeSafe, and the first of its System One models. System One models make fast, structured decisions for software, returning a typed choice rather...",
+  "category": "decision",
+  "provider": "typesafe",
+  "model_id": "typesafe/jev-1.13",
+  "context_length": 32000,
+  "supported_question_types": [
+    "noul",
+    "choice",
+    "score"
+  ],
+  "inputs": [
+    {
+      "name": "state",
+      "display_name": "State",
+      "type": "string or object or array or array of objects or array of strings or conversation or message",
+      "description": "The content to evaluate: plain text, a conversation or message, or structured data (object/array) such as a record or application state. Questions can refer to nested fields by name in backticks.",
+      "required": true
+    },
+    {
+      "name": "questions",
+      "display_name": "Questions",
+      "type": "object",
+      "description": "Map of question id -> typed question. Each question has a type (\"noul\" = yes/no probability, \"choice\" = pick one option, \"score\" = rate on ordered levels), instructions, and criteria (noul: optional { true, false }; choice: { option: description|null }; score: ordered array of 2-10 level descriptions). Answers come back under the same ids.",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "answers",
+      "display_name": "Answers",
+      "type": "object",
+      "description": "Typed answer per question id. noul: { type, noul }; choice: { type, choice, probabilities, confidence }; score: { type, score, legend, probabilities, confidence }"
+    },
+    {
+      "name": "values",
+      "display_name": "Values",
+      "type": "object",
+      "description": "Shortcut map of question id -> primary value (noul probability, chosen option, or score)"
+    },
+    {
+      "name": "model",
+      "display_name": "Model",
+      "type": "string",
+      "description": "The versioned model id that answered (aliases resolve to a specific version)"
+    },
+    {
+      "name": "usage",
+      "display_name": "Token Usage",
+      "type": "object",
+      "description": "Token usage statistics"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost for this request (USD)"
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array of objects",
+      "description": "Detailed breakdown of costs"
+    }
+  ],
+  "pricing": {
+    "reference": "https://openrouter.ai/models",
+    "items": [
+      {
+        "key": "input_cost_per_million",
+        "label": "Input Tokens (per 1M)",
+        "cost": 0.041999999999999996,
+        "currency": "USD"
+      },
+      {
+        "key": "output_cost_per_million",
+        "label": "Output Tokens (per 1M)",
+        "cost": 0,
+        "currency": "USD"
+      }
+    ]
+  }
+}

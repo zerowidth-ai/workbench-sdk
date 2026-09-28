@@ -134,6 +134,6 @@ export default async ({inputs, settings, config, nodeConfig}) => {
         };
     } catch (error) {
         console.log('error', error);
-        throw new Error(`xAI: Grok 4.20 node error: ${error.message}`);
+        throw new Error(`SpaceXAI: Grok 4.20 node error: ${error.message}`);
     }
 };

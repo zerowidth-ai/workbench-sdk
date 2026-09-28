@@ -12,6 +12,7 @@
     "logit_bias",
     "logprobs",
     "max_tokens",
+    "prediction",
     "presence_penalty",
     "response_format",
     "seed",

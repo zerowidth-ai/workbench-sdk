@@ -189,5 +189,13 @@
         "currency": "USD"
       }
     ]
+  },
+  "deprecated": true,
+  "deprecation": {
+    "reason": "Model no longer available on OpenRouter",
+    "since": "2026-09-28",
+    "expiration_date": null,
+    "replacement": null,
+    "source": "openrouter"
   }
 }

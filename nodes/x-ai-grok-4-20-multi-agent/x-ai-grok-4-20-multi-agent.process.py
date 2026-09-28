@@ -1,5 +1,5 @@
 """
-xAI: Grok 4.20 Multi-Agent - LLM node for the zv1 engine.
+SpaceXAI: Grok 4.20 Multi-Agent - LLM node for the zv1 engine.
 """
 
 from typing import Any
@@ -13,7 +13,7 @@ async def process(
     node_config: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Process function for the xAI: Grok 4.20 Multi-Agent node.
+    Process function for the SpaceXAI: Grok 4.20 Multi-Agent node.
 
     Args:
         inputs: Node inputs containing messages/prompt and parameters.

@@ -1,7 +1,7 @@
 {
-  "display_name": "xAI: Grok 4.20 Multi-Agent",
+  "display_name": "SpaceXAI: Grok 4.20 Multi-Agent",
   "tagline": "Generate text",
-  "description": "Grok 4.20 Multi-Agent is a variant of xAI’s Grok 4.20 designed for collaborative, agent-based workflows. Multiple agents operate in parallel to conduct deep research, coordinate tool use, and synthesize information...",
+  "description": "Grok 4.20 Multi-Agent is a variant of SpaceXAI’s Grok 4.20 designed for collaborative, agent-based workflows. Multiple agents operate in parallel to conduct deep research, coordinate tool use, and synthesize information...",
   "category": "llm",
   "provider": "x-ai",
   "accepts_plugins": false,
@@ -12,6 +12,7 @@
     "logprobs",
     "max_tokens",
     "reasoning",
+    "reasoning_effort",
     "response_format",
     "seed",
     "structured_outputs",
@@ -142,13 +143,13 @@
       {
         "key": "input_cost_per_million",
         "label": "Input Tokens (per 1M)",
-        "cost": 2,
+        "cost": 1.25,
         "currency": "USD"
       },
       {
         "key": "output_cost_per_million",
         "label": "Output Tokens (per 1M)",
-        "cost": 6,
+        "cost": 2.5,
         "currency": "USD"
       }
     ]

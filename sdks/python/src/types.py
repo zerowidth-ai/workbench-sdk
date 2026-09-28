@@ -506,7 +506,7 @@ def convert_import_to_node_type(
             "imports": import_definition.get("imports", []),
         }
 
-        child_engine = Zv1(child_flow, child_config)
+        child_engine = Workbench(child_flow, child_config)
         await child_engine.initialize()
 
         # Map inputs from parent to child flow's input nodes

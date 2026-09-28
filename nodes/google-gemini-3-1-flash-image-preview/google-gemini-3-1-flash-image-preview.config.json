@@ -6,14 +6,14 @@
   "provider": "google",
   "accepts_plugins": false,
   "model_id": "google/gemini-3.1-flash-image-preview",
-  "context_length": 131072,
+  "context_length": 65536,
   "supported_parameters": [
     "include_reasoning",
     "max_tokens",
     "reasoning",
+    "reasoning_effort",
     "response_format",
     "seed",
-    "stop",
     "structured_outputs",
     "temperature",
     "top_p"

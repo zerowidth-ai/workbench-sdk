@@ -100,7 +100,7 @@ class WorkbenchError(Exception):
         }
 
 
-class NodeError(Zv1Error):
+class NodeError(WorkbenchError):
     """Error during node execution."""
 
     def __init__(
@@ -131,7 +131,7 @@ class NodeError(Zv1Error):
         self.node_type = node_type
 
 
-class FlowError(Zv1Error):
+class FlowError(WorkbenchError):
     """Error related to flow structure or validation."""
 
     def __init__(
@@ -156,7 +156,7 @@ class FlowError(Zv1Error):
         )
 
 
-class ValidationError(Zv1Error):
+class ValidationError(WorkbenchError):
     """Input/output validation error."""
 
     def __init__(
@@ -184,7 +184,7 @@ class ValidationError(Zv1Error):
         self.field_name = field_name
 
 
-class TimeoutError(Zv1Error):  # noqa: A001 - Intentionally shadows builtin
+class TimeoutError(WorkbenchError):  # noqa: A001 - Intentionally shadows builtin
     """Flow execution timeout error."""
 
     def __init__(
@@ -210,7 +210,7 @@ class TimeoutError(Zv1Error):  # noqa: A001 - Intentionally shadows builtin
         self.timeout_ms = timeout_ms
 
 
-class ResourceError(Zv1Error):
+class ResourceError(WorkbenchError):
     """Resource allocation or access error."""
 
     def __init__(
@@ -327,7 +327,7 @@ class ErrorManager:
             original_error: Original exception if one exists.
 
         Raises:
-            Zv1Error: Enriched error with context.
+            WorkbenchError: Enriched error with context.
         """
         error_details.execution_id = self.execution_id
         error_details.timestamp = time.time()
@@ -352,7 +352,7 @@ class ErrorManager:
 
                 warnings.warn(f"Error in on_error callback: {callback_error}", stacklevel=2)
 
-        raise Zv1Error(
+        raise WorkbenchError(
             message=error_details.message,
             error_type=error_type,
             error_details=error_details,
@@ -376,7 +376,7 @@ class ErrorManager:
             original_error: Original exception if one exists.
 
         Raises:
-            Zv1Error: Enriched error with context.
+            WorkbenchError: Enriched error with context.
         """
         error_details.execution_id = self.execution_id
         error_details.timestamp = time.time()
@@ -384,7 +384,7 @@ class ErrorManager:
         error_event = self._create_error_event(error_type, error_details, original_error)
         await self._invoke_callback(error_event)
 
-        raise Zv1Error(
+        raise WorkbenchError(
             message=error_details.message,
             error_type=error_type,
             error_details=error_details,
@@ -535,3 +535,7 @@ class ErrorManager:
 
         # Default to recoverable for unknown types
         return True
+
+
+# Legacy alias from the zv1 -> Workbench rename; kept for backward compatibility.
+Zv1Error = WorkbenchError

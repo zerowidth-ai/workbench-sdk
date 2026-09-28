@@ -5,7 +5,7 @@
   "category": "embedding",
   "provider": "baai",
   "model_id": "baai/bge-large-en-v1.5",
-  "context_length": 8192,
+  "context_length": 512,
   "input_modalities": [
     "text"
   ],

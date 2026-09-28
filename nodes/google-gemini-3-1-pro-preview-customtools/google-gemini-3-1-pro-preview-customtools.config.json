@@ -6,14 +6,14 @@
   "provider": "google",
   "accepts_plugins": true,
   "model_id": "google/gemini-3.1-pro-preview-customtools",
-  "context_length": 1048756,
+  "context_length": 1048576,
   "supported_parameters": [
     "include_reasoning",
     "max_tokens",
     "reasoning",
+    "reasoning_effort",
     "response_format",
     "seed",
-    "stop",
     "structured_outputs",
     "temperature",
     "tool_choice",
@@ -62,13 +62,6 @@
       "display_name": "Response Format",
       "type": "object",
       "description": "Output format specification",
-      "default": null
-    },
-    {
-      "name": "stop",
-      "display_name": "Stop",
-      "type": "string or array",
-      "description": "Custom stop sequences",
       "default": null
     },
     {

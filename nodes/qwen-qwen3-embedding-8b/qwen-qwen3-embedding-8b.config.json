@@ -5,7 +5,7 @@
   "category": "embedding",
   "provider": "qwen",
   "model_id": "qwen/qwen3-embedding-8b",
-  "context_length": 32000,
+  "context_length": 32768,
   "input_modalities": [
     "text"
   ],

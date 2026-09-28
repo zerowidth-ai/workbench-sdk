@@ -1,0 +1,83 @@
+{
+  "display_name": "Respan: Span-01 Lite",
+  "tagline": "Answer typed questions about a state",
+  "description": "Span-01 Lite is the free, lighter tier of Span-01, a behavior scoring model from Respan. It returns, for each plain-language behavior you define, the probability that the behavior is present...\n\nOnly accepts noul questions whose instructions and criteria are plain strings. Scores a conversation span: connect a conversation that ends with an assistant reply (converted automatically), or a string.",
+  "category": "decision",
+  "provider": "respan",
+  "model_id": "respan/span-01-lite",
+  "context_length": 0,
+  "supported_question_types": [
+    "noul"
+  ],
+  "inputs": [
+    {
+      "name": "state",
+      "display_name": "State",
+      "type": "string or object or array or array of objects or array of strings or conversation or message",
+      "description": "The conversation span to score: a conversation ending with an assistant reply (converted to { input, output } automatically), a single assistant message, or plain text. Other structured data is sent as JSON text.",
+      "required": true
+    },
+    {
+      "name": "questions",
+      "display_name": "Questions",
+      "type": "object",
+      "description": "Map of question id -> typed question. Each question has a type (\"noul\" = yes/no probability, \"choice\" = pick one option, \"score\" = rate on ordered levels), instructions, and criteria (noul: optional { true, false }; choice: { option: description|null }; score: ordered array of 2-10 level descriptions). Answers come back under the same ids.",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "answers",
+      "display_name": "Answers",
+      "type": "object",
+      "description": "Typed answer per question id. noul: { type, noul }; choice: { type, choice, probabilities, confidence }; score: { type, score, legend, probabilities, confidence }"
+    },
+    {
+      "name": "values",
+      "display_name": "Values",
+      "type": "object",
+      "description": "Shortcut map of question id -> primary value (noul probability, chosen option, or score)"
+    },
+    {
+      "name": "model",
+      "display_name": "Model",
+      "type": "string",
+      "description": "The versioned model id that answered (aliases resolve to a specific version)"
+    },
+    {
+      "name": "usage",
+      "display_name": "Token Usage",
+      "type": "object",
+      "description": "Token usage statistics"
+    },
+    {
+      "name": "cost_total",
+      "display_name": "Total Cost",
+      "type": "number",
+      "description": "Total cost for this request (USD)"
+    },
+    {
+      "name": "cost_itemized",
+      "display_name": "Itemized Cost",
+      "type": "array of objects",
+      "description": "Detailed breakdown of costs"
+    }
+  ],
+  "pricing": {
+    "reference": "https://openrouter.ai/models",
+    "items": [
+      {
+        "key": "input_cost_per_million",
+        "label": "Input Tokens (per 1M)",
+        "cost": 0,
+        "currency": "USD"
+      },
+      {
+        "key": "output_cost_per_million",
+        "label": "Output Tokens (per 1M)",
+        "cost": 0,
+        "currency": "USD"
+      }
+    ]
+  }
+}

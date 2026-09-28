@@ -8,16 +8,19 @@
   "model_id": "qwen/qwen3.5-flash-02-23",
   "context_length": 1000000,
   "supported_parameters": [
+    "frequency_penalty",
     "include_reasoning",
     "max_tokens",
     "presence_penalty",
     "reasoning",
     "response_format",
     "seed",
+    "stop",
     "structured_outputs",
     "temperature",
     "tool_choice",
     "tools",
+    "top_k",
     "top_p"
   ],
   "inputs": [
@@ -65,6 +68,13 @@
       "default": null
     },
     {
+      "name": "stop",
+      "display_name": "Stop",
+      "type": "string or array",
+      "description": "Custom stop sequences",
+      "default": null
+    },
+    {
       "name": "temperature",
       "display_name": "Temperature",
       "type": "number",
@@ -83,6 +93,13 @@
       "display_name": "Max Tokens",
       "type": "number",
       "description": "Maximum tokens to generate",
+      "default": null
+    },
+    {
+      "name": "frequency_penalty",
+      "display_name": "Frequency Penalty",
+      "type": "number",
+      "description": "Reduces repetition (-2 to 2)",
       "default": null
     },
     {

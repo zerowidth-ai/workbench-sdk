@@ -327,7 +327,7 @@ class Workbench:
         cls,
         flow: str | dict[str, Any] | bytes,
         config: dict[str, Any] | None = None,
-    ) -> Zv1:
+    ) -> Workbench:
         """
         Create a new Zv1 instance (async factory method).
 
@@ -561,7 +561,7 @@ class Workbench:
             }
 
             # Create internal engine
-            internal_engine = Zv1(internal_flow, child_config)
+            internal_engine = Workbench(internal_flow, child_config)
             await internal_engine.initialize()
 
             # Map macro inputs to internal flow inputs
@@ -2443,3 +2443,7 @@ class Workbench:
 
         except Exception as e:
             logger.warning(f"Error during cleanup: {e}")
+
+
+# Legacy alias from the zv1 -> Workbench rename; kept for backward compatibility.
+Zv1 = Workbench

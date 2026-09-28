@@ -4,12 +4,13 @@
   "description": "Mistral Small 3.1 24B Instruct is an upgraded variant of Mistral Small 3 (2501), featuring 24 billion parameters with advanced multimodal capabilities. It provides state-of-the-art performance in text-based reasoning and...",
   "category": "llm",
   "provider": "mistralai",
-  "accepts_plugins": false,
+  "accepts_plugins": true,
   "model_id": "mistralai/mistral-small-3.1-24b-instruct",
   "context_length": 128000,
   "supported_parameters": [
     "frequency_penalty",
     "logit_bias",
+    "logprobs",
     "max_tokens",
     "min_p",
     "presence_penalty",
@@ -17,16 +18,41 @@
     "seed",
     "stop",
     "temperature",
+    "tool_choice",
+    "tools",
     "top_k",
+    "top_logprobs",
     "top_p"
   ],
   "inputs": [
     {
-      "name": "prompt",
-      "display_name": "Prompt",
-      "type": "string",
-      "description": "Text prompt for completion",
+      "name": "messages",
+      "display_name": "Conversation",
+      "type": "conversation or message or string",
+      "description": "Array of chat messages that make up the conversation",
       "required": true
+    },
+    {
+      "name": "system_prompt",
+      "display_name": "System Message",
+      "type": "message or string",
+      "description": "System prompt to instruct the model",
+      "default": null
+    },
+    {
+      "name": "tools",
+      "display_name": "Tools",
+      "type": "tool or array of tools",
+      "description": "Array of tools to use",
+      "default": null,
+      "allow_multiple": true
+    },
+    {
+      "name": "tool_choice",
+      "display_name": "Tool Choice",
+      "type": "string",
+      "description": "Tool selection control",
+      "default": null
     },
     {
       "name": "stop",
@@ -76,15 +102,56 @@
       "type": "number",
       "description": "Deterministic outputs",
       "default": null
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Logprobs",
+      "type": "boolean",
+      "description": "Return log probabilities of the output tokens",
+      "default": null
+    },
+    {
+      "name": "top_logprobs",
+      "display_name": "Top Logprobs",
+      "type": "number",
+      "description": "Number of most likely tokens to return at each position (0-20). Requires logprobs to be enabled.",
+      "default": null
     }
   ],
   "outputs": [
+    {
+      "name": "conversation",
+      "display_name": "Conversation",
+      "type": "conversation",
+      "can_stream": true,
+      "description": "An array of messages including any tool call & response messages as well as the final generated output."
+    },
     {
       "name": "content",
       "display_name": "Content",
       "can_stream": true,
       "type": "string",
-      "description": "The generated completion text"
+      "description": "The content portion of the final generated response message."
+    },
+    {
+      "name": "message",
+      "display_name": "Final Message",
+      "type": "message",
+      "can_stream": true,
+      "description": "The final generated response message."
+    },
+    {
+      "name": "role",
+      "display_name": "Role",
+      "can_stream": true,
+      "type": "string",
+      "description": "Role of the response (usually 'assistant')"
+    },
+    {
+      "name": "tool_calls",
+      "display_name": "Tool Calls",
+      "type": "array of tools",
+      "description": "Tool calls made by the model"
     },
     {
       "name": "usage",
@@ -109,6 +176,12 @@
       "display_name": "Finish Reason",
       "type": "string",
       "description": "Why the completion finished"
+    },
+    {
+      "name": "logprobs",
+      "display_name": "Log Probabilities",
+      "type": "object",
+      "description": "Token probabilities and logprobs from the model"
     }
   ],
   "pricing": {
