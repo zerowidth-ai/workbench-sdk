@@ -12,8 +12,9 @@ Example:
     >>> print(result.outputs)
 """
 
-from src.engine import Workbench
+from src.engine import Workbench, Zv1
 from src.errors import (
+    WorkbenchError,
     Zv1Error,
     NodeError,
     FlowError,
@@ -25,6 +26,8 @@ from src.cache import CacheManager
 
 __version__ = "0.5.0"
 __all__ = [
+    "Workbench",
+    "WorkbenchError",
     "Zv1",
     "CacheManager",
     "Zv1Error",
