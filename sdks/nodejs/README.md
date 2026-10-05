@@ -520,10 +520,21 @@ await Workbench.create(flow, { memory: { instance: new RowsMemory(db, userId) } 
 
 With neither, the engine keeps memory in-process and it's gone when the
 process exits. Paths are checked and file sizes capped before your store is
-called. Optional store members: `person` (`{ id, name }` of whoever is talking;
-the Memory node reads in `people/<id>.md`), `held: true` with
-`write`/`delete` returning `{ status: "held" }` when changes wait for a person
-to approve them, and `pending()` for how many are waiting. An imported
+called.
+
+Three ways to key a memory:
+
+- **One shared memory:** one store for everyone.
+- **A memory per person:** a store per person, by whatever id you key it on.
+- **Shared, with a page per person:** one shared store plus
+  `memory: { instance, people: true, person: { id, name } }`. The Memory node
+  reads in `people/<id>.md` for whoever is talking, and the agent can only see
+  and change that one page, so one person's notes never reach another
+  conversation. With no `person`, it sees no pages at all.
+
+Optional store members: `held: true` with `write`/`delete` returning
+`{ status: "held" }` when changes wait for a person to approve them, and
+`pending()` for how many are waiting. An imported
 sub-agent never sees its caller's memory: pass
 `memory.forImport(importId) => ({ instance | path })` to give it its own.
 

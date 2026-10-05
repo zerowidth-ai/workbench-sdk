@@ -4,7 +4,8 @@
  *
  *   MEMORY.md            a short index, read into the prompt every turn
  *   memory/<topic>.md    detail, read when the agent decides it needs it
- *   people/<id>.md       one person's notes, read in when they're talking
+ *   people/<id>.md       optional: one person's private page in a shared
+ *                        memory, read in only when they're talking
  *
  * A memory store is four operations over those paths. The SDK ships a
  * folder store and an in-memory store; a host keeping many agents'
@@ -64,8 +65,6 @@ export function normalizeMemoryPath(raw) {
  * that keep a history.
  *
  * Optional members a host store may add:
- *   person   { id, name } of whoever is talking; their notes are
- *            people/<id>.md and the Memory node reads them in.
  *   held     true when changes wait for a person to approve them;
  *            write/delete then return { status: "held" }.
  *   pending()  how many changes are waiting, for the prompt.
@@ -183,23 +182,44 @@ export class FolderMemoryStore extends MemoryStoreInterface {
  * The store the memory nodes see: path rules and size limits in front
  * of whatever store the host passed, so a custom store can't be handed
  * `../../etc/passwd` and doesn't have to re-implement the limits.
+ *
+ * People pages (`people: true`, a shared memory with a page per person):
+ * the agent sees and changes only the page of whoever is talking
+ * (`person`), so one person's notes never reach another conversation.
+ * With nobody talking it sees no pages at all. Without `people`, the
+ * `people/` folder isn't part of the memory.
  */
 export class ScopedMemory {
-  constructor(store) {
+  constructor(store, { people = false, person = null } = {}) {
     this.store = store;
+    this.people = people === true;
+    this.talking = this.people && person?.id ? { id: String(person.id), name: person.name || String(person.id) } : null;
   }
 
+  /** Whoever is talking, when this memory keeps a page per person. */
   get person() {
-    return this.store.person ?? null;
+    return this.talking;
   }
 
   get held() {
     return this.store.held === true;
   }
 
-  /** The canonical form of a path, or a MemoryPathError. */
+  /** The canonical form of a path the agent may use, or a MemoryPathError. */
   normalize(raw) {
-    return normalizeMemoryPath(raw);
+    const p = normalizeMemoryPath(raw);
+    if (!p.startsWith("people/")) return p;
+    if (!this.people) {
+      throw new MemoryPathError(`"${raw}" isn't a memory file. Use MEMORY.md or memory/<topic>.md.`);
+    }
+    if (!this.talking || p !== `people/${this.talking.id}.md`) {
+      throw new MemoryPathError(
+        this.talking
+          ? `You can only use the page of the person you're talking to: people/${this.talking.id}.md.`
+          : "Nobody is named in this conversation, so there's no person's page to use.",
+      );
+    }
+    return p;
   }
 
   async pending() {
@@ -207,15 +227,16 @@ export class ScopedMemory {
   }
 
   async list() {
-    return this.store.list();
+    const own = this.talking ? `people/${this.talking.id}.md` : null;
+    return (await this.store.list()).filter((f) => !f.path.startsWith("people/") || f.path === own);
   }
 
   async read(raw) {
-    return this.store.read(normalizeMemoryPath(raw));
+    return this.store.read(this.normalize(raw));
   }
 
   async write(raw, content, origin = {}) {
-    const p = normalizeMemoryPath(raw);
+    const p = this.normalize(raw);
     const text = String(content ?? "");
     if (Buffer.byteLength(text, "utf8") > MAX_FILE_BYTES) {
       throw new MemoryPathError(
@@ -232,7 +253,7 @@ export class ScopedMemory {
   }
 
   async delete(raw, origin = {}) {
-    return this.store.delete(normalizeMemoryPath(raw), origin);
+    return this.store.delete(this.normalize(raw), origin);
   }
 }
 
@@ -241,9 +262,12 @@ export class ScopedMemory {
  *   { instance }  a host store (wins)
  *   { path }      a FolderMemoryStore at that folder
  *   neither       an in-memory store, gone when the process exits
+ * plus `people: true` and `person: { id, name }` for a shared memory
+ * with a page per person.
  */
 export function createMemory(memoryConfig = {}) {
-  if (memoryConfig.instance) return new ScopedMemory(memoryConfig.instance);
-  if (memoryConfig.path) return new ScopedMemory(new FolderMemoryStore(memoryConfig.path));
-  return new ScopedMemory(new InMemoryMemoryStore());
+  const options = { people: memoryConfig.people, person: memoryConfig.person };
+  if (memoryConfig.instance) return new ScopedMemory(memoryConfig.instance, options);
+  if (memoryConfig.path) return new ScopedMemory(new FolderMemoryStore(memoryConfig.path), options);
+  return new ScopedMemory(new InMemoryMemoryStore(), options);
 }

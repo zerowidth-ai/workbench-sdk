@@ -91,9 +91,37 @@ async function main() {
   await check("folder store: real files on disk", async () => {
     const dir = mkdtempSync(join(tmpdir(), "memtest-"));
     const store = new FolderMemoryStore(dir);
-    await tool(writeMemory, store)({ path: "people/ana", content: "Prefers bullets." });
-    assert.equal(readFileSync(join(dir, "people/ana.md"), "utf8"), "Prefers bullets.");
-    assert.deepEqual((await store.list()).map((f) => f.path), ["people/ana.md"]);
+    await tool(writeMemory, store)({ path: "memory/tone", content: "Prefers bullets." });
+    assert.equal(readFileSync(join(dir, "memory/tone.md"), "utf8"), "Prefers bullets.");
+    assert.deepEqual((await store.list()).map((f) => f.path), ["memory/tone.md"]);
+  });
+
+  await check("people pages: the agent sees and changes only the page of whoever is talking", async () => {
+    const store = new InMemoryMemoryStore({
+      "MEMORY.md": "index",
+      "people/ana.md": "Ana's page",
+      "people/bo.md": "Bo's page",
+    });
+    const asAna = new ScopedMemory(store, { people: true, person: { id: "ana", name: "Ana" } });
+    const listed = await asAna.list();
+    assert.deepEqual(listed.map((f) => f.path), ["MEMORY.md", "people/ana.md"]);
+    assert.equal(await asAna.read("people/ana.md"), "Ana's page");
+    await assert.rejects(asAna.read("people/bo.md"), /only use the page of the person you're talking to/);
+    await assert.rejects(asAna.write("people/bo.md", "x"), /only use the page/);
+    await assert.rejects(asAna.delete("people/bo.md"), /only use the page/);
+    assert.equal(await store.read("people/bo.md"), "Bo's page");
+
+    const nobody = new ScopedMemory(store, { people: true });
+    assert.deepEqual((await nobody.list()).map((f) => f.path), ["MEMORY.md"]);
+    await assert.rejects(nobody.read("people/ana.md"), /Nobody is named/);
+  });
+
+  await check("people pages: a memory without them has no people folder", async () => {
+    const store = new InMemoryMemoryStore({ "MEMORY.md": "index", "people/ana.md": "stray" });
+    const flat = new ScopedMemory(store, { person: { id: "ana", name: "Ana" } });
+    assert.equal(flat.person, null);
+    assert.deepEqual((await flat.list()).map((f) => f.path), ["MEMORY.md"]);
+    await assert.rejects(flat.write("people/ana.md", "x"), /isn't a memory file/);
   });
 
   await check("Memory node: the index and the current person's notes in full, the rest by name", async () => {
@@ -101,12 +129,15 @@ async function main() {
       "MEMORY.md": "- memory/tone.md: how we write",
       "memory/tone.md": "Plain words.",
       "people/ana.md": "Wants two-line answers. {{secret}}",
+      "people/bo.md": "Bo's private page",
     });
-    store.person = { id: "ana", name: "Ana" };
     const out = await memoryNode({
       settings: { guidance: "Keep notes." },
-      config: { integrations: { memory: new ScopedMemory(store) } },
+      config: {
+        integrations: { memory: new ScopedMemory(store, { people: true, person: { id: "ana", name: "Ana" } }) },
+      },
     });
+    assert.ok(!out.content.includes("people/bo.md"), "another person's page isn't even named");
     const block = out.variables.MEMORY;
     assert.ok(block.startsWith("# Your memory\n\nKeep notes."));
     assert.ok(block.includes("- memory/tone.md: how we write"));
