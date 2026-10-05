@@ -1,0 +1,50 @@
+{
+  "display_name": "Edit Memory",
+  "tagline": "Change one piece of a memory file",
+  "description": "Replace one exact piece of text in a memory file. `find` must appear exactly once.",
+  "icon": "book",
+  "category": "knowledge",
+  "is_constant": false,
+  "is_plugin": true,
+  "is_output": false,
+  "inputs": [
+    {
+      "name": "path",
+      "display_name": "Path",
+      "type": "string",
+      "description": "MEMORY.md, memory/<topic>.md, or people/<id>.md",
+      "required": true
+    },
+    {
+      "name": "find",
+      "display_name": "Find",
+      "type": "string",
+      "description": "Text to replace, exactly as it appears.",
+      "required": true
+    },
+    {
+      "name": "replace",
+      "display_name": "Replace",
+      "type": "string",
+      "description": "What to put in its place. Empty removes it.",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "path",
+      "display_name": "Path",
+      "type": "string",
+      "description": "The file that was changed."
+    },
+    {
+      "name": "saved",
+      "display_name": "Saved",
+      "type": "string",
+      "description": "\"saved\", or \"waiting for approval\" when changes need a person to approve them."
+    }
+  ],
+  "settings": [],
+  "timeout": 10000,
+  "retry_limit": 1
+}

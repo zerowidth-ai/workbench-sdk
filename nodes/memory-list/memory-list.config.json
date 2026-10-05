@@ -1,0 +1,22 @@
+{
+  "display_name": "List Memory",
+  "tagline": "See what the agent has written down",
+  "description": "List the files in your memory with their sizes.",
+  "icon": "book",
+  "category": "knowledge",
+  "is_constant": false,
+  "is_plugin": true,
+  "is_output": false,
+  "inputs": [],
+  "outputs": [
+    {
+      "name": "files",
+      "display_name": "Files",
+      "type": "array",
+      "description": "Every memory file: { path, size }."
+    }
+  ],
+  "settings": [],
+  "timeout": 10000,
+  "retry_limit": 1
+}

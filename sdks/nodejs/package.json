@@ -1,6 +1,6 @@
 {
   "name": "@zerowidth/workbench-sdk",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "dependencies": {
     "adm-zip": "^0.5.16",
     "ajv": "^8.17.1",
@@ -46,7 +46,8 @@
     "test-flows": "node tests/test.flows.js",
     "test-flow": "node tests/test.flows.js",
     "test-kb": "node tests/test.kb-search.js && node tests/test.kb-graph.js",
-    "test-custom-inference": "node tests/test.custom-inference.js"
+    "test-custom-inference": "node tests/test.custom-inference.js",
+    "test-memory": "node tests/test.agent-memory.js"
   },
   "author": "Peter Binggeser @ ZeroWidth, LLC",
   "license": "Apache-2.0",

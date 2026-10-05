@@ -5,6 +5,7 @@ import AdmZip from "adm-zip";
 import { convertImportToNodeType } from "./typers.js";
 import { getDirname, isRemoteMCPTool } from "./helpers.js";
 import { isOAuthKey, OAuthRefreshManager } from "./oauth.js";
+import { createMemory, flowUsesMemory } from "../integrations/memory-store.js";
 
 
 /**
@@ -234,6 +235,13 @@ export async function loadIntegrations(config, flow = null) {
           console.warn('[WARN] Error details:', error);
           // Don't throw error - knowledge base is optional
       }
+  }
+
+  // Agent memory (integrations/memory-store.js): the host's store from
+  // `config.memory`, else an in-memory one, whenever the host asked for
+  // memory or the flow has memory nodes.
+  if (config.memory || flowUsesMemory(flow)) {
+      integrations.memory = createMemory(config.memory ?? {});
   }
 
   // Initialize OAuth refresh manager if any OAuth keys are present

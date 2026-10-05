@@ -1,0 +1,43 @@
+{
+  "display_name": "Write Memory",
+  "tagline": "Create or replace a memory file",
+  "description": "Create a memory file, or replace one's whole content. For a small change, edit the file instead.",
+  "icon": "book",
+  "category": "knowledge",
+  "is_constant": false,
+  "is_plugin": true,
+  "is_output": false,
+  "inputs": [
+    {
+      "name": "path",
+      "display_name": "Path",
+      "type": "string",
+      "description": "MEMORY.md, memory/<topic>.md, or people/<id>.md",
+      "required": true
+    },
+    {
+      "name": "content",
+      "display_name": "Content",
+      "type": "string",
+      "description": "The file's full markdown content.",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "path",
+      "display_name": "Path",
+      "type": "string",
+      "description": "The file that was written."
+    },
+    {
+      "name": "saved",
+      "display_name": "Saved",
+      "type": "string",
+      "description": "\"saved\", or \"waiting for approval\" when changes need a person to approve them."
+    }
+  ],
+  "settings": [],
+  "timeout": 10000,
+  "retry_limit": 1
+}
