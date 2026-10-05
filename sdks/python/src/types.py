@@ -10,10 +10,13 @@ This module provides:
 
 from __future__ import annotations
 
+import inspect
 import json
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable
+
+from src.integrations.memory_store import create_memory, flow_uses_memory
 
 try:
     import jsonschema
@@ -498,6 +501,24 @@ def convert_import_to_node_type(
                 logger.debug(f"Created SQLite integration for import with knowledge database: {knowledge_db_path}")
             except ImportError as e:
                 logger.warning(f"Failed to load SQLite integration for import: {e}")
+
+        # An imported agent keeps its own memory, never its caller's. The
+        # host says which with config["memory"]["for_import"](import_id);
+        # without it the import gets an in-memory one for the run. An import
+        # with memory nodes gets one even when its caller has none.
+        if config.get("integrations", {}).get("memory") or flow_uses_memory(import_definition):
+            for_import = (config.get("memory") or {}).get("for_import")
+            own = {}
+            if callable(for_import):
+                own = for_import(processed_def.get("id"))
+                if inspect.isawaitable(own):
+                    own = await own
+                own = own or {}
+            child_config["integrations"] = {
+                **child_config.get("integrations", config.get("integrations", {})),
+                "memory": create_memory(own),
+            }
+            child_config["memory"] = own
 
         # Create child engine with the import's flow definition
         child_flow = {

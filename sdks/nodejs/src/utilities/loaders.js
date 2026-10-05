@@ -5,21 +5,7 @@ import AdmZip from "adm-zip";
 import { convertImportToNodeType } from "./typers.js";
 import { getDirname, isRemoteMCPTool } from "./helpers.js";
 import { isOAuthKey, OAuthRefreshManager } from "./oauth.js";
-import { createMemory } from "../integrations/memory-store.js";
-
-/** The node types that read or write an agent's memory. */
-export const MEMORY_NODE_TYPES = new Set([
-  "memory",
-  "memory-list",
-  "memory-read",
-  "memory-write",
-  "memory-edit",
-  "memory-delete",
-]);
-
-function flowUsesMemory(flow) {
-  return Array.isArray(flow?.nodes) && flow.nodes.some((n) => MEMORY_NODE_TYPES.has(n.type));
-}
+import { createMemory, flowUsesMemory } from "../integrations/memory-store.js";
 
 
 /**

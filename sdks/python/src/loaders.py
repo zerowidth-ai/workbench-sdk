@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable
 
 from src.helpers import get_nodes_dir
+from src.integrations.memory_store import create_memory, flow_uses_memory
 from src.types import convert_import_to_node_type
 
 if TYPE_CHECKING:
@@ -239,6 +240,12 @@ async def load_integrations(
                         logger.debug("Loaded SQLite knowledge base integration")
         except ImportError as e:
             logger.warning(f"Failed to load knowledge base integration: {e}")
+
+    # Agent memory (integrations/memory_store.py): the host's store from
+    # config["memory"], else an in-memory one, whenever the host asked for
+    # memory or the flow has memory nodes.
+    if config.get("memory") or flow_uses_memory(flow):
+        integrations["memory"] = create_memory(config.get("memory"))
 
     # Set engine config reference on all integration instances
     # This allows integrations to emit on_api_call events without signature changes

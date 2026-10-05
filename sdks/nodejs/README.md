@@ -530,7 +530,9 @@ Three ways to key a memory:
   `memory: { instance, people: true, person: { id, name } }`. The Memory node
   reads in `people/<id>.md` for whoever is talking, and the agent can only see
   and change that one page, so one person's notes never reach another
-  conversation. With no `person`, it sees no pages at all.
+  conversation. With no `person`, it sees no pages at all. The id becomes a
+  file name, so it must be letters, digits, `.`, `_` and `-`: hash or slug
+  an email first.
 
 Optional store members: `held: true` with `write`/`delete` returning
 `{ status: "held" }` when changes wait for a person to approve them, and

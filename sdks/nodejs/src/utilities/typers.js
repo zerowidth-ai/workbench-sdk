@@ -5,7 +5,7 @@ import Workbench from "../index.js";
 
 import { getDirname } from "./helpers.js";
 import { loadTypeConverter } from "./typeConverters.js";
-import { createMemory } from "../integrations/memory-store.js";
+import { createMemory, flowUsesMemory } from "../integrations/memory-store.js";
 
 const ajv = new Ajv();
 
@@ -319,8 +319,9 @@ export function convertImportToNodeType(importDef) {
       
       // An imported agent keeps its own memory, never its caller's. The
       // host says which with `config.memory.forImport(importId)`; without
-      // it the import gets an in-memory one for the run.
-      if (config.integrations?.memory) {
+      // it the import gets an in-memory one for the run. An import with
+      // memory nodes gets one even when its caller has none.
+      if (config.integrations?.memory || flowUsesMemory(processedImportDef)) {
         const own =
           typeof config.memory?.forImport === 'function'
             ? (await config.memory.forImport(processedImportDef.id)) ?? {}

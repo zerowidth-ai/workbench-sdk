@@ -147,6 +147,13 @@ async function main() {
     assert.ok(!block.includes("Plain words."));
   });
 
+  await check("Memory node: a long index is cut with a note to read the rest", async () => {
+    const store = new InMemoryMemoryStore({ "MEMORY.md": Array.from({ length: 10 }, (_, i) => `line ${i}`).join("\n") });
+    const out = await memoryNode({ settings: { index_lines: 3 }, config: { integrations: { memory: new ScopedMemory(store) } } });
+    assert.ok(out.content.includes("line 2") && !out.content.includes("line 3"));
+    assert.ok(out.content.includes("(Cut here: the rest is still in the file."));
+  });
+
   await check("Memory node: says when changes wait for approval", async () => {
     const store = new InMemoryMemoryStore();
     store.held = true;
@@ -188,6 +195,23 @@ async function main() {
     assert.deepEqual(asked, ["imported-sub"]);
     assert.ok(result.outputs.data.includes("CHILD NOTES"), result.outputs.data);
     assert.ok(!result.outputs.data.includes("PARENT NOTES"));
+  });
+
+  await check("engine: an import with memory nodes runs under a caller that has none", async () => {
+    const engine = await Workbench.create(importFlow(), {});
+    const result = await engine.run({ data: "!" });
+    assert.ok(result.outputs.data.includes("Nothing has been written down yet."), result.outputs.data);
+  });
+
+  await check("people pages: a person id that can't be a file name is refused up front", () => {
+    for (const id of ["ana@x.com", "../MEMORY", "a/b"]) {
+      assert.throws(
+        () => new ScopedMemory(new InMemoryMemoryStore(), { people: true, person: { id } }),
+        /can't name a page/,
+        id,
+      );
+    }
+    assert.ok(new ScopedMemory(new InMemoryMemoryStore(), { people: true, person: { id: "user_42" } }).person);
   });
 
   console.log(`\n${passed} passed`);

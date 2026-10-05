@@ -23,6 +23,12 @@ from src.errors import (
     ResourceError,
 )
 from src.cache import CacheManager
+from src.integrations.memory_store import (
+    MemoryStoreInterface,
+    FolderMemoryStore,
+    InMemoryMemoryStore,
+    normalize_memory_path,
+)
 
 __version__ = "0.5.0"
 __all__ = [
@@ -36,4 +42,8 @@ __all__ = [
     "ValidationError",
     "TimeoutError",
     "ResourceError",
+    "MemoryStoreInterface",
+    "FolderMemoryStore",
+    "InMemoryMemoryStore",
+    "normalize_memory_path",
 ]

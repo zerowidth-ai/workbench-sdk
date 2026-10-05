@@ -29,6 +29,20 @@ export const MAX_FILES = 200;
 
 const SEGMENT = /^[a-z0-9][a-z0-9._-]*$/i;
 
+/** The node types that read or write an agent's memory. */
+export const MEMORY_NODE_TYPES = new Set([
+  "memory",
+  "memory-list",
+  "memory-read",
+  "memory-write",
+  "memory-edit",
+  "memory-delete",
+]);
+
+export function flowUsesMemory(flow) {
+  return Array.isArray(flow?.nodes) && flow.nodes.some((n) => MEMORY_NODE_TYPES.has(n.type));
+}
+
 export class MemoryPathError extends Error {
   constructor(message) {
     super(message);
@@ -194,6 +208,13 @@ export class ScopedMemory {
     this.store = store;
     this.people = people === true;
     this.talking = this.people && person?.id ? { id: String(person.id), name: person.name || String(person.id) } : null;
+    // The id becomes a file name; an id that can't be one would leave
+    // the agent pointed at a page it isn't allowed to write.
+    if (this.talking && (!SEGMENT.test(`${this.talking.id}.md`) || this.talking.id.includes(".."))) {
+      throw new MemoryPathError(
+        `memory.person.id "${this.talking.id}" can't name a page: use letters, digits, ".", "_" and "-" (hash or slug an email first).`,
+      );
+    }
   }
 
   /** Whoever is talking, when this memory keeps a page per person. */
