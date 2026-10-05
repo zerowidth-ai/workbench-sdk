@@ -1,0 +1,249 @@
+/**
+ * Agent memory: a small folder of markdown an agent reads and writes
+ * between conversations.
+ *
+ *   MEMORY.md            a short index, read into the prompt every turn
+ *   memory/<topic>.md    detail, read when the agent decides it needs it
+ *   people/<id>.md       one person's notes, read in when they're talking
+ *
+ * A memory store is four operations over those paths. The SDK ships a
+ * folder store and an in-memory store; a host keeping many agents'
+ * memories implements the same four over whatever it has (SQL rows,
+ * bucket objects, Redis) and passes it as `config.memory.instance`.
+ * Each store instance is one memory: the host decides whose (an
+ * agent's own, one end user's) before handing it to the engine.
+ *
+ * The memory nodes (Memory, memory_list/read/write/edit/delete) only
+ * ever talk to `config.integrations.memory`, which is the host's store
+ * wrapped in `ScopedMemory` so every store gets the same path rules
+ * and size limits.
+ */
+
+import fs from "node:fs/promises";
+import path from "node:path";
+
+export const MEMORY_INDEX = "MEMORY.md";
+export const MAX_FILE_BYTES = 100_000;
+export const MAX_FILES = 200;
+
+const SEGMENT = /^[a-z0-9][a-z0-9._-]*$/i;
+
+export class MemoryPathError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "MemoryPathError";
+  }
+}
+
+/**
+ * Normalize and check a memory path. Accepts `MEMORY.md`,
+ * `memory/<name>.md` and `people/<id>.md`, adding `.md` when missing.
+ * Nothing nests deeper than one folder.
+ */
+export function normalizeMemoryPath(raw) {
+  const trimmed = String(raw ?? "").trim().replace(/^\.?\/+/, "");
+  const withExt = /\.md$/i.test(trimmed) ? trimmed : `${trimmed}.md`;
+  const parts = withExt.split("/");
+  const ok =
+    (parts.length === 1 && parts[0] === MEMORY_INDEX) ||
+    (parts.length === 2 &&
+      (parts[0] === "memory" || parts[0] === "people") &&
+      SEGMENT.test(parts[1]) &&
+      !parts[1].includes(".."));
+  if (!ok) {
+    throw new MemoryPathError(
+      `"${raw}" isn't a memory file. Use MEMORY.md, memory/<topic>.md, or people/<id>.md.`,
+    );
+  }
+  return withExt;
+}
+
+/**
+ * The contract every memory store implements. Paths arrive already
+ * normalized. `origin` says which node made the change, for stores
+ * that keep a history.
+ *
+ * Optional members a host store may add:
+ *   person   { id, name } of whoever is talking; their notes are
+ *            people/<id>.md and the Memory node reads them in.
+ *   held     true when changes wait for a person to approve them;
+ *            write/delete then return { status: "held" }.
+ *   pending()  how many changes are waiting, for the prompt.
+ */
+export class MemoryStoreInterface {
+  /** @returns {Promise<Array<{path: string, size: number, updated_at?: string}>>} */
+  async list() {
+    throw new Error("list() must be implemented by a memory store");
+  }
+
+  /** @returns {Promise<string|null>} the file's content, or null when it doesn't exist */
+  async read(_path) {
+    throw new Error("read() must be implemented by a memory store");
+  }
+
+  /** @returns {Promise<{status: "applied"|"held"}>} */
+  async write(_path, _content, _origin) {
+    throw new Error("write() must be implemented by a memory store");
+  }
+
+  /** @returns {Promise<{status: "applied"|"held"}>} */
+  async delete(_path, _origin) {
+    throw new Error("delete() must be implemented by a memory store");
+  }
+}
+
+/** Memory that lasts as long as the process. For tests and trials. */
+export class InMemoryMemoryStore extends MemoryStoreInterface {
+  constructor(files = {}) {
+    super();
+    this.files = new Map(Object.entries(files));
+  }
+
+  async list() {
+    return [...this.files.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([p, content]) => ({ path: p, size: Buffer.byteLength(content, "utf8") }));
+  }
+
+  async read(p) {
+    return this.files.has(p) ? this.files.get(p) : null;
+  }
+
+  async write(p, content) {
+    this.files.set(p, content);
+    return { status: "applied" };
+  }
+
+  async delete(p) {
+    this.files.delete(p);
+    return { status: "applied" };
+  }
+}
+
+/** Memory as real files under a folder: `<root>/MEMORY.md`, … */
+export class FolderMemoryStore extends MemoryStoreInterface {
+  constructor(root) {
+    super();
+    if (!root) throw new Error("FolderMemoryStore needs a folder path.");
+    this.root = path.resolve(root);
+  }
+
+  async list() {
+    const out = [];
+    const visit = async (rel) => {
+      let entries;
+      try {
+        entries = await fs.readdir(path.join(this.root, rel), { withFileTypes: true });
+      } catch (err) {
+        if (err.code === "ENOENT") return;
+        throw err;
+      }
+      for (const entry of entries) {
+        const p = rel ? `${rel}/${entry.name}` : entry.name;
+        if (entry.isDirectory() && !rel && (entry.name === "memory" || entry.name === "people")) {
+          await visit(p);
+        } else if (entry.isFile() && entry.name.endsWith(".md")) {
+          try {
+            normalizeMemoryPath(p);
+          } catch {
+            continue;
+          }
+          const stat = await fs.stat(path.join(this.root, p));
+          out.push({ path: p, size: stat.size, updated_at: stat.mtime.toISOString() });
+        }
+      }
+    };
+    await visit("");
+    return out.sort((a, b) => a.path.localeCompare(b.path));
+  }
+
+  async read(p) {
+    try {
+      return await fs.readFile(path.join(this.root, p), "utf8");
+    } catch (err) {
+      if (err.code === "ENOENT") return null;
+      throw err;
+    }
+  }
+
+  async write(p, content) {
+    const full = path.join(this.root, p);
+    await fs.mkdir(path.dirname(full), { recursive: true });
+    await fs.writeFile(full, content, "utf8");
+    return { status: "applied" };
+  }
+
+  async delete(p) {
+    await fs.rm(path.join(this.root, p), { force: true });
+    return { status: "applied" };
+  }
+}
+
+/**
+ * The store the memory nodes see: path rules and size limits in front
+ * of whatever store the host passed, so a custom store can't be handed
+ * `../../etc/passwd` and doesn't have to re-implement the limits.
+ */
+export class ScopedMemory {
+  constructor(store) {
+    this.store = store;
+  }
+
+  get person() {
+    return this.store.person ?? null;
+  }
+
+  get held() {
+    return this.store.held === true;
+  }
+
+  /** The canonical form of a path, or a MemoryPathError. */
+  normalize(raw) {
+    return normalizeMemoryPath(raw);
+  }
+
+  async pending() {
+    return typeof this.store.pending === "function" ? await this.store.pending() : 0;
+  }
+
+  async list() {
+    return this.store.list();
+  }
+
+  async read(raw) {
+    return this.store.read(normalizeMemoryPath(raw));
+  }
+
+  async write(raw, content, origin = {}) {
+    const p = normalizeMemoryPath(raw);
+    const text = String(content ?? "");
+    if (Buffer.byteLength(text, "utf8") > MAX_FILE_BYTES) {
+      throw new MemoryPathError(
+        `${p} would be over ${MAX_FILE_BYTES / 1000}KB. Keep memory files short; split detail into another topic file.`,
+      );
+    }
+    const existing = await this.store.list();
+    if (!existing.some((f) => f.path === p) && existing.length >= MAX_FILES) {
+      throw new MemoryPathError(
+        `Memory already holds ${MAX_FILES} files. Fold some together or delete ones that no longer matter.`,
+      );
+    }
+    return this.store.write(p, text, origin);
+  }
+
+  async delete(raw, origin = {}) {
+    return this.store.delete(normalizeMemoryPath(raw), origin);
+  }
+}
+
+/**
+ * Pick the memory for a run from `config.memory`:
+ *   { instance }  a host store (wins)
+ *   { path }      a FolderMemoryStore at that folder
+ *   neither       an in-memory store, gone when the process exits
+ */
+export function createMemory(memoryConfig = {}) {
+  if (memoryConfig.instance) return new ScopedMemory(memoryConfig.instance);
+  if (memoryConfig.path) return new ScopedMemory(new FolderMemoryStore(memoryConfig.path));
+  return new ScopedMemory(new InMemoryMemoryStore());
+}

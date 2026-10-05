@@ -5,6 +5,21 @@ import AdmZip from "adm-zip";
 import { convertImportToNodeType } from "./typers.js";
 import { getDirname, isRemoteMCPTool } from "./helpers.js";
 import { isOAuthKey, OAuthRefreshManager } from "./oauth.js";
+import { createMemory } from "../integrations/memory-store.js";
+
+/** The node types that read or write an agent's memory. */
+export const MEMORY_NODE_TYPES = new Set([
+  "memory",
+  "memory-list",
+  "memory-read",
+  "memory-write",
+  "memory-edit",
+  "memory-delete",
+]);
+
+function flowUsesMemory(flow) {
+  return Array.isArray(flow?.nodes) && flow.nodes.some((n) => MEMORY_NODE_TYPES.has(n.type));
+}
 
 
 /**
@@ -234,6 +249,13 @@ export async function loadIntegrations(config, flow = null) {
           console.warn('[WARN] Error details:', error);
           // Don't throw error - knowledge base is optional
       }
+  }
+
+  // Agent memory (integrations/memory-store.js): the host's store from
+  // `config.memory`, else an in-memory one, whenever the host asked for
+  // memory or the flow has memory nodes.
+  if (config.memory || flowUsesMemory(flow)) {
+      integrations.memory = createMemory(config.memory ?? {});
   }
 
   // Initialize OAuth refresh manager if any OAuth keys are present

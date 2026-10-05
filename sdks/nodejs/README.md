@@ -485,6 +485,48 @@ const engine = await Workbench.create(flow, {
 });
 ```
 
+### Agent Memory
+
+An agent can keep notes between conversations in a small folder of markdown:
+`MEMORY.md` (a short index), `memory/<topic>.md`, and `people/<id>.md`. A flow
+uses it through six nodes:
+
+- **Memory** reads the memory at the start of a turn. Wire its `variables`
+  output into a System Prompt's Variables and put `{{MEMORY}}` where the
+  memory belongs. Its `guidance` setting is the text that tells the agent
+  how to work its memory.
+- **List / Read / Write / Edit / Delete Memory** are tools: attach the ones
+  you want to the model. An agent with only List and Read can't change
+  what it remembers.
+
+Which memory a run uses is up to you:
+
+```javascript
+import Workbench, { MemoryStoreInterface } from "@zerowidth/workbench-sdk";
+
+// A folder per end user
+await Workbench.create(flow, { memory: { path: `./memory/${userId}` } });
+
+// Or your own store: rows in a table, objects in a bucket
+class RowsMemory extends MemoryStoreInterface {
+  constructor(db, userId) { super(); this.db = db; this.userId = userId; }
+  async list() { /* → [{ path, size }] */ }
+  async read(path) { /* → string | null */ }
+  async write(path, content) { /* … */ return { status: "applied" }; }
+  async delete(path) { /* … */ return { status: "applied" }; }
+}
+await Workbench.create(flow, { memory: { instance: new RowsMemory(db, userId) } });
+```
+
+With neither, the engine keeps memory in-process and it's gone when the
+process exits. Paths are checked and file sizes capped before your store is
+called. Optional store members: `person` (`{ id, name }` of whoever is talking;
+the Memory node reads in `people/<id>.md`), `held: true` with
+`write`/`delete` returning `{ status: "held" }` when changes wait for a person
+to approve them, and `pending()` for how many are waiting. An imported
+sub-agent never sees its caller's memory: pass
+`memory.forImport(importId) => ({ instance | path })` to give it its own.
+
 ### Custom Node Types
 
 Create custom nodes by implementing:

@@ -1,0 +1,36 @@
+{
+  "display_name": "Read Memory",
+  "tagline": "Open one memory file",
+  "description": "Read one file from your memory.",
+  "icon": "book",
+  "category": "knowledge",
+  "is_constant": false,
+  "is_plugin": true,
+  "is_output": false,
+  "inputs": [
+    {
+      "name": "path",
+      "display_name": "Path",
+      "type": "string",
+      "description": "MEMORY.md, memory/<topic>.md, or people/<id>.md",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "path",
+      "display_name": "Path",
+      "type": "string",
+      "description": "The file that was read."
+    },
+    {
+      "name": "content",
+      "display_name": "Content",
+      "type": "string",
+      "description": "The file's markdown."
+    }
+  ],
+  "settings": [],
+  "timeout": 10000,
+  "retry_limit": 1
+}

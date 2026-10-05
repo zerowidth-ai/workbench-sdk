@@ -3259,3 +3259,13 @@ export default class Workbench {
 // pass an instance via `config.knowledgeBase.instance` (flow-global)
 // or `config.knowledgeBase.instances[kbUuid]` (per Knowledge Base node).
 export { KnowledgeBaseInterface } from './integrations/knowledge-base-interface.js';
+
+// Agent memory: implement MemoryStoreInterface over your own store and
+// pass it as `config.memory.instance`, or pass `config.memory.path` for
+// a folder of markdown. See integrations/memory-store.js.
+export {
+  MemoryStoreInterface,
+  FolderMemoryStore,
+  InMemoryMemoryStore,
+  normalizeMemoryPath,
+} from './integrations/memory-store.js';

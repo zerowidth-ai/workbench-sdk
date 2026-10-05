@@ -5,6 +5,7 @@ import Workbench from "../index.js";
 
 import { getDirname } from "./helpers.js";
 import { loadTypeConverter } from "./typeConverters.js";
+import { createMemory } from "../integrations/memory-store.js";
 
 const ajv = new Ajv();
 
@@ -316,6 +317,21 @@ export function convertImportToNodeType(importDef) {
         this.logDebug(`[INFO] Created SQLite integration for import ${processedImportDef.id} with knowledge database:`, processedImportDef.knowledgeDbPath);
       }
       
+      // An imported agent keeps its own memory, never its caller's. The
+      // host says which with `config.memory.forImport(importId)`; without
+      // it the import gets an in-memory one for the run.
+      if (config.integrations?.memory) {
+        const own =
+          typeof config.memory?.forImport === 'function'
+            ? (await config.memory.forImport(processedImportDef.id)) ?? {}
+            : {};
+        importConfig.integrations = {
+          ...(importConfig.integrations ?? config.integrations),
+          memory: createMemory(own),
+        };
+        importConfig.memory = own;
+      }
+
       // If this import accepts plugins, create tool runners for parent context execution
       // Note: We need to access the parent engine (this) to find connected plugins
       let tools = {};

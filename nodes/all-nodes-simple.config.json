@@ -204,6 +204,12 @@ loop-end,Loop End,Loop exit point that decides whether to continue looping or ex
 loop-start,Loop Start,Entry point for loops - receives values and passes them through. Refires on each new value, enabling iterative processing.
 mean,Mean,Calculates arithmetic mean (average) of numbers
 median,Median,Finds the middle value of a sorted array of numbers
+memory,Memory,Read an agent's memory at the start of each turn: MEMORY.md, the notes about whoever is talking, and the names of the other files, under guidance for working with them. Wire Variables into a System Prompt's Variables and put {{MEMORY}} where the memory belongs. Attach the List, Read, Write, Edit and Delete Memory tools to the model so it can change what it remembers. The memory itself comes from the host (config.memory): a folder, your own store, or an in-memory one.
+memory-delete,Delete Memory,Delete a memory file that's no longer useful.
+memory-edit,Edit Memory,Replace one exact piece of text in a memory file. `find` must appear exactly once.
+memory-list,List Memory,List the files in your memory with their sizes.
+memory-read,Read Memory,Read one file from your memory.
+memory-write,Write Memory,Create a memory file, or replace one's whole content. For a small change, edit the file instead.
 merge-consecutive-roles,Merge Consecutive Roles,Merges consecutive messages with the same role into a single message. Tool messages and assistant messages with tool_calls are never merged to preserve tool call sequences.
 merge-messages,Merge Messages,Combine consecutive messages from the same role into single messages.
 message,Message,Manually create a single message.
