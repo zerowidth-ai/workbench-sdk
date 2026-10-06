@@ -11,6 +11,7 @@ import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+from src.utilities.prompt_cache import apply_prompt_cache, read_cache_usage, strip_cache_hints
 from src.utilities.sanitize_api_call import emit_api_call_event
 
 try:
@@ -31,12 +32,17 @@ class UsageStats:
     prompt_tokens: int = 0
     completion_tokens: int = 0
     total_tokens: int = 0
+    # Of prompt_tokens: read from the provider's prompt cache, and written to it.
+    cached_tokens: int = 0
+    cache_write_tokens: int = 0
 
     def to_dict(self) -> dict[str, int]:
         return {
             "prompt_tokens": self.prompt_tokens,
             "completion_tokens": self.completion_tokens,
             "total_tokens": self.total_tokens,
+            "cached_tokens": self.cached_tokens,
+            "cache_write_tokens": self.cache_write_tokens,
         }
 
 
@@ -136,7 +142,14 @@ class OpenRouterIntegration:
 
         # Add messages (cleaned up)
         if messages:
-            payload["messages"] = self._clean_messages(messages)
+            # Prompt-cache marks for models that need them (prompt_cache.py).
+            payload["messages"] = apply_prompt_cache(
+                self._clean_messages(messages),
+                model=model,
+                # Only the platform endpoint understands the marks.
+                enabled="openrouter.ai" in (self.base_url or "")
+                and (engine_config or {}).get("prompt_cache", True) is not False,
+            )
         elif prompt:
             payload["prompt"] = prompt
 
@@ -333,6 +346,7 @@ class OpenRouterIntegration:
             prompt_tokens=usage_raw.get("prompt_tokens", 0) or 0,
             completion_tokens=usage_raw.get("completion_tokens", 0) or 0,
             total_tokens=usage_raw.get("total_tokens", 0) or 0,
+            **read_cache_usage(usage_raw),
         )
 
         cost_data = None
@@ -503,6 +517,9 @@ class OpenRouterIntegration:
                     usage.prompt_tokens += chunk.usage.prompt_tokens or 0
                     usage.completion_tokens += chunk.usage.completion_tokens or 0
                     usage.total_tokens += chunk.usage.total_tokens or 0
+                    cache = read_cache_usage(chunk.usage)
+                    usage.cached_tokens += cache["cached_tokens"]
+                    usage.cache_write_tokens += cache["cache_write_tokens"]
                     # OpenRouter returns cost in the final usage chunk (custom field)
                     cost_val = getattr(chunk.usage, "cost", None)
                     if cost_val is None and getattr(chunk.usage, "model_extra", None):
@@ -678,10 +695,18 @@ class OpenRouterIntegration:
             input_cost = total_cost
             output_cost = 0
 
+        # How much of the input came from (or went into) the provider's prompt
+        # cache. The total above already reflects what that cost.
+        input_line: dict[str, Any] = {"label": "Input Tokens", "cost": round(input_cost, 8), "tokens": prompt_tokens}
+        if usage.get("cached_tokens"):
+            input_line["cached_tokens"] = usage["cached_tokens"]
+        if usage.get("cache_write_tokens"):
+            input_line["cache_write_tokens"] = usage["cache_write_tokens"]
+
         return CostBreakdown(
             total_cost=round(total_cost, 8),
             itemized_costs=[
-                {"label": "Input Tokens", "cost": round(input_cost, 8), "tokens": prompt_tokens},
+                input_line,
                 {"label": "Output Tokens", "cost": round(output_cost, 8), "tokens": completion_tokens},
             ],
         )
@@ -972,7 +997,8 @@ class OpenRouterIntegration:
                 "{ type, instructions, criteria }"
             )
 
-        payload: dict[str, Any] = {"model": model, "state": state, "questions": questions}
+        # A conversation's cache hints are for chat models only.
+        payload: dict[str, Any] = {"model": model, "state": strip_cache_hints(state), "questions": questions}
 
         url = f"{self.base_url}/systemone"
         headers = {

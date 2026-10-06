@@ -86,17 +86,6 @@ async def process(
     else:
         full_content = base_content
 
-    # Create message object
-    message = {
-        "role": "system",
-        "content": [
-            {
-                "type": "text",
-                "text": full_content,
-            }
-        ],
-    }
-
     # Process variables - replace {{key}} with variable value
     def replace_variable(match):
         key = match.group(1)
@@ -106,14 +95,32 @@ async def process(
                 return _render_variable(variable[key])
         return match.group(0)  # Return original if no match
 
-    message["content"][0]["text"] = re.sub(
-        r"\{\{(.*?)\}\}",
-        replace_variable,
-        message["content"][0]["text"]
-    )
+    def fill(text: str) -> str:
+        return re.sub(r"\{\{(.*?)\}\}", replace_variable, text)
+
+    # Values filled in can change from run to run (the time, memory, search
+    # results); the text before the first of them doesn't. The block records
+    # that length as cache_prefix_length, so the model client can cache the
+    # prompt up to there for a model that caches on request. The client
+    # removes the hint before any model sees it.
+    first_filled = -1
+    for match in re.finditer(r"\{\{(.*?)\}\}", full_content):
+        if any(isinstance(v, dict) and match.group(1) in v for v in variables):
+            first_filled = match.start()
+            break
+
+    if first_filled < 0:
+        text, prefix = full_content, len(full_content)
+    else:
+        text = full_content[:first_filled] + fill(full_content[first_filled:])
+        prefix = first_filled
+    block: dict[str, Any] = {"type": "text", "text": text}
+    if text[:prefix].strip():
+        block["cache_prefix_length"] = prefix
+    message = {"role": "system", "content": [block]}
 
     # Return the message and string prompt
     return {
         "message": message,
-        "prompt": message["content"][0]["text"],
+        "prompt": text,
     }

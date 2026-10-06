@@ -17,7 +17,8 @@
         "content": [
           {
             "type": "text",
-            "text": "Hello Ada!"
+            "text": "Hello Ada!",
+            "cache_prefix_length": 6
           }
         ]
       },
@@ -48,7 +49,8 @@
         "content": [
           {
             "type": "text",
-            "text": "Profile: {\n  \"name\": \"Ada\",\n  \"langs\": [\n    \"js\",\n    \"py\"\n  ]\n}"
+            "text": "Profile: {\n  \"name\": \"Ada\",\n  \"langs\": [\n    \"js\",\n    \"py\"\n  ]\n}",
+            "cache_prefix_length": 9
           }
         ]
       },
@@ -103,7 +105,8 @@
         "content": [
           {
             "type": "text",
-            "text": "Hello {{missing}}!"
+            "text": "Hello {{missing}}!",
+            "cache_prefix_length": 18
           }
         ]
       },

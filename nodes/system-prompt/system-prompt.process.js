@@ -56,30 +56,39 @@ export default async ({inputs, settings, config}) => {
   // Combine chained content with base content
   let fullContent = chainedContent ? `${chainedContent}\n\n${baseContent}` : baseContent;
 
-  // Create message object
-  let message = {
-    role: "system",
-    content: [
-      {
-        type: "text",
-        text: fullContent
+  const fill = (text) =>
+    text.replace(/\{\{(.*?)\}\}/g, (match, p1) => {
+      // look for a variable with the key p1
+      let variable = variables.find(variable => Object.keys(variable).find(key => key === p1));
+      if(variable) {
+        return renderVariable(variable[p1]);
       }
-    ]
+      return match;
+    });
+
+  // Values filled in can change from run to run (the time, memory, search
+  // results); the text before the first of them doesn't. The block records
+  // that length as `cache_prefix_length`, so the model client can cache
+  // the prompt up to there for a model that caches on request. The client
+  // removes the hint before any model sees it.
+  let firstFilled = -1;
+  for (const m of fullContent.matchAll(/\{\{(.*?)\}\}/g)) {
+    if (variables.some(variable => Object.keys(variable).includes(m[1]))) {
+      firstFilled = m.index;
+      break;
+    }
+  }
+
+  const text = firstFilled < 0 ? fullContent : fullContent.slice(0, firstFilled) + fill(fullContent.slice(firstFilled));
+  const prefix = firstFilled < 0 ? text.length : firstFilled;
+  const message = {
+    role: "system",
+    content: [{ type: "text", text, ...(text.slice(0, prefix).trim() ? { cache_prefix_length: prefix } : {}) }],
   };
 
-  // Process variables
-  message.content[0].text = message.content[0].text.replace(/\{\{(.*?)\}\}/g, (match, p1) => {
-    // look for a variable with the key p1
-    let variable = variables.find(variable => Object.keys(variable).find(key => key === p1));
-    if(variable) {
-      return renderVariable(variable[p1]);
-    }
-    return match;
-  });
-  
   // Return the message and string prompt
   return {
     message: message,
-    prompt: message.content[0].text
+    prompt: text
   };
 }; 
