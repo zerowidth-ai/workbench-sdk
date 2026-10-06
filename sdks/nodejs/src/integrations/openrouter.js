@@ -1,5 +1,6 @@
 import OpenAI, { AzureOpenAI } from 'openai';
 import { emitAPICallEvent } from '../utilities/sanitizeAPICall.js';
+import { applyPromptCache } from '../utilities/promptCache.js';
 
 /**
  * Prompt-cache counts from a usage block, in OpenAI's shape
@@ -83,6 +84,15 @@ export default class OpenRouterIntegration {
                 delete clean.tool_calls;
               }
               return clean;
+            });
+
+            // Prompt-cache marks for models that need them (promptCache.js).
+            // Only the platform endpoint understands them; the SDK's own
+            // cache flags are removed for every endpoint.
+            const cacheConfig = engineConfig || this._engineConfig;
+            payload.messages = applyPromptCache(payload.messages, {
+                model,
+                enabled: this.dialect === 'openrouter' && cacheConfig?.promptCache !== false,
             });
 
         } else if (prompt) {

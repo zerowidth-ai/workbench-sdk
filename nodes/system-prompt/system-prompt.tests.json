@@ -17,7 +17,14 @@
         "content": [
           {
             "type": "text",
-            "text": "Hello Ada!"
+            "text": "Hello ",
+            "cache_control": {
+              "type": "ephemeral"
+            }
+          },
+          {
+            "type": "text",
+            "text": "Ada!"
           }
         ]
       },
@@ -48,7 +55,14 @@
         "content": [
           {
             "type": "text",
-            "text": "Profile: {\n  \"name\": \"Ada\",\n  \"langs\": [\n    \"js\",\n    \"py\"\n  ]\n}"
+            "text": "Profile: ",
+            "cache_control": {
+              "type": "ephemeral"
+            }
+          },
+          {
+            "type": "text",
+            "text": "{\n  \"name\": \"Ada\",\n  \"langs\": [\n    \"js\",\n    \"py\"\n  ]\n}"
           }
         ]
       },
@@ -103,7 +117,10 @@
         "content": [
           {
             "type": "text",
-            "text": "Hello {{missing}}!"
+            "text": "Hello {{missing}}!",
+            "cache_control": {
+              "type": "ephemeral"
+            }
           }
         ]
       },

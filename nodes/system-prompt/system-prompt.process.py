@@ -86,17 +86,6 @@ async def process(
     else:
         full_content = base_content
 
-    # Create message object
-    message = {
-        "role": "system",
-        "content": [
-            {
-                "type": "text",
-                "text": full_content,
-            }
-        ],
-    }
-
     # Process variables - replace {{key}} with variable value
     def replace_variable(match):
         key = match.group(1)
@@ -106,14 +95,40 @@ async def process(
                 return _render_variable(variable[key])
         return match.group(0)  # Return original if no match
 
-    message["content"][0]["text"] = re.sub(
-        r"\{\{(.*?)\}\}",
-        replace_variable,
-        message["content"][0]["text"]
-    )
+    def fill(text: str) -> str:
+        return re.sub(r"\{\{(.*?)\}\}", replace_variable, text)
+
+    # Values filled in can change from run to run (the time, memory, search
+    # results); the text before the first of them doesn't. The message keeps
+    # the two as separate blocks and marks the fixed one with cache_control,
+    # so a model that caches on request can reuse the prompt up to there.
+    # The model client removes the mark for models that don't take it.
+    first_filled = -1
+    for match in re.finditer(r"\{\{(.*?)\}\}", full_content):
+        if any(isinstance(v, dict) and match.group(1) in v for v in variables):
+            first_filled = match.start()
+            break
+
+    cache = {"type": "ephemeral"}
+    if first_filled < 0:
+        block = {"type": "text", "text": full_content}
+        if full_content.strip():
+            block["cache_control"] = cache
+        blocks = [block]
+    else:
+        fixed = full_content[:first_filled]
+        changing = fill(full_content[first_filled:])
+        if fixed.strip():
+            blocks = [{"type": "text", "text": fixed, "cache_control": cache}]
+            if changing:
+                blocks.append({"type": "text", "text": changing})
+        else:
+            blocks = [{"type": "text", "text": changing}]
+
+    message = {"role": "system", "content": blocks}
 
     # Return the message and string prompt
     return {
         "message": message,
-        "prompt": message["content"][0]["text"],
+        "prompt": "".join(block["text"] for block in blocks),
     }

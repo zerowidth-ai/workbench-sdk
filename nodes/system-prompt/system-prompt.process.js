@@ -56,30 +56,51 @@ export default async ({inputs, settings, config}) => {
   // Combine chained content with base content
   let fullContent = chainedContent ? `${chainedContent}\n\n${baseContent}` : baseContent;
 
-  // Create message object
-  let message = {
-    role: "system",
-    content: [
-      {
-        type: "text",
-        text: fullContent
+  const fill = (text) =>
+    text.replace(/\{\{(.*?)\}\}/g, (match, p1) => {
+      // look for a variable with the key p1
+      let variable = variables.find(variable => Object.keys(variable).find(key => key === p1));
+      if(variable) {
+        return renderVariable(variable[p1]);
       }
-    ]
-  };
+      return match;
+    });
 
-  // Process variables
-  message.content[0].text = message.content[0].text.replace(/\{\{(.*?)\}\}/g, (match, p1) => {
-    // look for a variable with the key p1
-    let variable = variables.find(variable => Object.keys(variable).find(key => key === p1));
-    if(variable) {
-      return renderVariable(variable[p1]);
+  // Values filled in can change from run to run (the time, memory, search
+  // results); the text before the first of them doesn't. The message keeps
+  // the two as separate blocks and marks the fixed one with
+  // `cache_control`, so a model that caches on request can reuse the
+  // prompt up to there. The model client removes the mark for models
+  // that don't take it.
+  let firstFilled = -1;
+  for (const m of fullContent.matchAll(/\{\{(.*?)\}\}/g)) {
+    if (variables.some(variable => Object.keys(variable).includes(m[1]))) {
+      firstFilled = m.index;
+      break;
     }
-    return match;
-  });
-  
+  }
+
+  const CACHE = { type: "ephemeral" };
+  let message;
+  if (firstFilled < 0) {
+    message = {
+      role: "system",
+      content: [{ type: "text", text: fullContent, ...(fullContent.trim() ? { cache_control: CACHE } : {}) }],
+    };
+  } else {
+    const fixed = fullContent.slice(0, firstFilled);
+    const changing = fill(fullContent.slice(firstFilled));
+    message = {
+      role: "system",
+      content: fixed.trim()
+        ? [{ type: "text", text: fixed, cache_control: CACHE }, ...(changing ? [{ type: "text", text: changing }] : [])]
+        : [{ type: "text", text: changing }],
+    };
+  }
+
   // Return the message and string prompt
   return {
     message: message,
-    prompt: message.content[0].text
+    prompt: message.content.map(block => block.text).join("")
   };
 }; 
