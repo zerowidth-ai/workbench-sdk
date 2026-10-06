@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Prompt-cache usage.** A model call's `usage` now reports `cached_tokens` (read from the provider's prompt cache) and `cache_write_tokens` (written to it), both part of `prompt_tokens`. They also appear on the `Input Tokens` line of `cost_itemized` when nonzero. The cost total is unchanged: it already reflected what caching cost or saved. Covered by `tests/test.prompt-cache.js`.
+
 ## 2.5.0 — 2026-10
 
 - **Agent memory.** Six new nodes let an agent keep notes between conversations in a folder of markdown (`MEMORY.md`, `memory/<topic>.md`, `people/<id>.md`): **Memory** reads the index, the current person's notes and the names of the other files into a block for a System Prompt's `{{MEMORY}}` (with editable `guidance`), and **List / Read / Write / Edit / Delete Memory** are plugin tools the model works it with. The store is the host's: `config.memory.path` (a folder), `config.memory.instance` (any `MemoryStoreInterface`: SQL rows, bucket objects), or an in-process default. Paths are validated and file sizes capped in front of every store. A shared memory can keep a private page per person (`config.memory.people: true` plus `person: { id, name }`): the agent sees and changes only the page of whoever is talking, and a `person.id` that can't be a file name is refused when the engine is created. A store can hold changes for approval (`held`, `pending()`). An imported sub-agent never inherits its caller's memory; `config.memory.forImport(importId)` gives it its own, and an import with memory nodes gets an in-process memory even when its caller has none. The Python SDK has the same nodes, store classes and `config["memory"]` (`for_import` there). New exports `MemoryStoreInterface`, `FolderMemoryStore`, `InMemoryMemoryStore`, `normalizeMemoryPath`. Covered by `tests/test.agent-memory.js`.

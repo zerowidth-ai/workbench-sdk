@@ -1,6 +1,19 @@
 import OpenAI, { AzureOpenAI } from 'openai';
 import { emitAPICallEvent } from '../utilities/sanitizeAPICall.js';
 
+/**
+ * Prompt-cache counts from a usage block, in OpenAI's shape
+ * (`prompt_tokens_details`), which OpenRouter normalizes every provider
+ * to. Both are part of `prompt_tokens`, not on top of it.
+ */
+export function readCacheUsage(usage) {
+    const details = usage?.prompt_tokens_details || {};
+    return {
+        cached_tokens: Number(details.cached_tokens) || 0,
+        cache_write_tokens: Number(details.cache_write_tokens) || 0,
+    };
+}
+
 export default class OpenRouterIntegration {
     constructor(apiKey, options = {}) {
         // dialect: 'openrouter' (default — the platform endpoint, which
@@ -151,7 +164,11 @@ export default class OpenRouterIntegration {
             let usage = {
               prompt_tokens: 0,
               completion_tokens: 0,
-              total_tokens: 0
+              total_tokens: 0,
+              // Of prompt_tokens: read from the provider's prompt cache, and
+              // written to it. Both 0 when the provider reports neither.
+              cached_tokens: 0,
+              cache_write_tokens: 0
             }
 
             // Authoritative cost from OpenRouter usage accounting (final usage chunk)
@@ -240,6 +257,9 @@ export default class OpenRouterIntegration {
                     usage.prompt_tokens += chunk.usage.prompt_tokens || 0;
                     usage.completion_tokens += chunk.usage.completion_tokens || 0;
                     usage.total_tokens += chunk.usage.total_tokens || 0;
+                    const cache = readCacheUsage(chunk.usage);
+                    usage.cached_tokens += cache.cached_tokens;
+                    usage.cache_write_tokens += cache.cache_write_tokens;
                     if (typeof chunk.usage.cost === 'number') apiCost = chunk.usage.cost;
                     if (chunk.usage.cost_details) apiCostDetails = chunk.usage.cost_details;
                   }
@@ -413,7 +433,9 @@ export default class OpenRouterIntegration {
         const data = await res.json();
         const choice = data.choices?.[0];
         const message = choice?.message || {};
-        const usage = data.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+        const usage = data.usage
+            ? { ...data.usage, ...readCacheUsage(data.usage) }
+            : { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0, cached_tokens: 0, cache_write_tokens: 0 };
 
         let costData = null;
         if (nodeConfig) {
@@ -547,10 +569,20 @@ export default class OpenRouterIntegration {
             outputCost = 0;
         }
 
+        // How much of the input came from (or went into) the provider's
+        // prompt cache. The total above already reflects what that cost.
+        const cachedTokens = usage.cached_tokens || 0;
+        const cacheWriteTokens = usage.cache_write_tokens || 0;
         return {
             totalCost: Number(totalCost.toFixed(8)),
             itemizedCosts: [
-                { label: "Input Tokens", cost: Number(inputCost.toFixed(8)), tokens: promptTokens },
+                {
+                    label: "Input Tokens",
+                    cost: Number(inputCost.toFixed(8)),
+                    tokens: promptTokens,
+                    ...(cachedTokens > 0 && { cached_tokens: cachedTokens }),
+                    ...(cacheWriteTokens > 0 && { cache_write_tokens: cacheWriteTokens })
+                },
                 { label: "Output Tokens", cost: Number(outputCost.toFixed(8)), tokens: completionTokens }
             ]
         };
