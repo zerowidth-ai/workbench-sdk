@@ -1,6 +1,6 @@
 import OpenAI, { AzureOpenAI } from 'openai';
 import { emitAPICallEvent } from '../utilities/sanitizeAPICall.js';
-import { applyPromptCache } from '../utilities/promptCache.js';
+import { applyPromptCache, stripCacheHints } from '../utilities/promptCache.js';
 
 /**
  * Prompt-cache counts from a usage block, in OpenAI's shape
@@ -845,7 +845,8 @@ export default class OpenRouterIntegration {
             throw new Error('questions must be a non-empty object mapping question ids to { type, instructions, criteria }');
         }
 
-        const payload = { model, state, questions };
+        // A conversation's cache hints are for chat models only.
+        const payload = { model, state: stripCacheHints(state), questions };
 
         const url = `${this.client.baseURL}/systemone`;
         const headers = {

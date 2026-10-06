@@ -96,6 +96,20 @@ def _split_at_prefix(blocks: list[Any]) -> list[Any]:
     return out
 
 
+def _strip_message(m: Any) -> Any:
+    if isinstance(m, dict) and isinstance(m.get("content"), list):
+        return {**m, "content": [_strip(b) for b in m["content"]]}
+    return m
+
+
+def strip_cache_hints(value: Any) -> Any:
+    """A message or conversation with every cache mark and hint removed, for
+    anything that sends one somewhere other than a chat model (a decision
+    model's ``state``). Anything else passes through. Never mutates the
+    input."""
+    return [_strip_message(m) for m in value] if isinstance(value, list) else _strip_message(value)
+
+
 def _has_mark(message: Any, test: Any) -> bool:
     content = message.get("content") if isinstance(message, dict) else None
     return isinstance(content, list) and any(isinstance(b, dict) and b.get("cache_control") and test(b["cache_control"]) for b in content)
@@ -112,10 +126,7 @@ def apply_prompt_cache(messages: Any, *, model: Any, enabled: bool = True) -> An
         return m.get("content") if isinstance(m, dict) else None
 
     if not marking:
-        return [
-            {**m, "content": [_strip(b) for b in content_of(m)]} if isinstance(content_of(m), list) else m
-            for m in messages
-        ]
+        return [_strip_message(m) for m in messages]
 
     # Split the hinted blocks, then keep the earliest three marks.
     kept = 0

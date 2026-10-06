@@ -7,7 +7,7 @@
 
 import assert from "assert";
 import OpenRouterIntegration, { readCacheUsage } from "../src/integrations/openrouter.js";
-import { applyPromptCache } from "../src/utilities/promptCache.js";
+import { applyPromptCache, stripCacheHints } from "../src/utilities/promptCache.js";
 
 const MARK = { type: "ephemeral" };
 const marked = (b) => Boolean(b && b.cache_control);
@@ -130,6 +130,26 @@ await check("the request a Claude node sends carries the marks; the engine optio
     await i.chatCompletion({ model: "anthropic/claude-sonnet-4.6", messages: conversation() }, { type: "x", id: "llm" });
     assert.equal(marked(sent.messages[0].content[0]), expectMarks, `promptCache=${promptCache}`);
   }
+});
+
+await check("a decision model's state goes out without cache hints or marks", async () => {
+  const i = new OpenRouterIntegration("k");
+  let sent = null;
+  const origFetch = globalThis.fetch;
+  globalThis.fetch = async (_url, init) => {
+    sent = JSON.parse(init.body);
+    return new Response(JSON.stringify({ model: "m", answers: {}, usage: {} }), { status: 200, headers: { "content-type": "application/json" } });
+  };
+  try {
+    const state = conversation();
+    await i.systemOne({ model: "m", state, questions: { q: { type: "noul", instructions: "x" } } }, { type: "x", id: "d" });
+    assert.ok(sent, "the request was sent");
+    assert.deepEqual(sent.state[0].content, [{ type: "text", text: "You help the team.\n\nNow: 2026-10-05 12:00" }]);
+    assert.ok("cache_prefix_length" in state[0].content[0], "the input isn't changed");
+  } finally {
+    globalThis.fetch = origFetch;
+  }
+  assert.equal(stripCacheHints("plain"), "plain");
 });
 
 await check("reads cached and written tokens from a usage block", async () => {

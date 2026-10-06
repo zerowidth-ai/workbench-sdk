@@ -58,6 +58,18 @@ function splitAtPrefix(blocks) {
   });
 }
 
+const stripMessage = (m) =>
+  m && typeof m === "object" && Array.isArray(m.content) ? { ...m, content: m.content.map(strip) } : m;
+
+/**
+ * A message or conversation with every cache mark and hint removed, for
+ * anything that sends one somewhere other than a chat model (a decision
+ * model's `state`). Anything else passes through. Never mutates the input.
+ */
+export function stripCacheHints(value) {
+  return Array.isArray(value) ? value.map(stripMessage) : stripMessage(value);
+}
+
 /**
  * The messages to send, with cache marks placed for a model that takes
  * them and removed for any other. Never mutates the input.
@@ -67,9 +79,7 @@ export function applyPromptCache(messages, { model, enabled = true } = {}) {
   const marking = enabled && takesCacheMarks(model);
 
   if (!marking) {
-    return messages.map((m) =>
-      m && Array.isArray(m.content) ? { ...m, content: m.content.map(strip) } : m,
-    );
+    return messages.map(stripMessage);
   }
 
   // Split the hinted blocks, then keep the earliest three marks.

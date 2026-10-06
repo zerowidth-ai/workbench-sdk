@@ -11,7 +11,7 @@ import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from src.utilities.prompt_cache import apply_prompt_cache, read_cache_usage
+from src.utilities.prompt_cache import apply_prompt_cache, read_cache_usage, strip_cache_hints
 from src.utilities.sanitize_api_call import emit_api_call_event
 
 try:
@@ -997,7 +997,8 @@ class OpenRouterIntegration:
                 "{ type, instructions, criteria }"
             )
 
-        payload: dict[str, Any] = {"model": model, "state": state, "questions": questions}
+        # A conversation's cache hints are for chat models only.
+        payload: dict[str, Any] = {"model": model, "state": strip_cache_hints(state), "questions": questions}
 
         url = f"{self.base_url}/systemone"
         headers = {

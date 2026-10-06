@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.integrations.openrouter import OpenRouterIntegration  # noqa: E402
-from src.utilities.prompt_cache import apply_prompt_cache, read_cache_usage  # noqa: E402
+from src.utilities.prompt_cache import apply_prompt_cache, read_cache_usage, strip_cache_hints  # noqa: E402
 
 MARK = {"type": "ephemeral"}
 
@@ -94,6 +94,15 @@ def test_one_hour_marks_come_first():
     out = apply_prompt_cache(msgs, model="anthropic/claude-sonnet-4.6")
     assert out[0]["content"][0]["cache_control"] == {"type": "ephemeral", "ttl": "1h"}
     assert out[3]["content"][0]["cache_control"] == MARK, "a later mark keeps its own lifetime"
+
+
+def test_strip_cache_hints():
+    source = conversation()
+    out = strip_cache_hints(source)
+    assert out[0]["content"] == [{"type": "text", "text": "You help the team.\n\nNow: 2026-10-05 12:00"}]
+    assert "cache_prefix_length" in source[0]["content"][0], "the input isn't changed"
+    assert strip_cache_hints(source[0])["content"] == out[0]["content"]
+    assert strip_cache_hints("plain") == "plain"
 
 
 def test_cache_usage_and_cost_line():
