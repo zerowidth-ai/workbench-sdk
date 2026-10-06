@@ -8,15 +8,22 @@
  * at a fraction of the input price. Other providers OpenRouter serves
  * cache a repeated prefix on their own.
  *
- * Marks come from two places:
- *   - the System Prompt node marks the end of the prompt's fixed part,
- *     before the first variable it fills in, so values that change per
- *     run (the time, memory, search results) don't spoil the cache;
- *   - this adds one on the last user message, so earlier turns are
- *     cached for the next call.
- * Marks a caller placed itself count too. Past four, the latest are
- * dropped. For a model that doesn't take marks, or with caching off,
- * every mark is removed so no provider sees a field it doesn't expect.
+ * Where marks go, for a model that takes them:
+ *   - the end of the system prompt's fixed part. The System Prompt node
+ *     records it as `cache_prefix_length` on its text block (the text
+ *     before the first variable it fills in); the block is split there
+ *     and the first part marked, so a value that changes per run (the
+ *     time, memory, search results) doesn't spoil the cache;
+ *   - marks the caller placed itself (`cache_control` on a block);
+ *   - the last message, whatever its role, so everything so far
+ *     (earlier turns, and this turn's tool calls and results) is reused
+ *     by the next call.
+ * At most four: the earliest three are kept, then the last message.
+ * A mark that comes before a one-hour mark gets the one-hour lifetime
+ * too, since Anthropic needs longer-lived marks to come first.
+ *
+ * For any other model, or with caching off, the hint and every mark are
+ * removed, and the system prompt goes out exactly as it was written.
  */
 
 const MAX_MARKS = 4;
@@ -27,10 +34,28 @@ export function takesCacheMarks(model) {
   return typeof model === "string" && model.startsWith("anthropic/");
 }
 
-function withoutMark(block) {
-  if (!block || typeof block !== "object" || !("cache_control" in block)) return block;
-  const { cache_control, ...rest } = block;
+const isText = (b) => b && typeof b === "object" && b.type === "text" && typeof b.text === "string";
+
+function strip(block) {
+  if (!block || typeof block !== "object") return block;
+  if (!("cache_control" in block) && !("cache_prefix_length" in block)) return block;
+  const { cache_control, cache_prefix_length, ...rest } = block;
   return rest;
+}
+
+/** One message's blocks, with the System Prompt node's hint turned into
+ *  a split and a mark. */
+function splitAtPrefix(blocks) {
+  return blocks.flatMap((b) => {
+    if (!isText(b) || typeof b.cache_prefix_length !== "number") return [b];
+    const { cache_prefix_length: at, ...block } = b;
+    if (at <= 0 || !b.text.slice(0, at).trim()) return [block];
+    if (at >= b.text.length) return [{ ...block, cache_control: block.cache_control ?? MARK }];
+    return [
+      { type: "text", text: b.text.slice(0, at), cache_control: MARK },
+      { ...block, text: b.text.slice(at) },
+    ];
+  });
 }
 
 /**
@@ -41,46 +66,67 @@ export function applyPromptCache(messages, { model, enabled = true } = {}) {
   if (!Array.isArray(messages)) return messages;
   const marking = enabled && takesCacheMarks(model);
 
-  // Keep the earliest marks, up to the limit (none when not marking).
+  if (!marking) {
+    return messages.map((m) =>
+      m && Array.isArray(m.content) ? { ...m, content: m.content.map(strip) } : m,
+    );
+  }
+
+  // Split the hinted blocks, then keep the earliest three marks.
   let kept = 0;
   const out = messages.map((m) => {
     if (!m || !Array.isArray(m.content)) return m;
-    if (!m.content.some((b) => b && b.cache_control)) return m;
-    return {
-      ...m,
-      content: m.content.map((b) => {
-        if (!b || !b.cache_control) return b;
-        // A mark on an empty block is refused by the provider.
-        if (marking && kept < MAX_MARKS && !(b.type === "text" && !b.text)) {
-          kept++;
-          return b;
-        }
-        return withoutMark(b);
-      }),
-    };
+    const blocks = splitAtPrefix(m.content).map((b) => {
+      if (!b || !b.cache_control) return b;
+      // A mark on an empty block is refused by the provider.
+      if (kept < MAX_MARKS - 1 && !(isText(b) && !b.text)) {
+        kept++;
+        return b;
+      }
+      return strip(b);
+    });
+    return { ...m, content: blocks };
   });
-  if (!marking || kept >= MAX_MARKS) return out;
 
-  // The last user message's last text block, so the conversation so far
-  // is cached for the next call.
-  for (let i = out.length - 1; i >= 0; i--) {
-    const m = out[i];
-    if (m?.role !== "user") continue;
+  // The last message's last text block.
+  const last = out.length - 1;
+  const m = out[last];
+  if (m && m.role !== "system") {
     const blocks =
       typeof m.content === "string"
         ? [{ type: "text", text: m.content }]
         : Array.isArray(m.content)
           ? [...m.content]
           : null;
-    if (!blocks || blocks.some((b) => b && b.cache_control)) break;
-    for (let j = blocks.length - 1; j >= 0; j--) {
-      if (blocks[j]?.type === "text" && blocks[j].text) {
-        blocks[j] = { ...blocks[j], cache_control: MARK };
-        out[i] = { ...m, content: blocks };
-        break;
+    if (blocks && !blocks.some((b) => b && b.cache_control)) {
+      for (let j = blocks.length - 1; j >= 0; j--) {
+        if (isText(blocks[j]) && blocks[j].text) {
+          blocks[j] = { ...blocks[j], cache_control: MARK };
+          out[last] = { ...m, content: blocks };
+          break;
+        }
       }
     }
-    break;
+  }
+
+  // Longer-lived marks must come first: anything before a one-hour mark
+  // lives an hour too.
+  let lastHourAt = -1;
+  out.forEach((msg, i) => {
+    if (Array.isArray(msg?.content) && msg.content.some((b) => b?.cache_control?.ttl === "1h")) lastHourAt = i;
+  });
+  if (lastHourAt > 0) {
+    for (let i = 0; i < lastHourAt; i++) {
+      const msg = out[i];
+      if (!Array.isArray(msg?.content)) continue;
+      if (!msg.content.some((b) => b?.cache_control && b.cache_control.ttl !== "1h")) continue;
+      out[i] = {
+        ...msg,
+        content: msg.content.map((b) =>
+          b?.cache_control && b.cache_control.ttl !== "1h" ? { ...b, cache_control: { ...b.cache_control, ttl: "1h" } } : b,
+        ),
+      };
+    }
   }
   return out;
 }

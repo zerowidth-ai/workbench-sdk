@@ -14,10 +14,7 @@ const marked = (b) => Boolean(b && b.cache_control);
 const conversation = () => [
   {
     role: "system",
-    content: [
-      { type: "text", text: "You help the team.\n\n", cache_control: MARK },
-      { type: "text", text: "Now: 2026-10-05 12:00" },
-    ],
+    content: [{ type: "text", text: "You help the team.\n\nNow: 2026-10-05 12:00", cache_prefix_length: 20 }],
   },
   { role: "user", content: "First question" },
   { role: "assistant", content: "First answer" },
@@ -50,10 +47,12 @@ const pricing = {
 
 console.log("prompt-cache:");
 
-await check("a Claude call keeps the system prompt's mark and marks the last user message", async () => {
+await check("a Claude call splits the system prompt at its fixed part and marks the last message", async () => {
   const input = conversation();
   const out = applyPromptCache(input, { model: "anthropic/claude-sonnet-4.6" });
-  assert.ok(marked(out[0].content[0]), "fixed part of the system prompt stays marked");
+  assert.deepEqual(out[0].content.map((b) => b.text), ["You help the team.\n\n", "Now: 2026-10-05 12:00"]);
+  assert.ok(!("cache_prefix_length" in out[0].content[1]), "the hint never reaches the model");
+  assert.ok(marked(out[0].content[0]), "fixed part of the system prompt is marked");
   assert.ok(!marked(out[0].content[1]), "the changing part is never marked");
   assert.ok(!Array.isArray(out[1].content), "earlier user turns are left alone");
   assert.ok(marked(out[3].content[0]), "the last user message is marked");
@@ -62,6 +61,7 @@ await check("a Claude call keeps the system prompt's mark and marks the last use
 
 await check("other models get no marks at all", async () => {
   const out = applyPromptCache(conversation(), { model: "openai/gpt-5" });
+  assert.deepEqual(out[0].content, [{ type: "text", text: "You help the team.\n\nNow: 2026-10-05 12:00" }], "one block, as written");
   for (const m of out) {
     if (Array.isArray(m.content)) assert.ok(!m.content.some(marked), `${m.role} still carries a mark`);
   }
@@ -73,14 +73,41 @@ await check("caching off removes every mark, even for Claude", async () => {
   assert.ok(!Array.isArray(out[3].content) || !out[3].content.some(marked));
 });
 
-await check("never more than four marks, keeping the earliest", async () => {
+await check("never more than four marks: the earliest three, then the last message", async () => {
   const many = [
     { role: "system", content: [1, 2, 3, 4, 5].map((n) => ({ type: "text", text: `part ${n}`, cache_control: MARK })) },
     { role: "user", content: "hi" },
   ];
   const out = applyPromptCache(many, { model: "anthropic/claude-sonnet-4.6" });
-  assert.deepEqual(out[0].content.map(marked), [true, true, true, true, false]);
-  assert.equal(out[1].content, "hi", "no room left for the user mark");
+  assert.deepEqual(out[0].content.map(marked), [true, true, true, false, false]);
+  assert.ok(marked(out[1].content[0]), "the last message keeps its mark");
+});
+
+await check("the last message is marked whatever its role, so a turn's tool results are cached", async () => {
+  const turn = [
+    ...conversation(),
+    { role: "assistant", content: null, tool_calls: [{ id: "t1" }] },
+    { role: "tool", tool_call_id: "t1", content: "rows" },
+  ];
+  const out = applyPromptCache(turn, { model: "anthropic/claude-sonnet-4.6" });
+  assert.ok(marked(out[5].content[0]));
+  assert.deepEqual(out[3].content, [{ type: "text", text: "Second question" }]);
+});
+
+await check("a whitespace-only fixed part isn't split off", async () => {
+  const out = applyPromptCache(
+    [{ role: "system", content: [{ type: "text", text: "  {now}", cache_prefix_length: 2 }] }, { role: "user", content: "hi" }],
+    { model: "anthropic/claude-sonnet-4.6" },
+  );
+  assert.deepEqual(out[0].content, [{ type: "text", text: "  {now}" }]);
+});
+
+await check("marks before a one-hour mark live an hour too; later ones keep their own", async () => {
+  const msgs = conversation();
+  msgs[1] = { role: "user", content: [{ type: "text", text: "First question", cache_control: { type: "ephemeral", ttl: "1h" } }] };
+  const out = applyPromptCache(msgs, { model: "anthropic/claude-sonnet-4.6" });
+  assert.deepEqual(out[0].content[0].cache_control, { type: "ephemeral", ttl: "1h" });
+  assert.deepEqual(out[3].content[0].cache_control, MARK);
 });
 
 await check("a mark on an empty block is dropped", async () => {

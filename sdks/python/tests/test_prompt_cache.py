@@ -28,10 +28,7 @@ def conversation():
     return [
         {
             "role": "system",
-            "content": [
-                {"type": "text", "text": "You help the team.\n\n", "cache_control": MARK},
-                {"type": "text", "text": "Now: 2026-10-05 12:00"},
-            ],
+            "content": [{"type": "text", "text": "You help the team.\n\nNow: 2026-10-05 12:00", "cache_prefix_length": 20}],
         },
         {"role": "user", "content": "First question"},
         {"role": "assistant", "content": "First answer"},
@@ -42,7 +39,9 @@ def conversation():
 def test_claude_marks():
     source = conversation()
     out = apply_prompt_cache(source, model="anthropic/claude-sonnet-4.6")
+    assert [b["text"] for b in out[0]["content"]] == ["You help the team.\n\n", "Now: 2026-10-05 12:00"]
     assert marked(out[0]["content"][0]) and not marked(out[0]["content"][1])
+    assert "cache_prefix_length" not in out[0]["content"][1]
     assert out[1]["content"] == "First question"
     assert marked(out[3]["content"][0])
     assert not marked(source[3]["content"][0]), "the input isn't changed"
@@ -50,6 +49,7 @@ def test_claude_marks():
 
 def test_other_models_unmarked():
     out = apply_prompt_cache(conversation(), model="openai/gpt-5")
+    assert out[0]["content"] == [{"type": "text", "text": "You help the team.\n\nNow: 2026-10-05 12:00"}]
     for message in out:
         if isinstance(message["content"], list):
             assert not any(marked(b) for b in message["content"])
@@ -66,8 +66,34 @@ def test_four_marks_at_most():
         {"role": "user", "content": "hi"},
     ]
     out = apply_prompt_cache(many, model="anthropic/claude-sonnet-4.6")
-    assert [marked(b) for b in out[0]["content"]] == [True, True, True, True, False]
-    assert out[1]["content"] == "hi"
+    assert [marked(b) for b in out[0]["content"]] == [True, True, True, False, False]
+    assert marked(out[1]["content"][0]), "the last message keeps its mark"
+
+
+def test_tail_of_any_role():
+    turn = conversation() + [
+        {"role": "assistant", "content": None, "tool_calls": [{"id": "t1"}]},
+        {"role": "tool", "tool_call_id": "t1", "content": "rows"},
+    ]
+    out = apply_prompt_cache(turn, model="anthropic/claude-sonnet-4.6")
+    assert marked(out[-1]["content"][0]), "a tool result at the end is marked"
+    assert out[3]["content"] == [{"type": "text", "text": "Second question"}]
+
+
+def test_whitespace_prefix_not_split():
+    out = apply_prompt_cache(
+        [{"role": "system", "content": [{"type": "text", "text": "  {now}", "cache_prefix_length": 2}]}, {"role": "user", "content": "hi"}],
+        model="anthropic/claude-sonnet-4.6",
+    )
+    assert out[0]["content"] == [{"type": "text", "text": "  {now}"}]
+
+
+def test_one_hour_marks_come_first():
+    msgs = conversation()
+    msgs[1] = {"role": "user", "content": [{"type": "text", "text": "First question", "cache_control": {"type": "ephemeral", "ttl": "1h"}}]}
+    out = apply_prompt_cache(msgs, model="anthropic/claude-sonnet-4.6")
+    assert out[0]["content"][0]["cache_control"] == {"type": "ephemeral", "ttl": "1h"}
+    assert out[3]["content"][0]["cache_control"] == MARK, "a later mark keeps its own lifetime"
 
 
 def test_cache_usage_and_cost_line():

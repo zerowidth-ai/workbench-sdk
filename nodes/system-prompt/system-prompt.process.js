@@ -67,11 +67,10 @@ export default async ({inputs, settings, config}) => {
     });
 
   // Values filled in can change from run to run (the time, memory, search
-  // results); the text before the first of them doesn't. The message keeps
-  // the two as separate blocks and marks the fixed one with
-  // `cache_control`, so a model that caches on request can reuse the
-  // prompt up to there. The model client removes the mark for models
-  // that don't take it.
+  // results); the text before the first of them doesn't. The block records
+  // that length as `cache_prefix_length`, so the model client can cache
+  // the prompt up to there for a model that caches on request. The client
+  // removes the hint before any model sees it.
   let firstFilled = -1;
   for (const m of fullContent.matchAll(/\{\{(.*?)\}\}/g)) {
     if (variables.some(variable => Object.keys(variable).includes(m[1]))) {
@@ -80,27 +79,16 @@ export default async ({inputs, settings, config}) => {
     }
   }
 
-  const CACHE = { type: "ephemeral" };
-  let message;
-  if (firstFilled < 0) {
-    message = {
-      role: "system",
-      content: [{ type: "text", text: fullContent, ...(fullContent.trim() ? { cache_control: CACHE } : {}) }],
-    };
-  } else {
-    const fixed = fullContent.slice(0, firstFilled);
-    const changing = fill(fullContent.slice(firstFilled));
-    message = {
-      role: "system",
-      content: fixed.trim()
-        ? [{ type: "text", text: fixed, cache_control: CACHE }, ...(changing ? [{ type: "text", text: changing }] : [])]
-        : [{ type: "text", text: changing }],
-    };
-  }
+  const text = firstFilled < 0 ? fullContent : fullContent.slice(0, firstFilled) + fill(fullContent.slice(firstFilled));
+  const prefix = firstFilled < 0 ? text.length : firstFilled;
+  const message = {
+    role: "system",
+    content: [{ type: "text", text, ...(text.slice(0, prefix).trim() ? { cache_prefix_length: prefix } : {}) }],
+  };
 
   // Return the message and string prompt
   return {
     message: message,
-    prompt: message.content.map(block => block.text).join("")
+    prompt: text
   };
 }; 

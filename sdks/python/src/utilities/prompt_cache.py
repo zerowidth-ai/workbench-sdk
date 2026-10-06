@@ -8,11 +8,21 @@ messages) is reused by the next call that starts the same way, read at a
 fraction of the input price. Other providers OpenRouter serves cache a
 repeated prefix on their own.
 
-Marks come from two places: the System Prompt node marks the end of the
-prompt's fixed part, and this adds one on the last user message so
-earlier turns are cached for the next call. Marks a caller placed itself
-count too; past four, the latest are dropped. For a model that doesn't
-take marks, or with caching off, every mark is removed.
+Where marks go, for a model that takes them:
+
+- the end of the system prompt's fixed part. The System Prompt node
+  records it as ``cache_prefix_length`` on its text block (the text before
+  the first variable it fills in); the block is split there and the first
+  part marked, so a value that changes per run doesn't spoil the cache;
+- marks the caller placed itself (``cache_control`` on a block);
+- the last message, whatever its role, so everything so far (earlier
+  turns, and this turn's tool calls and results) is reused by the next
+  call.
+
+At most four: the earliest three are kept, then the last message. A mark
+that comes before a one-hour mark gets the one-hour lifetime too, since
+Anthropic needs longer-lived marks to come first. For any other model, or
+with caching off, the hint and every mark are removed.
 
 Mirrors ``sdks/nodejs/src/utilities/promptCache.js``.
 """
@@ -22,6 +32,7 @@ from __future__ import annotations
 from typing import Any
 
 MAX_MARKS = 4
+MARK = {"type": "ephemeral"}
 
 
 def takes_cache_marks(model: Any) -> bool:
@@ -54,6 +65,42 @@ def read_cache_usage(usage: Any) -> dict[str, int]:
     return {"cached_tokens": field("cached_tokens"), "cache_write_tokens": field("cache_write_tokens")}
 
 
+def _is_text(block: Any) -> bool:
+    return isinstance(block, dict) and block.get("type") == "text" and isinstance(block.get("text"), str)
+
+
+def _strip(block: Any) -> Any:
+    if not isinstance(block, dict) or ("cache_control" not in block and "cache_prefix_length" not in block):
+        return block
+    return {k: v for k, v in block.items() if k not in ("cache_control", "cache_prefix_length")}
+
+
+def _split_at_prefix(blocks: list[Any]) -> list[Any]:
+    """One message's blocks, with the System Prompt node's hint turned into
+    a split and a mark."""
+    out: list[Any] = []
+    for b in blocks:
+        at = b.get("cache_prefix_length") if _is_text(b) else None
+        if not isinstance(at, int) or isinstance(at, bool):
+            out.append(b)
+            continue
+        block = {k: v for k, v in b.items() if k != "cache_prefix_length"}
+        text = b["text"]
+        if at <= 0 or not text[:at].strip():
+            out.append(block)
+        elif at >= len(text):
+            out.append({**block, "cache_control": block.get("cache_control") or dict(MARK)})
+        else:
+            out.append({"type": "text", "text": text[:at], "cache_control": dict(MARK)})
+            out.append({**block, "text": text[at:]})
+    return out
+
+
+def _has_mark(message: Any, test: Any) -> bool:
+    content = message.get("content") if isinstance(message, dict) else None
+    return isinstance(content, list) and any(isinstance(b, dict) and b.get("cache_control") and test(b["cache_control"]) for b in content)
+
+
 def apply_prompt_cache(messages: Any, *, model: Any, enabled: bool = True) -> Any:
     """The messages to send, with cache marks placed for a model that takes
     them and removed for any other. Never mutates the input."""
@@ -61,47 +108,61 @@ def apply_prompt_cache(messages: Any, *, model: Any, enabled: bool = True) -> An
         return messages
     marking = enabled and takes_cache_marks(model)
 
+    def content_of(m: Any) -> Any:
+        return m.get("content") if isinstance(m, dict) else None
+
+    if not marking:
+        return [
+            {**m, "content": [_strip(b) for b in content_of(m)]} if isinstance(content_of(m), list) else m
+            for m in messages
+        ]
+
+    # Split the hinted blocks, then keep the earliest three marks.
     kept = 0
     out: list[Any] = []
-    for message in messages:
-        content = message.get("content") if isinstance(message, dict) else None
-        if not isinstance(content, list) or not any(isinstance(b, dict) and b.get("cache_control") for b in content):
-            out.append(message)
+    for m in messages:
+        content = content_of(m)
+        if not isinstance(content, list):
+            out.append(m)
             continue
         blocks = []
-        for block in content:
-            if not isinstance(block, dict) or not block.get("cache_control"):
-                blocks.append(block)
-                continue
-            empty_text = block.get("type") == "text" and not block.get("text")
-            if marking and kept < MAX_MARKS and not empty_text:
+        for b in _split_at_prefix(content):
+            if not isinstance(b, dict) or not b.get("cache_control"):
+                blocks.append(b)
+            # A mark on an empty block is refused by the provider.
+            elif kept < MAX_MARKS - 1 and not (_is_text(b) and not b["text"]):
                 kept += 1
-                blocks.append(block)
+                blocks.append(b)
             else:
-                blocks.append({k: v for k, v in block.items() if k != "cache_control"})
-        out.append({**message, "content": blocks})
+                blocks.append(_strip(b))
+        out.append({**m, "content": blocks})
 
-    if not marking or kept >= MAX_MARKS:
-        return out
+    # The last message's last text block.
+    if out and isinstance(out[-1], dict) and out[-1].get("role") != "system":
+        m = out[-1]
+        content = m.get("content")
+        blocks = [{"type": "text", "text": content}] if isinstance(content, str) else list(content) if isinstance(content, list) else None
+        if blocks is not None and not any(isinstance(b, dict) and b.get("cache_control") for b in blocks):
+            for j in range(len(blocks) - 1, -1, -1):
+                if _is_text(blocks[j]) and blocks[j]["text"]:
+                    blocks[j] = {**blocks[j], "cache_control": dict(MARK)}
+                    out[-1] = {**m, "content": blocks}
+                    break
 
-    for i in range(len(out) - 1, -1, -1):
-        message = out[i]
-        if not isinstance(message, dict) or message.get("role") != "user":
+    # Longer-lived marks must come first: anything before a one-hour mark
+    # lives an hour too.
+    last_hour = max((i for i, m in enumerate(out) if _has_mark(m, lambda c: c.get("ttl") == "1h")), default=-1)
+    for i in range(last_hour):
+        m = out[i]
+        if not _has_mark(m, lambda c: c.get("ttl") != "1h"):
             continue
-        content = message.get("content")
-        if isinstance(content, str):
-            blocks = [{"type": "text", "text": content}]
-        elif isinstance(content, list):
-            blocks = list(content)
-        else:
-            break
-        if any(isinstance(b, dict) and b.get("cache_control") for b in blocks):
-            break
-        for j in range(len(blocks) - 1, -1, -1):
-            block = blocks[j]
-            if isinstance(block, dict) and block.get("type") == "text" and block.get("text"):
-                blocks[j] = {**block, "cache_control": {"type": "ephemeral"}}
-                out[i] = {**message, "content": blocks}
-                break
-        break
+        out[i] = {
+            **m,
+            "content": [
+                {**b, "cache_control": {**b["cache_control"], "ttl": "1h"}}
+                if isinstance(b, dict) and b.get("cache_control") and b["cache_control"].get("ttl") != "1h"
+                else b
+                for b in m["content"]
+            ],
+        }
     return out

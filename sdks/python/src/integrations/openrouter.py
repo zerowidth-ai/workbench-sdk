@@ -146,7 +146,9 @@ class OpenRouterIntegration:
             payload["messages"] = apply_prompt_cache(
                 self._clean_messages(messages),
                 model=model,
-                enabled=(engine_config or {}).get("prompt_cache", True) is not False,
+                # Only the platform endpoint understands the marks.
+                enabled="openrouter.ai" in (self.base_url or "")
+                and (engine_config or {}).get("prompt_cache", True) is not False,
             )
         elif prompt:
             payload["prompt"] = prompt
