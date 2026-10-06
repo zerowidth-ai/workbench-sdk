@@ -1,14 +1,17 @@
 export default async ({ inputs, settings, config }) => {
   const messages = inputs.messages;
   const keepRecent = Math.max(0, Math.floor(Number(inputs.keep_recent ?? 20)));
+  const step = Math.max(1, Math.floor(Number(inputs.step ?? 1)) || 1);
   const placeholder = inputs.placeholder ?? "[Truncated]";
 
   if (!Array.isArray(messages)) {
     throw new Error("Messages input must be an array");
   }
 
+  // The cutoff moves in whole steps, so between steps the earlier
+  // messages are byte-for-byte what they were last turn (cacheable).
   const total = messages.length;
-  const cutoffIndex = total - keepRecent;
+  const cutoffIndex = Math.floor(Math.max(0, total - keepRecent) / step) * step;
 
   const result = [];
   let truncatedCount = 0;

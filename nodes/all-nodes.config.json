@@ -19041,6 +19041,14 @@
                 "default": 20
             },
             {
+                "name": "step",
+                "display_name": "Step",
+                "type": "number",
+                "description": "Move the cutoff only in steps of this many messages, so earlier messages stay the same from turn to turn and a model's prompt cache keeps matching them. 1 moves it every message.",
+                "required": false,
+                "default": 1
+            },
+            {
                 "name": "placeholder",
                 "display_name": "Placeholder",
                 "type": "string",

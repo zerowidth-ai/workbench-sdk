@@ -203,5 +203,51 @@
       ],
       "truncated_count": 2
     }
+  },
+  {
+    "description": "With a step, the cutoff only moves in whole steps (here it hasn't reached the first)",
+    "inputs": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "first result"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "second result"},
+        {"role": "tool", "tool_call_id": "call_3", "content": "third result"},
+        {"role": "user", "content": "And now?"}
+      ],
+      "keep_recent": 1,
+      "step": 4
+    },
+    "expected": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "first result"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "second result"},
+        {"role": "tool", "tool_call_id": "call_3", "content": "third result"},
+        {"role": "user", "content": "And now?"}
+      ],
+      "truncated_count": 0
+    }
+  },
+  {
+    "description": "With a step, a whole step's worth is truncated once it's reached",
+    "inputs": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "first result"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "second result"},
+        {"role": "tool", "tool_call_id": "call_3", "content": "third result"},
+        {"role": "assistant", "content": "Done"},
+        {"role": "user", "content": "And now?"}
+      ],
+      "keep_recent": 1,
+      "step": 2
+    },
+    "expected": {
+      "messages": [
+        {"role": "tool", "tool_call_id": "call_1", "content": "[Truncated]"},
+        {"role": "tool", "tool_call_id": "call_2", "content": "[Truncated]"},
+        {"role": "tool", "tool_call_id": "call_3", "content": "[Truncated]"},
+        {"role": "assistant", "content": "Done"},
+        {"role": "user", "content": "And now?"}
+      ],
+      "truncated_count": 3
+    }
   }
 ]
