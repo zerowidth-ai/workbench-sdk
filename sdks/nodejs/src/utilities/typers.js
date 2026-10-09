@@ -229,12 +229,17 @@ export function convertImportToNodeType(importDef) {
       requestedSnapshot: processedImportDef.requestedSnapshot,
       inputs: inputNodes.map(node => {
         if (node.type === 'input-data') {
+          // An input with a default doesn't need a connection: left
+          // unconnected (or left out by a tool call), it gets the default,
+          // the same as running the imported flow on its own.
+          const defaultValue = node.settings?.default_value;
           return {
             // Use the node's settings.key as the input name to match port connections
             name: node.settings?.key || 'data',
-            display_name: `Data: ${node.settings?.key || 'value'}`,
+            display_name: node.settings?.display_name || node.settings?.key || 'Data',
             type: node.settings?.type || 'any',
-            required: true,
+            required: defaultValue === undefined,
+            ...(defaultValue !== undefined ? { default: defaultValue } : {}),
             is_data_input: true,
             description: node.settings?.description || 'Imported data input'
           };

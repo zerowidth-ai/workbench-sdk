@@ -1,0 +1,33 @@
+{
+  "description": "An imported flow's data input with a default can be left unconnected; the default fills it",
+  "flow": {
+    "nodes": [
+      { "id": "a-in", "type": "input-data", "settings": { "key": "a", "type": "number" } },
+      { "id": "imp", "type": "imported-adder" },
+      { "id": "out", "type": "output-data", "settings": { "key": "data" } }
+    ],
+    "links": [
+      { "from": { "node_id": "a-in", "port_name": "value" }, "to": { "node_id": "imp", "port_name": "a" } },
+      { "from": { "node_id": "imp", "port_name": "sum" }, "to": { "node_id": "out", "port_name": "value" } }
+    ],
+    "imports": [
+      {
+        "id": "adder",
+        "display_name": "Adder with a default",
+        "nodes": [
+          { "id": "a", "type": "input-data", "settings": { "key": "a", "type": "number" } },
+          { "id": "b", "type": "input-data", "settings": { "key": "b", "type": "number", "default_value": 5 } },
+          { "id": "add", "type": "add" },
+          { "id": "sum", "type": "output-data", "settings": { "key": "sum" } }
+        ],
+        "links": [
+          { "from": { "node_id": "a", "port_name": "value" }, "to": { "node_id": "add", "port_name": "a" } },
+          { "from": { "node_id": "b", "port_name": "value" }, "to": { "node_id": "add", "port_name": "b" } },
+          { "from": { "node_id": "add", "port_name": "result" }, "to": { "node_id": "sum", "port_name": "value" } }
+        ]
+      }
+    ]
+  },
+  "inputs": { "a": 20 },
+  "expected": { "data": 25 }
+}
