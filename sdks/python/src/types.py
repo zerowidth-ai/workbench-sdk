@@ -397,16 +397,21 @@ def convert_import_to_node_type(
         settings = node.get("settings", {})
 
         if node_type == "input-data":
-            inputs.append(
-                {
-                    "name": settings.get("key", "data"),
-                    "display_name": f"Data: {settings.get('key', 'value')}",
-                    "type": settings.get("type", "any"),
-                    "required": True,
-                    "is_data_input": True,
-                    "description": settings.get("description", "Imported data input"),
-                }
-            )
+            # An input with a default doesn't need a connection: left
+            # unconnected, it gets the default, the same as running the
+            # imported flow on its own.
+            has_default = "default_value" in settings
+            input_def = {
+                "name": settings.get("key", "data"),
+                "display_name": settings.get("display_name") or settings.get("key") or "Data",
+                "type": settings.get("type", "any"),
+                "required": not has_default,
+                "is_data_input": True,
+                "description": settings.get("description", "Imported data input"),
+            }
+            if has_default:
+                input_def["default"] = settings["default_value"]
+            inputs.append(input_def)
         elif node_type == "input-chat":
             inputs.append(
                 {
