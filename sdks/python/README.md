@@ -432,6 +432,7 @@ from workbench import Workbench, CodeExecutorInterface
 
 # A sandbox service that speaks the HTTP contract below
 await Workbench.create(flow, {'code_executor': {'url': 'https://sandbox.example.com', 'api_key': key}})
+# 'headers' adds fixed headers; 'get_headers' (sync or async) works them out per request
 
 # Or your own executor over any sandbox you like
 class MySandbox(CodeExecutorInterface):

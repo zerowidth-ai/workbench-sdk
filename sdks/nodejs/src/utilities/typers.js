@@ -6,6 +6,7 @@ import Workbench from "../index.js";
 import { getDirname } from "./helpers.js";
 import { loadTypeConverter } from "./typeConverters.js";
 import { createMemory, flowUsesMemory } from "../integrations/memory-store.js";
+import { withOwnCodeSession } from "../integrations/code-executor.js";
 
 const ajv = new Ajv();
 
@@ -337,6 +338,12 @@ export function convertImportToNodeType(importDef) {
         };
         importConfig.memory = own;
       }
+
+      // An imported flow runs code in a session of its own, like memory:
+      // it never sees its caller's variables, and its cleanup below closes
+      // its session, not the caller's. Run Code attached to the caller and
+      // passed in as a tool still runs in the caller's session.
+      importConfig.integrations = withOwnCodeSession(importConfig.integrations ?? config.integrations);
 
       // If this import accepts plugins, create tool runners for parent context execution
       // Note: We need to access the parent engine (this) to find connected plugins

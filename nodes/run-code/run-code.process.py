@@ -10,6 +10,13 @@ import re
 from typing import Any
 
 IMAGE = re.compile(r"^image/(png|jpeg|gif|webp)$")
+# Inside the node's own 150s timeout, so the sandbox's limit is the one
+# that fires and the model is told which limit it hit.
+MAX_SECONDS = 120.0
+# What the model is shown per call. Larger or later images are still
+# listed in `files`.
+MAX_IMAGES = 4
+MAX_IMAGE_BYTES = 5 * 1024 * 1024
 
 
 async def process(
@@ -30,7 +37,7 @@ async def process(
         seconds = float((settings or {}).get("timeout_seconds") or 60)
     except (TypeError, ValueError):
         seconds = 60.0
-    timeout_ms = int(max(1.0, seconds) * 1000)
+    timeout_ms = int(min(MAX_SECONDS, max(1.0, seconds)) * 1000)
 
     out = await executor.run(language=language, code=code, timeout_ms=timeout_ms)
 
@@ -47,16 +54,26 @@ async def process(
         raise RuntimeError(f"{reason}{printed}")
 
     produced = out.get("files") if isinstance(out.get("files"), list) else []
-    content = [
-        {"type": "image", "data": f["data"], "mimeType": f.get("mimeType")}
-        for f in produced
+    images = [
+        f for f in produced
         if isinstance(f.get("data"), str) and IMAGE.match(f.get("mimeType") or "")
     ]
+    shown = [f for f in images if len(f["data"]) * 0.75 <= MAX_IMAGE_BYTES][:MAX_IMAGES]
+    content = [{"type": "image", "data": f["data"], "mimeType": f.get("mimeType")} for f in shown]
+    not_shown = len(images) - len(shown)
     files = [{k: v for k, v in f.items() if k != "data"} for f in produced]
+
+    stderr = out.get("stderr") or ""
+    if not_shown:
+        plural = "s" if not_shown > 1 else ""
+        stderr += (
+            f"{chr(10) if stderr else ''}{not_shown} image{plural} not shown: at most {MAX_IMAGES} "
+            "per call, each up to 5 MB. They are still listed in files."
+        )
 
     return {
         "stdout": out.get("stdout") or "",
-        "stderr": out.get("stderr") or "",
+        "stderr": stderr,
         "result": out.get("result"),
         "files": files,
         "content": content,

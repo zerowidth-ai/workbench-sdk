@@ -714,7 +714,7 @@
                 "name": "timeout_seconds",
                 "display_name": "Time Limit (seconds)",
                 "type": "number",
-                "description": "How long one call may run before it is stopped.",
+                "description": "How long one call may run before it is stopped, up to 120.",
                 "default": 60
             }
         ],

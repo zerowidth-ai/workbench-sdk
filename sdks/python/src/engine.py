@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Any, Callable, Optional
 from uuid import uuid4
 
 from src.cache import CacheManager
+from src.integrations.code_executor import with_own_code_session
 from src.errors import (
     ErrorManager,
     FlowError,
@@ -559,6 +560,10 @@ class Workbench:
                 "on_node_complete": self.config.get("on_node_complete") if self.config.get("include_internal_events") else None,
                 "on_node_error": self.config.get("on_node_error") if self.config.get("include_internal_events") else None,
             }
+            # Code runs in a session of the macro's own: its run ending
+            # closes that one, not ours.
+            if self.config.get("integrations") is not None:
+                child_config["integrations"] = with_own_code_session(self.config["integrations"])
 
             # Create internal engine
             internal_engine = Workbench(internal_flow, child_config)
@@ -2191,6 +2196,20 @@ class Workbench:
             # Restore the inherited signal so a reused engine doesn't treat this
             # run's (possibly set) Event as an ancestor on the next run().
             self.config["signal"] = self._inherited_signal
+            await self._close_code_session()
+
+    async def _close_code_session(self) -> None:
+        """Close this engine's code session, if it opened one. Each run()
+        gets its own, so a reused engine never carries one run's variables
+        and files into the next. The sandbox would expire it on its own;
+        closing frees it now."""
+        code_executor = (self.config.get("integrations") or {}).get("code_executor")
+        if code_executor is None or not hasattr(code_executor, "close"):
+            return
+        try:
+            await code_executor.close()
+        except Exception as e:
+            self._log_debug(f"Failed to close the code session: {e}")
 
     async def _launch_node(self, node: dict[str, Any]) -> None:
         """Launch a node for execution."""
@@ -2432,14 +2451,9 @@ class Workbench:
                 if hasattr(kb, "disconnect"):
                     await kb.disconnect()
 
-            # Close this run's code session; the sandbox would expire it
-            # on its own, closing frees it now.
-            code_executor = integrations.get("code_executor")
-            if code_executor is not None and hasattr(code_executor, "close"):
-                try:
-                    await code_executor.close()
-                except Exception as e:
-                    self._log_debug(f"Failed to close the code session: {e}")
+            # run() already closes the code session; this covers an engine
+            # whose run never finished.
+            await self._close_code_session()
 
             # Clean up any remaining temporary knowledge base files
             await self._cleanup_temp_knowledge_files()

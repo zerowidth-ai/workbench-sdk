@@ -20,7 +20,9 @@ HTTP contract (all JSON):
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Optional
+import inspect
+import json
+from typing import Any, Callable, Optional
 from urllib.parse import quote
 
 OUTPUT_CAP = 20000
@@ -62,27 +64,34 @@ class HttpCodeExecutor(CodeExecutorInterface):
         url: str,
         api_key: Optional[str] = None,
         headers: Optional[dict[str, str]] = None,
+        get_headers: Optional[Callable[[], Any]] = None,
         capabilities: Optional[dict[str, Any]] = None,
-        timeout: float = 180.0,
+        timeout: float = 30.0,
     ) -> None:
         if not url:
             raise ValueError("A code executor needs a url.")
         self.url = url.rstrip("/")
         self.api_key = api_key
         self.headers = headers or {}
+        self.get_headers = get_headers
         self.declared = capabilities
         self.timeout = timeout
 
     async def capabilities(self) -> dict[str, Any]:
         return self.declared or {"languages": ["python", "javascript"], "sessions": True, "files": True}
 
-    async def _request(self, method: str, path: str, body: Any = None) -> Any:
+    async def _request(self, method: str, path: str, body: Any = None, timeout: Optional[float] = None) -> Any:
         import httpx
 
         headers = {"content-type": "application/json", **self.headers}
+        if self.get_headers:
+            extra = self.get_headers()
+            if inspect.isawaitable(extra):
+                extra = await extra
+            headers.update(extra or {})
         if self.api_key:
             headers["authorization"] = f"Bearer {self.api_key}"
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
+        async with httpx.AsyncClient(timeout=timeout or self.timeout) as client:
             res = await client.request(method, f"{self.url}{path}", headers=headers, json=body)
         if res.status_code == 204:
             return None
@@ -94,12 +103,16 @@ class HttpCodeExecutor(CodeExecutorInterface):
             error = data.get("error") if isinstance(data, dict) else None
             if res.status_code == 410 or (isinstance(error, dict) and error.get("kind") == "session_lost"):
                 raise CodeSessionLostError()
-            message = error.get("message") if isinstance(error, dict) else error or res.text[:300]
+            message = (error.get("message") if isinstance(error, dict) else error) or res.text[:300]
             raise RuntimeError(f"The code executor refused the request ({res.status_code}): {message}")
         return data
 
     async def run(self, request: dict[str, Any]) -> dict[str, Any]:
-        return await self._request("POST", "/run", request)
+        # Wait a little past the sandbox's own limit so its timeout answer
+        # arrives instead of a dropped connection.
+        timeout_ms = request.get("timeoutMs")
+        timeout = timeout_ms / 1000 + 15 if isinstance(timeout_ms, (int, float)) else None
+        return await self._request("POST", "/run", request, timeout=timeout)
 
     async def open_session(self) -> str:
         data = await self._request("POST", "/sessions", {})
@@ -118,10 +131,28 @@ def _cap(text: Any) -> str:
     return value
 
 
+def _cap_result(value: Any) -> Any:
+    """``result`` is whatever the sandbox reports for the last expression;
+    a big one (a DataFrame, a long list) is capped like printed output."""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return _cap(value)
+    try:
+        dumped = json.dumps(value)
+    except (TypeError, ValueError):
+        return _cap(str(value))
+    return _cap(dumped) if len(dumped) > OUTPUT_CAP else value
+
+
 class RunScopedCodeExecutor:
     """One run's view of an executor: opens a session on first use when
-    the executor supports them, reuses it, and closes it in the engine's
-    cleanup. Output is capped here whatever the executor allows."""
+    the executor supports them, reuses it, and closes it when the run
+    ends. Output is capped here whatever the executor allows.
+
+    Every engine owns one of these. A sub-engine (an import or a macro)
+    gets its own through ``for_sub_engine()``, so its session never shares
+    state with its caller's and closing it leaves the caller's open."""
 
     def __init__(self, executor: CodeExecutorInterface) -> None:
         self.executor = executor
@@ -130,6 +161,10 @@ class RunScopedCodeExecutor:
 
     async def capabilities(self) -> dict[str, Any]:
         return await self.executor.capabilities()
+
+    def for_sub_engine(self) -> "RunScopedCodeExecutor":
+        """A fresh scope over the same executor, for a sub-engine."""
+        return RunScopedCodeExecutor(self.executor)
 
     async def _session(self) -> Optional[str]:
         caps = await self.executor.capabilities()
@@ -170,12 +205,27 @@ class RunScopedCodeExecutor:
         if isinstance(error, dict) and error.get("kind") == "session_lost":
             self.session_id = None
             raise CodeSessionLostError()
-        return {**result, "stdout": _cap(result.get("stdout")), "stderr": _cap(result.get("stderr"))}
+        return {
+            **result,
+            "stdout": _cap(result.get("stdout")),
+            "stderr": _cap(result.get("stderr")),
+            "result": _cap_result(result.get("result")),
+        }
 
     async def close(self) -> None:
         session_id, self.session_id = self.session_id, None
         if session_id:
             await self.executor.close_session(session_id)
+
+
+def with_own_code_session(integrations: Optional[dict[str, Any]]) -> Optional[dict[str, Any]]:
+    """The integrations a sub-engine runs with: the caller's, except that
+    code runs in a session of its own. Returns the same dict when there is
+    no code executor."""
+    executor = (integrations or {}).get("code_executor")
+    if not hasattr(executor, "for_sub_engine"):
+        return integrations
+    return {**integrations, "code_executor": executor.for_sub_engine()}
 
 
 def create_code_executor(code_executor_config: dict[str, Any]) -> RunScopedCodeExecutor:
@@ -188,6 +238,7 @@ def create_code_executor(code_executor_config: dict[str, Any]) -> RunScopedCodeE
                 url=code_executor_config["url"],
                 api_key=code_executor_config.get("api_key") or code_executor_config.get("apiKey"),
                 headers=code_executor_config.get("headers"),
+                get_headers=code_executor_config.get("get_headers") or code_executor_config.get("getHeaders"),
                 capabilities=code_executor_config.get("capabilities"),
             )
         )

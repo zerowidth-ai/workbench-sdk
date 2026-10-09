@@ -51,12 +51,14 @@ export class CodeExecutorInterface {
    * @param {{ language: string, code: string, input?: unknown,
    *   files?: { path: string, data: string }[], timeoutMs: number,
    *   session?: string }} _request  file `data` is base64
+   * @param {{ signal?: AbortSignal }} [_options] aborted when the run is
+   *   cancelled or the node times out; stop waiting on the sandbox then
    * @returns {Promise<{ stdout: string, stderr: string, result?: unknown,
    *   files?: { path: string, mimeType?: string, data?: string, url?: string, size?: number }[],
    *   error?: { kind: "timeout" | "memory" | "runtime" | "unsupported" | "session_lost", message: string },
    *   usage?: { wallMs: number, cpuMs?: number } }>}
    */
-  async run(_request) {
+  async run(_request, _options) {
     throw new Error("run() not implemented");
   }
 
@@ -86,7 +88,7 @@ export class HttpCodeExecutor extends CodeExecutorInterface {
     return this.declared ?? { languages: ["python", "javascript"], sessions: true, files: true };
   }
 
-  async request(method, path, body) {
+  async request(method, path, body, signal) {
     const headers = {
       "content-type": "application/json",
       ...this.headers,
@@ -97,6 +99,7 @@ export class HttpCodeExecutor extends CodeExecutorInterface {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
+      signal,
     });
     if (res.status === 204) return null;
     const text = await res.text();
@@ -114,8 +117,8 @@ export class HttpCodeExecutor extends CodeExecutorInterface {
     return data;
   }
 
-  async run(request) {
-    return this.request("POST", "/run", request);
+  async run(request, { signal } = {}) {
+    return this.request("POST", "/run", request, signal);
   }
 
   async openSession() {
@@ -136,11 +139,29 @@ const cap = (text) => {
     : value;
 };
 
+// `result` is whatever the sandbox reports for the last expression; a
+// big one (a DataFrame, a long list) is capped like printed output.
+const capResult = (value) => {
+  if (value === undefined || value === null) return null;
+  if (typeof value === "string") return cap(value);
+  let json;
+  try {
+    json = JSON.stringify(value);
+  } catch {
+    return cap(String(value));
+  }
+  return json && json.length > OUTPUT_CAP ? cap(json) : value;
+};
+
 /**
  * One run's view of an executor: opens a session on first use when the
  * executor supports them, reuses it for every later call in the run, and
- * closes it in the engine's cleanup. Output is capped here so a print
- * loop cannot flood the conversation, whatever the executor allows.
+ * closes it when the run ends. Output is capped here so a print loop
+ * cannot flood the conversation, whatever the executor allows.
+ *
+ * Every engine owns one of these. A sub-engine (an import or a macro)
+ * gets its own through forSubEngine(), so its session never shares
+ * state with its caller's and closing it leaves the caller's open.
  */
 export class RunScopedCodeExecutor {
   constructor(executor) {
@@ -151,6 +172,11 @@ export class RunScopedCodeExecutor {
 
   async capabilities() {
     return this.executor.capabilities();
+  }
+
+  /** A fresh scope over the same executor, for a sub-engine. */
+  forSubEngine() {
+    return new RunScopedCodeExecutor(this.executor);
   }
 
   async session() {
@@ -168,7 +194,7 @@ export class RunScopedCodeExecutor {
     }
   }
 
-  async run({ language, code, input, files, timeoutMs }) {
+  async run({ language, code, input, files, timeoutMs, signal }) {
     const caps = await this.executor.capabilities();
     if (!caps.languages.includes(language)) {
       throw new Error(
@@ -178,7 +204,7 @@ export class RunScopedCodeExecutor {
     const session = await this.session();
     let result;
     try {
-      result = await this.executor.run({ language, code, input, files, timeoutMs, session });
+      result = await this.executor.run({ language, code, input, files, timeoutMs, session }, { signal });
     } catch (err) {
       if (err instanceof CodeSessionLostError) this.sessionId = null;
       throw err;
@@ -191,6 +217,7 @@ export class RunScopedCodeExecutor {
       ...result,
       stdout: cap(result?.stdout),
       stderr: cap(result?.stderr),
+      result: capResult(result?.result),
     };
   }
 
@@ -199,6 +226,16 @@ export class RunScopedCodeExecutor {
     this.sessionId = null;
     if (id) await this.executor.closeSession(id);
   }
+}
+
+/**
+ * The integrations a sub-engine runs with: the caller's, except that
+ * code runs in a session of its own. Returns the same object when there
+ * is no code executor.
+ */
+export function withOwnCodeSession(integrations) {
+  if (!integrations?.codeExecutor?.forSubEngine) return integrations;
+  return { ...integrations, codeExecutor: integrations.codeExecutor.forSubEngine() };
 }
 
 /** From the host's `config.codeExecutor` to the run-scoped executor. */

@@ -162,6 +162,57 @@ async function main() {
     await assert.rejects(tool(new RunScopedCodeExecutor(new FakeExecutor()))({ code: "  " }), /no code/);
   });
 
+  await check("the time limit is held to 120 seconds", async () => {
+    const fake = new FakeExecutor();
+    await tool(new RunScopedCodeExecutor(fake), { timeout_seconds: 600 })({ code: "1" });
+    assert.equal(fake.calls[0].timeoutMs, 120000);
+  });
+
+  await check("a big result is capped like printed output; a small one is left alone", async () => {
+    const big = new FakeExecutor({ reply: () => ({ stdout: "", stderr: "", result: Array(20000).fill(1) }) });
+    const out = await tool(new RunScopedCodeExecutor(big))({ code: "list(range(20000))" });
+    assert.equal(typeof out.result, "string");
+    assert.match(out.result, /cut: \d+ more characters/);
+    const small = new FakeExecutor({ reply: () => ({ stdout: "", stderr: "", result: { a: [1, 2] } }) });
+    assert.deepEqual((await tool(new RunScopedCodeExecutor(small))({ code: "x" })).result, { a: [1, 2] });
+  });
+
+  await check("at most four images reach the model; the rest are listed and noted", async () => {
+    const huge = "A".repeat(8 * 1024 * 1024);
+    const fake = new FakeExecutor({
+      reply: () => ({
+        stdout: "",
+        stderr: "",
+        files: [
+          { path: "big.png", mimeType: "image/png", data: huge },
+          ...[1, 2, 3, 4, 5].map((n) => ({ path: `p${n}.png`, mimeType: "image/png", data: "iVBO" })),
+        ],
+      }),
+    });
+    const out = await tool(new RunScopedCodeExecutor(fake))({ code: "plots()" });
+    assert.equal(out.content.length, 4);
+    assert.ok(out.content.every((c) => c.data === "iVBO"));
+    assert.equal(out.files.length, 6);
+    assert.match(out.stderr, /^2 images not shown/);
+  });
+
+  await check("the run's signal reaches the HTTP request", async () => {
+    const seen = [];
+    const fetchImpl = async (url, init) => {
+      seen.push({ url, signal: init.signal });
+      return new Response(JSON.stringify(url.endsWith("/sessions") ? { id: "x" } : { stdout: "", stderr: "" }));
+    };
+    const controller = new AbortController();
+    const scoped = new RunScopedCodeExecutor(new HttpCodeExecutor({ url: "http://sandbox", fetch: fetchImpl }));
+    await runCode({
+      inputs: { code: "1" },
+      settings: {},
+      config: { integrations: { codeExecutor: scoped }, signal: controller.signal },
+    });
+    const run = seen.filter((s) => s.url.endsWith("/run"));
+    assert.equal(run[0].signal, controller.signal);
+  });
+
   await check("HTTP executor: the contract's paths, bearer key, and 410 as a lost session", async () => {
     const seen = [];
     const server = http.createServer((req, res) => {
@@ -208,15 +259,44 @@ async function main() {
     }
   });
 
+  const fixture = (name) => JSON.parse(readFileSync(path.join(getDirname(import.meta.url), "flows", name), "utf8"));
+
   await check("engine: config.codeExecutor becomes the integration, and cleanup closes the session", async () => {
-    const fixture = path.join(getDirname(import.meta.url), "flows/flow.addition.json");
-    const { flow } = JSON.parse(readFileSync(fixture, "utf8"));
+    const { flow } = fixture("flow.addition.json");
     const fake = new FakeExecutor();
     const engine = await Workbench.create(flow, { codeExecutor: { instance: fake } });
     const executor = engine.config.integrations.codeExecutor;
     assert.ok(executor instanceof RunScopedCodeExecutor);
     await executor.run({ language: "python", code: "1", timeoutMs: 1000 });
     await engine.cleanup();
+    assert.deepEqual(fake.closed, ["s1"]);
+  });
+
+  await check("engine: each run() of a reused engine gets its own session", async () => {
+    const { flow, inputs } = fixture("flow.addition.json");
+    const fake = new FakeExecutor();
+    const engine = await Workbench.create(flow, { codeExecutor: { instance: fake } });
+    const executor = engine.config.integrations.codeExecutor;
+    for (const _ of [1, 2]) {
+      await executor.run({ language: "python", code: "1", timeoutMs: 1000 });
+      await engine.run(inputs);
+    }
+    assert.deepEqual(fake.opened, ["s1", "s2"]);
+    assert.deepEqual(fake.closed, ["s1", "s2"]);
+  });
+
+  await check("engine: an imported flow leaves its caller's session open", async () => {
+    const { flow, inputs } = fixture("flow.addition-import-inline.json");
+    const fake = new FakeExecutor();
+    const during = [];
+    const engine = await Workbench.create(flow, {
+      codeExecutor: { instance: fake },
+      onNodeComplete: () => during.push(engine.config.integrations.codeExecutor.sessionId),
+    });
+    await engine.config.integrations.codeExecutor.run({ language: "python", code: "x = 1", timeoutMs: 1000 });
+    await engine.run(inputs);
+    assert.ok(during.length > 0);
+    assert.ok(during.every((id) => id === "s1"), `caller's session during the run: ${during}`);
     assert.deepEqual(fake.closed, ["s1"]);
   });
 

@@ -14,6 +14,7 @@ import { validateKeys, validateFlow, validateInputs } from "./utilities/validato
 import { loadCustomTypes, typeCheck, convertType } from "./utilities/typers.js";
 import { createSafeToolName, isRemoteMCPTool, isManualToolNode, mapTypeToJSONSchema, getDirname } from "./utilities/helpers.js";
 import { sanitizeAPICallEvent } from "./utilities/sanitizeAPICall.js";
+import { withOwnCodeSession } from "./integrations/code-executor.js";
 
 
 /**
@@ -1186,6 +1187,21 @@ export default class Workbench {
    * This should be called when the engine is no longer needed to free up memory
    * @returns {Promise<void>}
    */
+  /**
+   * Close this engine's code session, if it opened one. Each run() gets
+   * its own, so a reused engine never carries one run's variables and
+   * files into the next. The sandbox would expire it on its own; closing
+   * frees it now.
+   */
+  async _closeCodeSession() {
+    if (!this.config.integrations?.codeExecutor?.close) return;
+    try {
+      await this.config.integrations.codeExecutor.close();
+    } catch (err) {
+      this.logDebug(`Failed to close the code session: ${err.message}`);
+    }
+  }
+
   async cleanup() {
     this.logDebug('Starting cleanup process...');
     
@@ -1218,15 +1234,9 @@ export default class Workbench {
         }
       }
 
-      // Close this run's code session. The sandbox would expire it on
-      // its own; closing frees it now.
-      if (this.config.integrations?.codeExecutor?.close) {
-        try {
-          await this.config.integrations.codeExecutor.close();
-        } catch (err) {
-          this.logDebug(`Failed to close the code session: ${err.message}`);
-        }
-      }
+      // run() already closes the code session; this covers an engine
+      // whose run never finished.
+      await this._closeCodeSession();
 
       // Clean up any imported engines that were created
       // These are stored in the cache when import nodes are processed
@@ -1671,6 +1681,7 @@ export default class Workbench {
       // Restore the inherited signal so a reused engine doesn't treat this run's
       // (possibly aborted) signal as an ancestor on the next run().
       this.config.signal = this._inheritedSignal;
+      await this._closeCodeSession();
     }
   }
 
@@ -1742,8 +1753,9 @@ export default class Workbench {
     // Create internal zv1 instance
     const internalEngine = new Workbench(internalFlow, {
       ...this.config,
-      // Pass through integrations and other config
-      integrations: this.config.integrations,
+      // Pass through integrations and other config. Code runs in a
+      // session of the macro's own: its run ending closes that one, not ours.
+      integrations: withOwnCodeSession(this.config.integrations),
       keys: this.config.keys,
       debug: this.config.debug,
       // Pass tools from parent context

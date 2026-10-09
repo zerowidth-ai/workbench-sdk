@@ -183,7 +183,34 @@ async def main() -> None:
     await expect_raises(tool(ce.RunScopedCodeExecutor(FakeExecutor()))({"code": "  "}), ValueError, "no code")
     ok("no executor and no code each fail with a reason")
 
+    fake = FakeExecutor()
+    await tool(ce.RunScopedCodeExecutor(fake), {"timeout_seconds": 600})({"code": "1"})
+    assert fake.calls[0]["timeoutMs"] == 120000
+    ok("the time limit is held to 120 seconds")
+
+    fake = FakeExecutor(reply=lambda r, n: {"stdout": "", "stderr": "", "result": [1] * 20000})
+    out = await tool(ce.RunScopedCodeExecutor(fake))({"code": "[1] * 20000"})
+    assert isinstance(out["result"], str) and "more characters" in out["result"]
+    fake = FakeExecutor(reply=lambda r, n: {"stdout": "", "stderr": "", "result": {"a": [1, 2]}})
+    assert (await tool(ce.RunScopedCodeExecutor(fake))({"code": "x"}))["result"] == {"a": [1, 2]}
+    ok("a big result is capped like printed output; a small one is left alone")
+
+    huge = "A" * (8 * 1024 * 1024)
+    fake = FakeExecutor(
+        reply=lambda r, n: {
+            "stdout": "",
+            "stderr": "",
+            "files": [{"path": "big.png", "mimeType": "image/png", "data": huge}]
+            + [{"path": f"p{i}.png", "mimeType": "image/png", "data": "iVBO"} for i in range(5)],
+        }
+    )
+    out = await tool(ce.RunScopedCodeExecutor(fake))({"code": "plots()"})
+    assert len(out["content"]) == 4 and all(c["data"] == "iVBO" for c in out["content"])
+    assert len(out["files"]) == 6 and out["stderr"].startswith("2 images not shown")
+    ok("at most four images reach the model; the rest are listed and noted")
+
     seen: list[tuple[str, str, str]] = []
+    run_ids: list[str] = []
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args: Any) -> None:
@@ -201,6 +228,7 @@ async def main() -> None:
             length = int(self.headers.get("content-length") or 0)
             body = json.loads(self.rfile.read(length) or b"null") if length else None
             seen.append((self.command, self.path, self.headers.get("authorization") or ""))
+            run_ids.append(self.headers.get("x-run") or "")
             if self.command == "POST" and self.path == "/sessions":
                 return self._send(200, {"id": "abc"})
             if self.command == "POST" and self.path == "/run":
@@ -219,7 +247,10 @@ async def main() -> None:
     threading.Thread(target=server.serve_forever, daemon=True).start()
     try:
         url = f"http://127.0.0.1:{server.server_address[1]}/"
-        scoped = ce.create_code_executor({"url": url, "api_key": "k1"})
+        async def get_headers():
+            return {"x-run": "r1"}
+
+        scoped = ce.create_code_executor({"url": url, "api_key": "k1", "get_headers": get_headers})
         out = await scoped.run(language="python", code="print(1)", timeout_ms=1000)
         assert out["stdout"] == "ran in abc\n"
         await expect_raises(scoped.run(language="python", code="lost", timeout_ms=1000), ce.CodeSessionLostError)
@@ -235,9 +266,10 @@ async def main() -> None:
             "DELETE /sessions/abc",
         ]
         assert all(auth == "Bearer k1" for _, _, auth in seen)
+        assert all(r == "r1" for r in run_ids)
     finally:
         server.shutdown()
-    ok("HTTP executor: the contract's paths, bearer key, and 410 as a lost session")
+    ok("HTTP executor: the contract's paths, bearer key, get_headers, and 410 as a lost session")
 
     try:
         from src import Workbench  # noqa: E402
@@ -254,6 +286,34 @@ async def main() -> None:
         await engine.cleanup()
         assert fake.closed == ["s1"]
         ok("engine: config code_executor becomes the integration, and cleanup closes the session")
+
+        fake = FakeExecutor()
+        engine = await Workbench.create(flow, {"code_executor": {"instance": fake}})
+        executor = engine.config["integrations"]["code_executor"]
+        inputs = json.loads((ROOT / "tests" / "flows" / "flow.addition.json").read_text())["inputs"]
+        for _ in range(2):
+            await executor.run(language="python", code="1", timeout_ms=1000)
+            await engine.run(inputs)
+        assert fake.opened == ["s1", "s2"] and fake.closed == ["s1", "s2"]
+        ok("engine: each run() of a reused engine gets its own session")
+
+        fixture = json.loads((ROOT / "tests" / "flows" / "flow.addition-import-inline.json").read_text())
+        fake = FakeExecutor()
+        during: list[Any] = []
+        holder: dict[str, Any] = {}
+        engine = await Workbench.create(
+            fixture["flow"],
+            {
+                "code_executor": {"instance": fake},
+                "on_node_complete": lambda _e: during.append(holder["executor"].session_id),
+            },
+        )
+        holder["executor"] = engine.config["integrations"]["code_executor"]
+        await holder["executor"].run(language="python", code="x = 1", timeout_ms=1000)
+        await engine.run(fixture["inputs"])
+        assert during and all(sid == "s1" for sid in during), f"caller's session during the run: {during}"
+        assert fake.closed == ["s1"]
+        ok("engine: an imported flow leaves its caller's session open")
 
     print(f"\n{passed} run-code checks passed")
 
