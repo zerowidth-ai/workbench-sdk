@@ -6,6 +6,7 @@ import { convertImportToNodeType } from "./typers.js";
 import { getDirname, isRemoteMCPTool } from "./helpers.js";
 import { isOAuthKey, OAuthRefreshManager } from "./oauth.js";
 import { createMemory, flowUsesMemory } from "../integrations/memory-store.js";
+import { createCodeExecutor } from "../integrations/code-executor.js";
 
 
 /**
@@ -242,6 +243,12 @@ export async function loadIntegrations(config, flow = null) {
   // memory or the flow has memory nodes.
   if (config.memory || flowUsesMemory(flow)) {
       integrations.memory = createMemory(config.memory ?? {});
+  }
+
+  // Code execution (integrations/code-executor.js): only ever the host's
+  // sandbox. There is no built-in fallback that runs code in-process.
+  if (config.codeExecutor) {
+      integrations.codeExecutor = createCodeExecutor(config.codeExecutor);
   }
 
   // Initialize OAuth refresh manager if any OAuth keys are present

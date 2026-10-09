@@ -2432,6 +2432,15 @@ class Workbench:
                 if hasattr(kb, "disconnect"):
                     await kb.disconnect()
 
+            # Close this run's code session; the sandbox would expire it
+            # on its own, closing frees it now.
+            code_executor = integrations.get("code_executor")
+            if code_executor is not None and hasattr(code_executor, "close"):
+                try:
+                    await code_executor.close()
+                except Exception as e:
+                    self._log_debug(f"Failed to close the code session: {e}")
+
             # Clean up any remaining temporary knowledge base files
             await self._cleanup_temp_knowledge_files()
 

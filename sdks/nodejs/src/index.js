@@ -1218,6 +1218,16 @@ export default class Workbench {
         }
       }
 
+      // Close this run's code session. The sandbox would expire it on
+      // its own; closing frees it now.
+      if (this.config.integrations?.codeExecutor?.close) {
+        try {
+          await this.config.integrations.codeExecutor.close();
+        } catch (err) {
+          this.logDebug(`Failed to close the code session: ${err.message}`);
+        }
+      }
+
       // Clean up any imported engines that were created
       // These are stored in the cache when import nodes are processed
       const rawStore = this.cache.getRawStore();
@@ -3269,3 +3279,13 @@ export {
   InMemoryMemoryStore,
   normalizeMemoryPath,
 } from './integrations/memory-store.js';
+
+// Code execution: pass `config.codeExecutor.url` for a sandbox that
+// speaks the HTTP contract, or implement CodeExecutorInterface over your
+// own and pass `config.codeExecutor.instance`. The Run Code tool node
+// uses it. See integrations/code-executor.js.
+export {
+  CodeExecutorInterface,
+  HttpCodeExecutor,
+  CodeSessionLostError,
+} from './integrations/code-executor.js';

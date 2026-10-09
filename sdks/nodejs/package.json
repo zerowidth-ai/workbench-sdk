@@ -47,7 +47,8 @@
     "test-flow": "node tests/test.flows.js",
     "test-kb": "node tests/test.kb-search.js && node tests/test.kb-graph.js",
     "test-custom-inference": "node tests/test.custom-inference.js",
-    "test-memory": "node tests/test.agent-memory.js"
+    "test-memory": "node tests/test.agent-memory.js",
+    "test-run-code": "node tests/test.run-code.js"
   },
   "author": "Peter Binggeser @ ZeroWidth, LLC",
   "license": "Apache-2.0",
