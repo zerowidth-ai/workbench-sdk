@@ -1,6 +1,6 @@
 {
   "name": "@zerowidth/workbench-sdk",
-  "version": "2.7.1",
+  "version": "2.8.0",
   "dependencies": {
     "adm-zip": "^0.5.16",
     "ajv": "^8.17.1",
