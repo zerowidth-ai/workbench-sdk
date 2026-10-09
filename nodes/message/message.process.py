@@ -25,6 +25,35 @@ def _render_variable(value: Any) -> str:
         return str(value)
 
 
+# A token's key and its fallback: `name`, or `name:"Unknown Name"` for the
+# text to use when `name` is missing or empty. Same rules as the System
+# Prompt node.
+_TOKEN = re.compile(r'^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::\s*"((?:[^"\\]|\\.)*)")?\s*$')
+
+
+def _is_empty(value: Any) -> bool:
+    return value is None or (isinstance(value, str) and value.strip() == "")
+
+
+def _resolve_token(variables: list, inner: str):
+    """The text a {{...}} token becomes, or None to leave it as written."""
+    for variable in variables:
+        if isinstance(variable, dict) and inner in variable:
+            return _render_variable(variable[inner])
+    m = _TOKEN.match(inner)
+    if not m:
+        return None
+    key = m.group(1)
+    fallback = None if m.group(2) is None else re.sub(r"\\(.)", lambda e: "\n" if e.group(1) == "n" else e.group(1), m.group(2))
+    found = next((v for v in variables if isinstance(v, dict) and key in v), None)
+    value = found[key] if found is not None else None
+    if not _is_empty(value):
+        return _render_variable(value)
+    if fallback is not None:
+        return fallback
+    return _render_variable(value) if found is not None else None
+
+
 def _flatten_variables(variables: Any) -> list:
     """
     A single connection can deliver a list of key-value objects, so flatten
@@ -76,12 +105,8 @@ async def process(
         )
         if text_content_index != -1:
             def replace_variable(match):
-                key = match.group(1)
-                # Look for a variable with the matching key
-                for variable in variables:
-                    if isinstance(variable, dict) and key in variable:
-                        return _render_variable(variable[key])
-                return match.group(0)  # Return original if no match
+                resolved = _resolve_token(variables, match.group(1))
+                return match.group(0) if resolved is None else resolved
 
             message["content"][text_content_index]["text"] = re.sub(
                 r"\{\{(.*?)\}\}",

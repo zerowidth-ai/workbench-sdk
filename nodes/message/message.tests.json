@@ -1,5 +1,11 @@
 [
   {
+    "description": "A token's fallback is used when its variable is missing or empty, and a value wins over it",
+    "inputs": { "variables": [{ "plan": "" }, { "name": "Ada" }] },
+    "settings": { "role": "user", "content": "{{name:\"there\"}} is on {{plan:\"no plan yet\"}}." },
+    "expected": { "message": { "role": "user", "content": [{ "type": "text", "text": "Ada is on no plan yet." }] } }
+  },
+  {
     "description": "String variable is injected as-is",
     "inputs": {
       "variables": [

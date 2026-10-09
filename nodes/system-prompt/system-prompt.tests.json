@@ -1,5 +1,50 @@
 [
   {
+    "description": "A fallback's \\n is a newline",
+    "inputs": { "variables": [] },
+    "settings": { "content": "Notes: {{notes:\"none yet\\nask the user\"}}" },
+    "expected": {
+      "message": { "role": "system", "content": [{ "type": "text", "text": "Notes: none yet\nask the user", "cache_prefix_length": 7 }] },
+      "prompt": "Notes: none yet\nask the user"
+    }
+  },
+  {
+    "description": "A token's fallback is used when its variable is missing",
+    "inputs": { "variables": [] },
+    "settings": { "content": "Hello {{name:\"there\"}}!" },
+    "expected": {
+      "message": { "role": "system", "content": [{ "type": "text", "text": "Hello there!", "cache_prefix_length": 6 }] },
+      "prompt": "Hello there!"
+    }
+  },
+  {
+    "description": "A token's fallback is used when its variable is empty",
+    "inputs": { "variables": [{ "name": "  " }] },
+    "settings": { "content": "Hello {{name:\"there\"}}!" },
+    "expected": {
+      "message": { "role": "system", "content": [{ "type": "text", "text": "Hello there!", "cache_prefix_length": 6 }] },
+      "prompt": "Hello there!"
+    }
+  },
+  {
+    "description": "A variable's value wins over the token's fallback",
+    "inputs": { "variables": [{ "name": "Ada" }] },
+    "settings": { "content": "Hello {{ name : \"there\" }}!" },
+    "expected": {
+      "message": { "role": "system", "content": [{ "type": "text", "text": "Hello Ada!", "cache_prefix_length": 6 }] },
+      "prompt": "Hello Ada!"
+    }
+  },
+  {
+    "description": "A fallback can hold an escaped quote, and spaces inside the braces are allowed",
+    "inputs": { "variables": [{ "name": "Ada" }] },
+    "settings": { "content": "Hi {{ name }}, say {{greeting:\"\\\"hello\\\"\"}}." },
+    "expected": {
+      "message": { "role": "system", "content": [{ "type": "text", "text": "Hi Ada, say \"hello\".", "cache_prefix_length": 3 }] },
+      "prompt": "Hi Ada, say \"hello\"."
+    }
+  },
+  {
     "description": "String variable is injected as-is",
     "inputs": {
       "variables": [

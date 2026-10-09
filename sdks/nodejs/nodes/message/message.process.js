@@ -19,6 +19,32 @@ const renderVariable = (value) => {
   }
 };
 
+/**
+ * A token's key and its fallback: `name`, or `name:"Unknown Name"` for the
+ * text to use when `name` is missing or empty. Inside the quotes, `\"` is a
+ * quote, `\\` a backslash and `\n` a newline. Same rules as the System
+ * Prompt node.
+ */
+const TOKEN = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::\s*"((?:[^"\\]|\\.)*)")?\s*$/;
+
+const isEmpty = (value) =>
+  value === null || value === undefined || (typeof value === "string" && value.trim() === "");
+
+/** The text a `{{…}}` token becomes, or null to leave it as written. */
+const resolveToken = (variables, inner) => {
+  const exact = variables.find((v) => Object.keys(v).includes(inner));
+  if (exact) return renderVariable(exact[inner]);
+  const m = TOKEN.exec(inner);
+  if (!m) return null;
+  const key = m[1];
+  const fallback = m[2] === undefined ? undefined : m[2].replace(/\\(.)/g, (_, c) => (c === "n" ? "\n" : c));
+  const found = variables.find((v) => Object.keys(v).includes(key));
+  const value = found ? found[key] : undefined;
+  if (!isEmpty(value)) return renderVariable(value);
+  if (fallback !== undefined) return fallback;
+  return found ? renderVariable(value) : null;
+};
+
 export default async ({inputs, settings, config}) => {
 
   // If an input value is provided, use it; otherwise use the value from settings
@@ -45,15 +71,10 @@ export default async ({inputs, settings, config}) => {
   // do we have a text content item and what index is it
   let textContentIndex = message.content.findIndex(item => item.type === 'text');
   if(textContentIndex !== -1) {
-    message.content[textContentIndex].text = message.content[textContentIndex].text.replace(/\{\{(.*?)\}\}/g, (match, p1) => {
-      
-      // look for a variable with the key p1
-      let variable = variables.find(variable => Object.keys(variable).find(key => key === p1));
-      if(variable) {
-        return renderVariable(variable[p1]);
-      }
-      return match;
-    });
+    message.content[textContentIndex].text = message.content[textContentIndex].text.replace(
+      /\{\{(.*?)\}\}/g,
+      (match, p1) => resolveToken(variables, p1) ?? match,
+    );
   }
   
   // Return the string value

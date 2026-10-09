@@ -19,6 +19,44 @@ const renderVariable = (value) => {
   }
 };
 
+/**
+ * A token's key and its fallback: `name`, or `name:"Unknown Name"` for the
+ * text to use when `name` is missing or empty. Inside the quotes, `\"` is a
+ * quote, `\\` a backslash and `\n` a newline. Spaces around the parts are
+ * allowed. A fallback can't hold `}}`, since that ends the token. Null when
+ * the token isn't in either form.
+ */
+const TOKEN = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::\s*"((?:[^"\\]|\\.)*)")?\s*$/;
+const parseToken = (inner) => {
+  const m = TOKEN.exec(inner);
+  if (!m) return null;
+  return {
+    key: m[1],
+    fallback: m[2] === undefined ? undefined : m[2].replace(/\\(.)/g, (_, c) => (c === "n" ? "\n" : c)),
+  };
+};
+
+const isEmpty = (value) =>
+  value === null || value === undefined || (typeof value === "string" && value.trim() === "");
+
+/**
+ * The text a `{{…}}` token becomes, or null to leave it as written: a
+ * variable's value, else the token's fallback when the value is missing or
+ * empty. A token naming nothing, with no fallback, stays in the text.
+ */
+const resolveToken = (variables, inner) => {
+  // An exact key first, so keys that aren't plain names keep working.
+  const exact = variables.find((v) => Object.keys(v).includes(inner));
+  if (exact) return renderVariable(exact[inner]);
+  const token = parseToken(inner);
+  if (!token) return null;
+  const found = variables.find((v) => Object.keys(v).includes(token.key));
+  const value = found ? found[token.key] : undefined;
+  if (!isEmpty(value)) return renderVariable(value);
+  if (token.fallback !== undefined) return token.fallback;
+  return found ? renderVariable(value) : null;
+};
+
 export default async ({inputs, settings, config}) => {
   // Initialize variables array if not provided
   if(!inputs.variables) {
@@ -57,14 +95,7 @@ export default async ({inputs, settings, config}) => {
   let fullContent = chainedContent ? `${chainedContent}\n\n${baseContent}` : baseContent;
 
   const fill = (text) =>
-    text.replace(/\{\{(.*?)\}\}/g, (match, p1) => {
-      // look for a variable with the key p1
-      let variable = variables.find(variable => Object.keys(variable).find(key => key === p1));
-      if(variable) {
-        return renderVariable(variable[p1]);
-      }
-      return match;
-    });
+    text.replace(/\{\{(.*?)\}\}/g, (match, p1) => resolveToken(variables, p1) ?? match);
 
   // Values filled in can change from run to run (the time, memory, search
   // results); the text before the first of them doesn't. The block records
@@ -73,7 +104,8 @@ export default async ({inputs, settings, config}) => {
   // removes the hint before any model sees it.
   let firstFilled = -1;
   for (const m of fullContent.matchAll(/\{\{(.*?)\}\}/g)) {
-    if (variables.some(variable => Object.keys(variable).includes(m[1]))) {
+    // A fallback is filled in too, so it ends the fixed part as a value does.
+    if (resolveToken(variables, m[1]) !== null) {
       firstFilled = m.index;
       break;
     }
