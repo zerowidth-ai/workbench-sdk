@@ -1,0 +1,70 @@
+{
+  "display_name": "Run Code",
+  "tagline": "Run code in a sandbox",
+  "description": "Run Python or JavaScript in a sandbox with no internet access. Variables and files you create stay available to later calls in this run. Print what you want to see: printed output and errors come back to you. A matplotlib figure that is still open when the code finishes comes back as an image. Prefer small steps you can check over one long script.",
+  "icon": "code",
+  "category": "data",
+  "is_constant": false,
+  "is_plugin": true,
+  "is_output": false,
+  "inputs": [
+    {
+      "name": "code",
+      "display_name": "Code",
+      "type": "string",
+      "description": "The code to run.",
+      "required": true
+    },
+    {
+      "name": "language",
+      "display_name": "Language",
+      "type": "string",
+      "description": "python or javascript.",
+      "default": "python",
+      "options": ["python", "javascript"]
+    }
+  ],
+  "outputs": [
+    {
+      "name": "stdout",
+      "display_name": "Output",
+      "type": "string",
+      "description": "What the code printed."
+    },
+    {
+      "name": "stderr",
+      "display_name": "Errors",
+      "type": "string",
+      "description": "Warnings and errors, including a traceback when the code failed."
+    },
+    {
+      "name": "result",
+      "display_name": "Result",
+      "type": "any",
+      "description": "The value of the last expression, when the sandbox reports one."
+    },
+    {
+      "name": "files",
+      "display_name": "Files",
+      "type": "array",
+      "description": "Files the code created or changed: path, type and size, and a link when the host saved them."
+    },
+    {
+      "name": "content",
+      "display_name": "Content",
+      "type": "array",
+      "description": "Images the code produced, delivered to the model as pictures."
+    }
+  ],
+  "settings": [
+    {
+      "name": "timeout_seconds",
+      "display_name": "Time Limit (seconds)",
+      "type": "number",
+      "description": "How long one call may run before it is stopped, up to 120.",
+      "default": 60
+    }
+  ],
+  "timeout": 150000,
+  "retry_limit": 0
+}

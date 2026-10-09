@@ -29,6 +29,11 @@ from src.integrations.memory_store import (
     InMemoryMemoryStore,
     normalize_memory_path,
 )
+from src.integrations.code_executor import (
+    CodeExecutorInterface,
+    HttpCodeExecutor,
+    CodeSessionLostError,
+)
 
 __version__ = "0.5.0"
 __all__ = [
@@ -46,4 +51,7 @@ __all__ = [
     "FolderMemoryStore",
     "InMemoryMemoryStore",
     "normalize_memory_path",
+    "CodeExecutorInterface",
+    "HttpCodeExecutor",
+    "CodeSessionLostError",
 ]

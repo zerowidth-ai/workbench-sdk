@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Any, Callable
 
 from src.helpers import get_nodes_dir
 from src.integrations.memory_store import create_memory, flow_uses_memory
+from src.integrations.code_executor import create_code_executor
 from src.types import convert_import_to_node_type
 
 if TYPE_CHECKING:
@@ -246,6 +247,12 @@ async def load_integrations(
     # memory or the flow has memory nodes.
     if config.get("memory") or flow_uses_memory(flow):
         integrations["memory"] = create_memory(config.get("memory"))
+
+    # Code execution (integrations/code_executor.py): only ever the host's
+    # sandbox. There is no built-in fallback that runs code in-process.
+    code_executor = config.get("code_executor") or config.get("codeExecutor")
+    if code_executor:
+        integrations["code_executor"] = create_code_executor(code_executor)
 
     # Set engine config reference on all integration instances
     # This allows integrations to emit on_api_call events without signature changes

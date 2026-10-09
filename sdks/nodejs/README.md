@@ -540,6 +540,52 @@ Optional store members: `held: true` with `write`/`delete` returning
 sub-agent never sees its caller's memory: pass
 `memory.forImport(importId) => ({ instance | path })` to give it its own.
 
+### Running Code
+
+Attach the **Run Code** tool to a model and it can write and run Python or
+JavaScript: load a CSV, compute something exactly, draw a chart. The engine
+never runs the code itself. You tell it where:
+
+```javascript
+// A sandbox service that speaks the HTTP contract below
+await Workbench.create(flow, {
+  codeExecutor: { url: "https://sandbox.example.com", apiKey: process.env.SANDBOX_KEY },
+});
+
+// Or your own executor over any sandbox you like
+import { CodeExecutorInterface } from "@zerowidth/workbench-sdk";
+class MySandbox extends CodeExecutorInterface {
+  async capabilities() { return { languages: ["python"], sessions: true, files: true }; }
+  async openSession() { /* → session id */ }
+  async run({ language, code, timeoutMs, session }, { signal }) {
+    /* → { stdout, stderr, result?, files?: [{ path, mimeType, data (base64) }], error? } */
+  }
+  async closeSession(id) { /* … */ }
+}
+await Workbench.create(flow, { codeExecutor: { instance: new MySandbox() } });
+```
+
+The HTTP contract is three JSON calls: `POST /sessions` → `{ id }`,
+`POST /run` with `{ language, code, timeoutMs, session? }` → the result above,
+and `DELETE /sessions/:id`. Answer `410` when a session is gone.
+
+Each `run()` gets one session, opened on the first call and closed when the
+run ends, so variables and files carry over between the model's calls within
+a run and never into the next run of a reused engine. An imported flow or a
+macro gets a session of its own, the way it gets its own memory; Run Code
+passed into an import as a tool still runs in the caller's session.
+
+A failure in the code comes back to the model as output (the traceback is in
+`stderr`) so it can fix it; a time limit, lost session or unreachable sandbox
+comes back as a tool error. The time limit is at most 120 seconds per call.
+Images the code produces (`image/png`, `jpeg`, `gif`, `webp`) reach the model
+as pictures, up to four per call and 5 MB each; every file is listed by path,
+type and size. Printed output and the `result` value are capped at 20,000
+characters each. `signal` is aborted when the run is cancelled or times out.
+
+Run the sandbox with no network access and pass it no secrets: the code is
+written by a model.
+
 ### Custom Node Types
 
 Create custom nodes by implementing:

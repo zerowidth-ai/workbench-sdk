@@ -1,8 +1,15 @@
 # Changelog
 
-## 2.7.0 — 2026-10
+## 2.8.0 — 2026-10
+
+- **Run Code.** A new tool node lets a model write and run Python or JavaScript: load a CSV, compute something exactly, draw a chart. The engine never runs code itself; the host says where with `config.codeExecutor`, either `{ url, apiKey?, headers?, getHeaders? }` for a sandbox that speaks a three-call HTTP contract (`POST /sessions`, `POST /run`, `DELETE /sessions/:id`, `410` for a lost session) or `{ instance }`, any `CodeExecutorInterface`. Each `run()` gets one session, opened on the first call and closed when the run ends, so variables and files carry across the model's calls but never into the next run of a reused engine. An imported flow or a macro gets a session of its own, the way an import gets its own memory; Run Code passed into an import as a tool still runs in the caller's session. A failure in the code comes back to the model as output, with the traceback in `stderr`, so it can fix it; a time limit, a lost session or an unreachable sandbox is a tool error. The time limit is a setting, 60 seconds by default and at most 120. Images the code produces reach the model as pictures, up to four per call and 5 MB each; every file is listed by path, type and size. Printed output and the `result` value are capped at 20,000 characters each. Run the sandbox with no network access and pass it no secrets. The Python SDK has the same node and `config["code_executor"]`. New exports `CodeExecutorInterface`, `HttpCodeExecutor`, `CodeSessionLostError`. Covered by `tests/test.run-code.js` and `tests/test_run_code.py`.
+
+## 2.7.1 — 2026-10
 
 - **An imported flow's data input with a default can be left unconnected.** Every `input-data` node in an imported flow became a required input on the import node, so leaving one unconnected stopped the run with "… is missing required input" even when the input node had a `default_value`, and an imported flow used as a tool made the model fill every one. An input whose node has a `default_value` is now optional and gets that default when nothing is connected, the same as running the imported flow on its own; inputs without one stay required. Its label is the node's `display_name`, else its key (was `Data: <key>`). Same in the Python SDK. Covered by `flow.import-input-default.json`.
+
+## 2.7.0 — 2026-10
+
 - **A `{{token}}` can carry its own fallback.** In the **System Prompt** and **Message** nodes, `{{name:"Unknown Name"}}` fills in `name`'s value, or `Unknown Name` when the variable is missing, null or blank. Inside the quotes, `\"` is a quote, `\\` a backslash and `\n` a newline; a fallback can't contain `}}`, which ends the token. Spaces inside the braces are allowed, so `{{ name }}` now fills like `{{name}}` (it was left as written), and a prompt that shows the syntax itself, like `{{user_name:"Guest"}}`, now reads `Guest` even with no variables connected. A fallback ends a System Prompt's fixed part the way a value does, so `cache_prefix_length` stops there too. A token naming nothing, with no fallback, is still left as written. A default set on the Input Data node is still the value itself; a token's fallback is only how that one spot reads when the value is blank. Same in the Python SDK. Covered by new `system-prompt` and `message` test cases.
 
 ## 2.6.0 — 2026-10

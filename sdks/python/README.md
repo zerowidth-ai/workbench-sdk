@@ -422,6 +422,34 @@ Optional store members: `held = True` with `write`/`delete` returning
 caller's memory: pass `'for_import': lambda import_id: {'instance': ...}`
 (sync or async) to give it its own.
 
+### Running Code
+
+Attach the **Run Code** tool to a model and it can write and run Python or
+JavaScript. The engine never runs the code itself. You tell it where:
+
+```python
+from workbench import Workbench, CodeExecutorInterface
+
+# A sandbox service that speaks the HTTP contract below
+await Workbench.create(flow, {'code_executor': {'url': 'https://sandbox.example.com', 'api_key': key}})
+# 'headers' adds fixed headers; 'get_headers' (sync or async) works them out per request
+
+# Or your own executor over any sandbox you like
+class MySandbox(CodeExecutorInterface):
+    async def capabilities(self):
+        return {'languages': ['python'], 'sessions': True, 'files': True}
+    async def open_session(self): ...       # -> session id
+    async def run(self, request): ...       # request: language, code, timeoutMs, session
+    async def close_session(self, session_id): ...
+
+await Workbench.create(flow, {'code_executor': {'instance': MySandbox()}})
+```
+
+The HTTP contract, the per-run session, and how results reach the model are
+the same as the Node.js SDK's; see its README's "Running Code". Run the
+sandbox with no network access and pass it no secrets: the code is written by
+a model.
+
 ### Custom Node Types
 
 Create custom nodes by implementing:

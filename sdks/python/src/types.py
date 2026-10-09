@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable
 
 from src.integrations.memory_store import create_memory, flow_uses_memory
+from src.integrations.code_executor import with_own_code_session
 
 try:
     import jsonschema
@@ -524,6 +525,16 @@ def convert_import_to_node_type(
                 "memory": create_memory(own),
             }
             child_config["memory"] = own
+
+        # An imported flow runs code in a session of its own, like memory:
+        # it never sees its caller's variables, and its cleanup below closes
+        # its session, not the caller's. Run Code attached to the caller and
+        # passed in as a tool still runs in the caller's session.
+        child_integrations = with_own_code_session(
+            child_config.get("integrations", config.get("integrations"))
+        )
+        if child_integrations is not None:
+            child_config["integrations"] = child_integrations
 
         # Create child engine with the import's flow definition
         child_flow = {

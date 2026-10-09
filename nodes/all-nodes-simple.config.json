@@ -461,6 +461,7 @@ Only accepts noul questions whose instructions and criteria are plain strings. S
 response-format,Response Format,Define a JSON Schema response format for structured outputs from LLMs.
 round,Round,Rounds a number to nearest integer
 route,Route,Routes a single value to one of two outputs based on a boolean condition
+run-code,Run Code,Run Python or JavaScript in a sandbox with no internet access. Variables and files you create stay available to later calls in this run. Print what you want to see: printed output and errors come back to you. A matplotlib figure that is still open when the code finishes comes back as an image. Prefer small steps you can check over one long script.
 search-internet,Search the Internet,Search the web using Firecrawl Search - returns clean search results with titles, links, and snippets
 self-healing-error,Self Healing Error,Throws an error initially but succeeds on retry, useful for testing retry logic and error recovery.
 semantic-search,Semantic Search,Search knowledge base using semantic similarity and vector embeddings
