@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- **A `{{token}}` can carry its own fallback.** In the **System Prompt** and **Message** nodes, `{{name:"Unknown Name"}}` fills in `name`'s value, or `Unknown Name` when the variable is missing, null or blank. Inside the quotes, `\"` is a quote and `\\` a backslash. Spaces inside the braces are allowed, so `{{ name }}` now fills like `{{name}}` (it was left as written). A fallback ends a System Prompt's fixed part the way a value does, so `cache_prefix_length` stops there too. A token naming nothing, with no fallback, is still left as written. A default set on the Input Data node is still the value itself; a token's fallback is only how that one spot reads when the value is blank. Same in the Python SDK. Covered by new `system-prompt` and `message` test cases.
+- **A `{{token}}` can carry its own fallback.** In the **System Prompt** and **Message** nodes, `{{name:"Unknown Name"}}` fills in `name`'s value, or `Unknown Name` when the variable is missing, null or blank. Inside the quotes, `\"` is a quote, `\\` a backslash and `\n` a newline; a fallback can't contain `}}`, which ends the token. Spaces inside the braces are allowed, so `{{ name }}` now fills like `{{name}}` (it was left as written), and a prompt that shows the syntax itself, like `{{user_name:"Guest"}}`, now reads `Guest` even with no variables connected. A fallback ends a System Prompt's fixed part the way a value does, so `cache_prefix_length` stops there too. A token naming nothing, with no fallback, is still left as written. A default set on the Input Data node is still the value itself; a token's fallback is only how that one spot reads when the value is blank. Same in the Python SDK. Covered by new `system-prompt` and `message` test cases.
 
 ## 2.6.0 — 2026-10
 

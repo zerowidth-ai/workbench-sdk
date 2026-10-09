@@ -44,7 +44,7 @@ def _resolve_token(variables: list, inner: str):
     if not m:
         return None
     key = m.group(1)
-    fallback = None if m.group(2) is None else re.sub(r"\\(.)", r"\1", m.group(2))
+    fallback = None if m.group(2) is None else re.sub(r"\\(.)", lambda e: "\n" if e.group(1) == "n" else e.group(1), m.group(2))
     found = next((v for v in variables if isinstance(v, dict) and key in v), None)
     value = found[key] if found is not None else None
     if not _is_empty(value):

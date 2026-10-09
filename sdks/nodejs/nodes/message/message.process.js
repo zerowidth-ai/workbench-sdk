@@ -22,7 +22,8 @@ const renderVariable = (value) => {
 /**
  * A token's key and its fallback: `name`, or `name:"Unknown Name"` for the
  * text to use when `name` is missing or empty. Inside the quotes, `\"` is a
- * quote and `\\` a backslash. Same rules as the System Prompt node.
+ * quote, `\\` a backslash and `\n` a newline. Same rules as the System
+ * Prompt node.
  */
 const TOKEN = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::\s*"((?:[^"\\]|\\.)*)")?\s*$/;
 
@@ -36,7 +37,7 @@ const resolveToken = (variables, inner) => {
   const m = TOKEN.exec(inner);
   if (!m) return null;
   const key = m[1];
-  const fallback = m[2] === undefined ? undefined : m[2].replace(/\\(.)/g, "$1");
+  const fallback = m[2] === undefined ? undefined : m[2].replace(/\\(.)/g, (_, c) => (c === "n" ? "\n" : c));
   const found = variables.find((v) => Object.keys(v).includes(key));
   const value = found ? found[key] : undefined;
   if (!isEmpty(value)) return renderVariable(value);

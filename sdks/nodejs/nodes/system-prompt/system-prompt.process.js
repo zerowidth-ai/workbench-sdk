@@ -22,7 +22,8 @@ const renderVariable = (value) => {
 /**
  * A token's key and its fallback: `name`, or `name:"Unknown Name"` for the
  * text to use when `name` is missing or empty. Inside the quotes, `\"` is a
- * quote and `\\` a backslash. Spaces around the parts are allowed. Null when
+ * quote, `\\` a backslash and `\n` a newline. Spaces around the parts are
+ * allowed. A fallback can't hold `}}`, since that ends the token. Null when
  * the token isn't in either form.
  */
 const TOKEN = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::\s*"((?:[^"\\]|\\.)*)")?\s*$/;
@@ -31,7 +32,7 @@ const parseToken = (inner) => {
   if (!m) return null;
   return {
     key: m[1],
-    fallback: m[2] === undefined ? undefined : m[2].replace(/\\(.)/g, "$1"),
+    fallback: m[2] === undefined ? undefined : m[2].replace(/\\(.)/g, (_, c) => (c === "n" ? "\n" : c)),
   };
 };
 

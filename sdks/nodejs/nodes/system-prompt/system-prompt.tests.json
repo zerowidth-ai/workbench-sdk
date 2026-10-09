@@ -1,5 +1,14 @@
 [
   {
+    "description": "A fallback's \\n is a newline",
+    "inputs": { "variables": [] },
+    "settings": { "content": "Notes: {{notes:\"none yet\\nask the user\"}}" },
+    "expected": {
+      "message": { "role": "system", "content": [{ "type": "text", "text": "Notes: none yet\nask the user", "cache_prefix_length": 7 }] },
+      "prompt": "Notes: none yet\nask the user"
+    }
+  },
+  {
     "description": "A token's fallback is used when its variable is missing",
     "inputs": { "variables": [] },
     "settings": { "content": "Hello {{name:\"there\"}}!" },
